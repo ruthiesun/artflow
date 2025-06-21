@@ -1,6 +1,8 @@
 package com.artflow.artflow.repository;
 
 import com.artflow.artflow.model.User;
+import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.UserProjectId;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -8,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,6 +28,9 @@ public class UserRepositoryTest {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private UserProjectRepository userProjectRepository;
 	
 	@Test
 	public void canCreateUser() {
@@ -180,6 +187,53 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void deletionPropagatesToProjects() {
-	
+		String email1 = "testEmail1";
+		String password1 = "testPassword1";
+		String email2 = "testEmail2";
+		String password2 = "testPassword2";
+		String projectName1 = "test project a";
+		String projectName2 = "test project b";
+		String projectName3 = "test project c";
+		
+		// create new users
+		User user1 = new User(email1, password1);
+		userRepository.save(user1);
+		User user2 = new User(email2, password2);
+		userRepository.save(user2);
+		assertEquals(2, userRepository.count());
+		assertEquals(0, userProjectRepository.count());
+		
+		// add projects to user 1
+		UserProjectId projectId1 = new UserProjectId(user1.getId(), projectName1);
+		UserProject project1 = new UserProject(projectId1);
+		project1.setUser(user1);
+		UserProjectId projectId2 = new UserProjectId(user1.getId(), projectName2);
+		UserProject project2 = new UserProject(projectId2);
+		project2.setUser(user1);
+		UserProjectId projectId3 = new UserProjectId(user1.getId(), projectName3);
+		UserProject project3 = new UserProject(projectId3);
+		project3.setUser(user1);
+		userProjectRepository.save(project1);
+		userProjectRepository.save(project2);
+		userProjectRepository.save(project3);
+		assertEquals(3, userProjectRepository.count());
+		
+		// add projects to user 2
+		UserProjectId projectId1User2 = new UserProjectId(user2.getId(), projectName1);
+		UserProject project1User2 = new UserProject(projectId1User2);
+		project1User2.setUser(user2);
+		userProjectRepository.save(project1User2);
+		assertEquals(4, userProjectRepository.count());
+		
+		// test that projects are available in user class
+		entityManager.flush();
+		entityManager.clear();
+		user1 = userRepository.getReferenceById(user1.getId());
+		assertEquals(3, user1.getProjects().size());
+		
+		// test that projects are deleted if user is deleted
+		userRepository.delete(user1);
+		assertEquals(1, userRepository.count());
+		assertEquals(1, userProjectRepository.count());
 	}
 }

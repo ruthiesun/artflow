@@ -2,9 +2,6 @@ package com.artflow.artflow.repository;
 
 import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.ProjectImageId;
-import com.artflow.artflow.model.ProjectTag;
-import com.artflow.artflow.model.ProjectTagId;
-import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.UserProjectId;
@@ -17,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

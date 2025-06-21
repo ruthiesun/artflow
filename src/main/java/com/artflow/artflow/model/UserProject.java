@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
@@ -18,16 +17,10 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "user_project")
@@ -62,6 +55,9 @@ public class UserProject {
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
 	@OrderBy("position ASC")
 	private List<ProjectImage> images = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+	private List<ProjectTag> projectTags = new ArrayList<>();
 	
 	@PrePersist
 	public void prePersist() {
@@ -148,5 +144,12 @@ public class UserProject {
 		this.images = images;
 	}
 	
+	public List<ProjectTag> getProjectTags() {
+		return projectTags;
+	}
+	
+	public void setProjectTags(List<ProjectTag> projectTags) {
+		this.projectTags = projectTags;
+	}
 }
 
