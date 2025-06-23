@@ -1,10 +1,8 @@
 package com.artflow.artflow.repository;
 
 import com.artflow.artflow.model.ProjectImage;
-import com.artflow.artflow.model.ProjectImageId;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.UserProjectId;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,6 +74,70 @@ public class ProjectImageRepositoryTest {
 		assertEquals(2, projectImageRepository.count());
 		assertTrue(projectImageRepository.findById(image1.getId()).isPresent());
 		assertTrue(projectImageRepository.findById(image2.getId()).isPresent());
+	}
+	
+	@Test
+	public void cannotCreateImagesWithSamePosition() {
+		String url1 = "testUrl1";
+		String url2 = "testUrl2";
+		int position = 0;
+		
+		ProjectImage image1 = new ProjectImage(project, position, url1);
+		ProjectImage image2 = new ProjectImage(project, position, url2);
+		projectImageRepository.save(image1);
+		
+		assertThrows(RuntimeException.class, () -> {
+			projectImageRepository.saveAndFlush(image2);
+		});
+	}
+	
+	@Test
+	public void canUpdatePosition() {
+		String url = "testUrl";
+		int position1 = 0;
+		int position2 = 1;
+		
+		ProjectImage image = new ProjectImage(project, position1, url);
+		projectImageRepository.save(image);
+		image.setPosition(position2);
+		entityManager.flush();
+		entityManager.clear();
+		
+		assertEquals(position2, projectImageRepository.getReferenceById(image.getId()).getPosition());
+	}
+	
+	@Test
+	public void cannotUpdateImagesWithSamePosition() {
+		String url1 = "testUrl1";
+		String url2 = "testUrl2";
+		int position1 = 0;
+		int position2 = 1;
+		
+		ProjectImage image1 = new ProjectImage(project, position1, url1);
+		ProjectImage image2 = new ProjectImage(project, position2, url2);
+		projectImageRepository.save(image1);
+		projectImageRepository.save(image2);
+		
+		assertThrows(RuntimeException.class, () -> {
+			image1.setPosition(position2);
+			entityManager.flush();
+			entityManager.clear();
+		});
+	}
+	
+	@Test
+	public void cannotNullifyPosition() {
+		String url = "testUrl";
+		int position = 0;
+		
+		ProjectImage image = new ProjectImage(project, position, url);
+		projectImageRepository.save(image);
+		
+		assertThrows(RuntimeException.class, () -> {
+			image.setPosition(null);
+			entityManager.flush();
+			entityManager.clear();
+		});
 	}
 	
 	@Test

@@ -2,7 +2,6 @@ package com.artflow.artflow.repository;
 
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.UserProjectId;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -10,11 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

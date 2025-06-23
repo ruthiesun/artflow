@@ -1,17 +1,12 @@
 package com.artflow.artflow.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +22,7 @@ public class ProjectImage {
 	private Long id;
 	
 	@Column(name = "position", nullable = false)
-	private int position;
+	private Integer position;
 	
 	@Column(name = "caption")
 	private String caption;
@@ -59,11 +54,11 @@ public class ProjectImage {
 		this.id = id;
 	}
 	
-	public int getPosition() {
+	public Integer getPosition() {
 		return position;
 	}
 	
-	public void setPosition(int position) {
+	public void setPosition(Integer position) {
 		this.position = position;
 	}
 	

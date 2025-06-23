@@ -5,7 +5,6 @@ import com.artflow.artflow.model.ProjectTagId;
 import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.UserProjectId;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

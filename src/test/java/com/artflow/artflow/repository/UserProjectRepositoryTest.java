@@ -1,13 +1,7 @@
 package com.artflow.artflow.repository;
 
-import com.artflow.artflow.model.ProjectImage;
-import com.artflow.artflow.model.ProjectImageId;
-import com.artflow.artflow.model.ProjectTag;
-import com.artflow.artflow.model.ProjectTagId;
-import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.UserProjectId;
 import com.artflow.artflow.model.Visibility;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +97,51 @@ public class UserProjectRepositoryTest {
 		
 		assertThrows(RuntimeException.class, () -> {
 			projectRepository.saveAndFlush(project2);
+		});
+	}
+	
+	@Test
+	public void canUpdateProjectName() {
+		String projectName1 = "test project 1";
+		String projectName2 = "test project 2";
+		
+		UserProject project = new UserProject(user, projectName1);
+		projectRepository.save(project);
+		project.setProjectName(projectName2);
+		entityManager.flush();
+		entityManager.clear();
+		
+		assertEquals(projectName2, projectRepository.getReferenceById(project.getId()).getProjectName());
+	}
+	
+	@Test
+	public void cannotUpdateProjectsWithSameName() {
+		String projectName1 = "test project 1";
+		String projectName2 = "test project 2";
+		
+		UserProject project1 = new UserProject(user, projectName1);
+		UserProject project2 = new UserProject(user, projectName2);
+		projectRepository.save(project1);
+		projectRepository.save(project2);
+		
+		assertThrows(RuntimeException.class, () -> {
+			project1.setProjectName(projectName2);
+			entityManager.flush();
+			entityManager.clear();
+		});
+	}
+	
+	@Test
+	public void cannotNullifyProjectName() {
+		String projectName = "test project";
+		
+		UserProject project = new UserProject(user, projectName);
+		projectRepository.save(project);
+		
+		assertThrows(RuntimeException.class, () -> {
+			project.setProjectName(null);
+			entityManager.flush();
+			entityManager.clear();
 		});
 	}
 	
