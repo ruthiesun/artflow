@@ -1,0 +1,114 @@
+package com.artflow.artflow.service;
+
+import com.artflow.artflow.dto.ProjectDto;
+import com.artflow.artflow.dto.ProjectCreateDto;
+import com.artflow.artflow.dto.ProjectUpdateDto;
+import com.artflow.artflow.exception.ProjectNameInUseException;
+import com.artflow.artflow.exception.ProjectNotFoundException;
+import com.artflow.artflow.model.User;
+import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.Visibility;
+import com.artflow.artflow.repository.UserProjectRepository;
+import com.artflow.artflow.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+public class ProjectService {
+	private final UserProjectRepository projectRepo;
+	private final UserRepository userRepo;
+	
+	public ProjectService(UserProjectRepository projectRepo, UserRepository userRepo) {
+		this.projectRepo = projectRepo;
+		this.userRepo = userRepo;
+	}
+	
+	public ProjectDto create(ProjectCreateDto projectInitDto, String userEmail) {
+		User user = userRepo.findByEmail(userEmail).get();
+		if (projectRepo.findByOwner_EmailAndProjectName(userEmail, projectInitDto.getProjectName()).isPresent()) {
+			throw new ProjectNameInUseException(projectInitDto.getProjectName());
+		}
+		UserProject project = new UserProject(user, projectInitDto.getProjectName());
+		project.setDescription(projectInitDto.getDescription());
+		createAndAddTagsToProject(projectInitDto.getTagStrings(), project);
+		setProjectVisibility(projectInitDto.getVisibility(), project);
+		return toDto(projectRepo.save(project));
+	}
+	
+	public List<ProjectDto> getUserProjects(String userEmail) {
+		Optional<List<UserProject>> projects = projectRepo.findByOwner_Email(userEmail);
+		return projects.map(this::toDto).orElseGet(ArrayList::new);
+	}
+
+	public List<ProjectDto> getPublicUserProjects(String userEmail) {
+		Optional<List<UserProject>> projects = projectRepo.findByOwner_EmailAndVisibility(userEmail, Visibility.PUBLIC);
+		return projects.map(this::toDto).orElseGet(ArrayList::new);
+	}
+
+	public ProjectDto getProject(Long projectId, String userEmail) {
+		UserProject project = projectRepo.findByOwner_EmailAndId(userEmail, projectId)
+				.orElseThrow(() -> new ProjectNotFoundException(projectId, userEmail));
+		return toDto(project);
+	}
+
+	public ProjectDto updateProject(ProjectUpdateDto projectUpdateDto, String userEmail) {
+		UserProject project = projectRepo.findByOwner_EmailAndId(userEmail, projectUpdateDto.getId())
+				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), userEmail));
+		Optional<UserProject> projectWithRequestedName = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectUpdateDto.getProjectName());
+		if (projectWithRequestedName.isPresent() && !Objects.equals(projectWithRequestedName.get().getId(), project.getId())) {
+			throw new ProjectNameInUseException(projectUpdateDto.getProjectName());
+		}
+		project.setProjectName(project.getProjectName());
+		project.setDescription(projectUpdateDto.getDescription());
+		project.setVisibility(projectUpdateDto.getVisibility());
+		createAndAddTagsToProject(projectUpdateDto.getTagStrings(), project);
+		return toDto(projectRepo.save(project));
+	}
+
+	public void deleteProject(Long projectId, String userEmail) {
+		Optional<UserProject> foundProject = projectRepo.findByOwner_EmailAndId(userEmail, projectId);
+		if (foundProject.isEmpty()) {
+			return;
+		}
+		projectRepo.delete(foundProject.get());
+	}
+	
+	private void createAndAddTagsToProject(List<String> tagStrings, UserProject project) {
+		// todo
+		// call tagservice to add tags that don't exist yet
+		// ensure project tags are added to projecttagservice
+	}
+	
+	private void setProjectVisibility(Visibility visibility, UserProject project) {
+		if (visibility == null) {
+			project.setVisibility(Visibility.PRIVATE);
+		}
+		else {
+			project.setVisibility(visibility);
+		}
+	}
+	
+	private List<ProjectDto> toDto(List<UserProject> projects) {
+		List<ProjectDto> projectDtos = new ArrayList<>();
+		for (UserProject project : projects) {
+			projectDtos.add(toDto(project));
+		}
+		return projectDtos;
+	}
+	
+	private ProjectDto toDto(UserProject project) {
+		return new ProjectDto(
+				project.getId(),
+				project.getProjectName(),
+				project.getDescription(),
+				project.getVisibility(),
+				project.getCreatedDateTime(),
+				project.getUpdatedDateTime()
+		);
+	}
+}
+

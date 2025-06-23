@@ -2,6 +2,7 @@ package com.artflow.artflow.security.filter;
 
 import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.security.authentication.UserAuthentication;
+import com.artflow.artflow.security.exception.UnsupportedAuthException;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
 import jakarta.servlet.FilterChain;
@@ -48,8 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	String stripBearerPrefix(String token) {
 		
-		if (!token.startsWith("Bearer")) {
-			throw new RuntimeException("Unsupported authentication scheme");
+		if (!token.startsWith(AuthConstants.BEARER_TOKEN_PREAMBLE)) {
+			throw new UnsupportedAuthException("Unsupported authentication scheme");
 		}
 		
 		return token.substring(7);

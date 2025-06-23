@@ -1,5 +1,6 @@
 package com.artflow.artflow.security.service;
 
+import com.artflow.artflow.security.exception.InvalidTokenException;
 import com.artflow.artflow.security.user.AuthUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -26,7 +27,7 @@ public class JwtService {
 			String email = decodedJWT.getSubject();
 			return new AuthUser(email);
 		} catch (JWTVerificationException exception) {
-			throw new RuntimeException("JWT is not valid");
+			throw new InvalidTokenException();
 		}
 	}
 	
