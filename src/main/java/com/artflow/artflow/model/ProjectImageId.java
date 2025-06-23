@@ -8,8 +8,7 @@ import java.util.Objects;
 
 @Embeddable
 public class ProjectImageId implements Serializable {
-	@Embedded
-	private UserProjectId userProjectId;
+	private Long userProjectId;
 
 	private int position;
 	
@@ -29,16 +28,16 @@ public class ProjectImageId implements Serializable {
 	
 	public ProjectImageId() {}
 	
-	public ProjectImageId(UserProjectId userProjectId, int position) {
+	public ProjectImageId(Long userProjectId, int position) {
 		this.userProjectId = userProjectId;
 		this.position = position;
 	}
 	
-	public UserProjectId getUserProjectId() {
+	public Long getUserProjectId() {
 		return userProjectId;
 	}
 	
-	public void setUserProjectId(UserProjectId userProjectId) {
+	public void setUserProjectId(Long userProjectId) {
 		this.userProjectId = userProjectId;
 	}
 	

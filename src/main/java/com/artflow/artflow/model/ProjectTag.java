@@ -30,10 +30,7 @@ public class ProjectTag {
 	
 	@MapsId("userProjectId")
 	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "user_id", referencedColumnName = "user_id"),
-			@JoinColumn(name = "project_name", referencedColumnName = "project_name")
-	})
+	@JoinColumn(name = "project_id", referencedColumnName = "project_id")
 	private UserProject project;
 	
 	public ProjectTag() {}

@@ -204,24 +204,16 @@ public class UserRepositoryTest {
 		assertEquals(0, userProjectRepository.count());
 		
 		// add projects to user 1
-		UserProjectId projectId1 = new UserProjectId(user1.getId(), projectName1);
-		UserProject project1 = new UserProject(projectId1);
-		project1.setUser(user1);
-		UserProjectId projectId2 = new UserProjectId(user1.getId(), projectName2);
-		UserProject project2 = new UserProject(projectId2);
-		project2.setUser(user1);
-		UserProjectId projectId3 = new UserProjectId(user1.getId(), projectName3);
-		UserProject project3 = new UserProject(projectId3);
-		project3.setUser(user1);
+		UserProject project1 = new UserProject(user1, projectName1);
+		UserProject project2 = new UserProject(user1, projectName2);
+		UserProject project3 = new UserProject(user1, projectName3);;
 		userProjectRepository.save(project1);
 		userProjectRepository.save(project2);
 		userProjectRepository.save(project3);
 		assertEquals(3, userProjectRepository.count());
 		
 		// add projects to user 2
-		UserProjectId projectId1User2 = new UserProjectId(user2.getId(), projectName1);
-		UserProject project1User2 = new UserProject(projectId1User2);
-		project1User2.setUser(user2);
+		UserProject project1User2 = new UserProject(user2, projectName1);
 		userProjectRepository.save(project1User2);
 		assertEquals(4, userProjectRepository.count());
 		

@@ -9,8 +9,8 @@ import java.util.Objects;
 
 @Embeddable
 public class ProjectTagId implements Serializable {
-	@Embedded
-	private UserProjectId userProjectId;
+	
+	private Long userProjectId;
 	
 	private Long tagId;
 	
@@ -30,16 +30,16 @@ public class ProjectTagId implements Serializable {
 	
 	public ProjectTagId() {}
 	
-	public ProjectTagId(UserProjectId userProjectId, Long tagId) {
+	public ProjectTagId(Long userProjectId, Long tagId) {
 		this.userProjectId = userProjectId;
 		this.tagId = tagId;
 	}
 	
-	public UserProjectId getUserProjectId() {
+	public Long getUserProjectId() {
 		return userProjectId;
 	}
 	
-	public void setUserProjectId(UserProjectId userProjectId) {
+	public void setUserProjectId(Long userProjectId) {
 		this.userProjectId = userProjectId;
 	}
 	

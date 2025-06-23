@@ -24,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class ProjectImageRepositoryTest {
-	private static final Logger LOG = LoggerFactory.getLogger(ProjectImageRepositoryTest.class);
-	private final String EMAIL = "testEmail";
-	private final String PASSWORD = "testPassword";
-	private final String PROJECT_NAME = "test project";
+	private static final Logger log = LoggerFactory.getLogger(ProjectImageRepositoryTest.class);
+	private final String email = "testEmail";
+	private final String password = "testPassword";
+	private final String projectName = "test project";
 	
 	@Autowired
 	private EntityManager entityManager;
@@ -51,13 +51,11 @@ public class ProjectImageRepositoryTest {
 		
 		assertEquals(0, projectImageRepository.count());
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
 		
 		assertEquals(1, projectImageRepository.count());
-		Optional<ProjectImage> foundProjectImage = projectImageRepository.findById(imageId);
+		Optional<ProjectImage> foundProjectImage = projectImageRepository.findById(image.getId());
 		assertTrue(foundProjectImage.isPresent());
 	}
 	
@@ -70,18 +68,14 @@ public class ProjectImageRepositoryTest {
 		
 		assertEquals(0, projectImageRepository.count());
 		
-		ProjectImageId imageId1 = new ProjectImageId(project.getId(), position1);
-		ProjectImage image1 = new ProjectImage(imageId1, url1);
-		image1.setProject(project);
-		ProjectImageId imageId2 = new ProjectImageId(project.getId(), position2);
-		ProjectImage image2 = new ProjectImage(imageId2, url2);
-		image2.setProject(project);
+		ProjectImage image1 = new ProjectImage(project, position1, url1);
+		ProjectImage image2 = new ProjectImage(project, position2, url2);
 		projectImageRepository.save(image1);
 		projectImageRepository.save(image2);
 		
 		assertEquals(2, projectImageRepository.count());
-		assertTrue(projectImageRepository.findById(imageId1).isPresent());
-		assertTrue(projectImageRepository.findById(imageId2).isPresent());
+		assertTrue(projectImageRepository.findById(image1.getId()).isPresent());
+		assertTrue(projectImageRepository.findById(image2.getId()).isPresent());
 	}
 	
 	@Test
@@ -90,18 +84,16 @@ public class ProjectImageRepositoryTest {
 		int position = 0;
 		String caption = "test caption";
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
-		ProjectImage foundImage = projectImageRepository.getReferenceById(imageId);
+		ProjectImage foundImage = projectImageRepository.getReferenceById(image.getId());
 		assertNull(foundImage.getCaption());
 		
 		foundImage.setCaption(caption);
 		entityManager.flush();
 		entityManager.clear();
 		
-		assertEquals(caption, projectImageRepository.getReferenceById(imageId).getCaption());
+		assertEquals(caption, projectImageRepository.getReferenceById(image.getId()).getCaption());
 	}
 	
 	@Test
@@ -110,11 +102,9 @@ public class ProjectImageRepositoryTest {
 		int position = 0;
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
-		ProjectImage foundImage = projectImageRepository.getReferenceById(imageId);
+		ProjectImage foundImage = projectImageRepository.getReferenceById(image.getId());
 		assertNull(foundImage.getCaption());
 		
 		foundImage.setDateTime(currentDateTime);
@@ -123,7 +113,7 @@ public class ProjectImageRepositoryTest {
 		
 		assertEquals(
 				currentDateTime.truncatedTo(ChronoUnit.SECONDS),
-				projectImageRepository.getReferenceById(imageId).getDateTime().truncatedTo(ChronoUnit.SECONDS)
+				projectImageRepository.getReferenceById(image.getId()).getDateTime().truncatedTo(ChronoUnit.SECONDS)
 		);
 	}
 	
@@ -133,18 +123,16 @@ public class ProjectImageRepositoryTest {
 		String url2 = "testUrl2";
 		int position = 0;
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url1);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url1);
 		projectImageRepository.save(image);
-		ProjectImage foundImage = projectImageRepository.getReferenceById(imageId);
+		ProjectImage foundImage = projectImageRepository.getReferenceById(image.getId());
 		assertEquals(url1, foundImage.getUrl());
 		
 		foundImage.setUrl(url2);
 		entityManager.flush();
 		entityManager.clear();
 		
-		assertEquals(url2, projectImageRepository.getReferenceById(imageId).getUrl());
+		assertEquals(url2, projectImageRepository.getReferenceById(image.getId()).getUrl());
 	}
 	
 	@Test
@@ -152,13 +140,11 @@ public class ProjectImageRepositoryTest {
 		String url = "testUrl";
 		int position = 0;
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
 		
 		assertThrows(RuntimeException.class, () -> {
-			projectImageRepository.getReferenceById(imageId).setUrl(null);
+			projectImageRepository.getReferenceById(image.getId()).setUrl(null);
 			entityManager.flush();
 		});
 	}
@@ -168,28 +154,24 @@ public class ProjectImageRepositoryTest {
 		String url = "testUrl";
 		int position = 0;
 		
-		ProjectImageId imageId = new ProjectImageId(project.getId(), position);
-		ProjectImage image = new ProjectImage(imageId, url);
-		image.setProject(project);
+		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
 		
 		assertEquals(1, projectImageRepository.count());
-		projectImageRepository.delete(projectImageRepository.getReferenceById(imageId));
+		projectImageRepository.delete(projectImageRepository.getReferenceById(image.getId()));
 		assertEquals(0, projectImageRepository.count());
 	}
 	
 	@BeforeEach
 	public void setup() {
-		user = new User(EMAIL, PASSWORD);
+		user = new User(email, password);
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
-		LOG.info("created test user");
+		log.info("created test user");
 		
-		UserProjectId projectId = new UserProjectId(user.getId(), PROJECT_NAME);
-		project = new UserProject(projectId);
-		project.setUser(user);
+		project = new UserProject(user, projectName);
 		projectRepository.save(project);
-		project = projectRepository.getReferenceById(projectId);
-		LOG.info("created test project");
+		project = projectRepository.getReferenceById(project.getId());
+		log.info("created test project");
 	}
 }

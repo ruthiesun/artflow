@@ -5,24 +5,29 @@ import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "project_image")
+@Table(name = "project_image", uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "position"}))
 public class ProjectImage {
-	@EmbeddedId
-	@AttributeOverrides({
-			@AttributeOverride(name = "position", column = @Column(name = "position"))
-	})
-	private ProjectImageId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "image_id")
+	private Long id;
+	
+	@Column(name = "position", nullable = false)
+	private int position;
 	
 	@Column(name = "caption")
 	private String caption;
@@ -34,27 +39,32 @@ public class ProjectImage {
 	@Column(name = "url", nullable = false)
 	private String url;
 	
-	@MapsId("userProjectId")
 	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "user_id", referencedColumnName = "user_id"),
-			@JoinColumn(name = "project_name", referencedColumnName = "project_name")
-	})
+	@JoinColumn(name = "project_id")
 	private UserProject project;
 	
 	public ProjectImage() {}
 	
-	public ProjectImage(ProjectImageId id, String url) {
-		this.id = id;
+	public ProjectImage(UserProject project, int position, String url) {
+		this.project = project;
+		this.position = position;
 		this.url = url;
 	}
 	
-	public ProjectImageId getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(ProjectImageId id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public int getPosition() {
+		return position;
+	}
+	
+	public void setPosition(int position) {
+		this.position = position;
 	}
 	
 	public String getCaption() {
@@ -84,9 +94,8 @@ public class ProjectImage {
 	public UserProject getProject() {
 		return project;
 	}
-
+	
 	public void setProject(UserProject project) {
 		this.project = project;
 	}
-	
 }

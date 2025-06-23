@@ -10,11 +10,11 @@ import java.util.Objects;
 public class UserProjectId implements Serializable {
 	private Long userId;
 	
-	private String projectName;
+	private Long projectId;
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(userId, projectName);
+		return Objects.hash(userId, projectId);
 	}
 	
 	@Override
@@ -23,14 +23,14 @@ public class UserProjectId implements Serializable {
 		if (!(obj instanceof UserProjectId)) return false;
 		UserProjectId that = (UserProjectId) obj;
 		return Objects.equals(userId, that.userId) &&
-				Objects.equals(projectName, that.projectName);
+				Objects.equals(projectId, that.projectId);
 	}
 	
 	public UserProjectId() {}
 	
-	public UserProjectId(Long userId, String projectName) {
+	public UserProjectId(Long userId, Long projectId) {
 		this.userId = userId;
-		this.projectName = projectName;
+		this.projectId = projectId;
 	}
 	
 	public Long getUserId() {
@@ -41,11 +41,11 @@ public class UserProjectId implements Serializable {
 		this.userId = userId;
 	}
 	
-	public String getProjectName() {
-		return projectName;
+	public Long getProjectId() {
+		return projectId;
 	}
 	
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
 	}
 }

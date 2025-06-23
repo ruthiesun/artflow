@@ -147,27 +147,25 @@ public class TagRepositoryTest {
 		String projectName2 = "test project 2";
 		String tagName1 = "test tag 1";
 		String tagName2 = "test tag 2";
-		
+
 		User user = new User("email", "password");
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
-		
+
 		// create projects
-		UserProject project1 = new UserProject(new UserProjectId(user.getId(), projectName1));
-		project1.setUser(user);
-		UserProject project2 = new UserProject(new UserProjectId(user.getId(), projectName2));
-		project2.setUser(user);
+		UserProject project1 = new UserProject(user, projectName1);
+		UserProject project2 = new UserProject(user, projectName2);
 		projectRepository.save(project1);
 		projectRepository.save(project2);
 		assertEquals(2, projectRepository.count());
-		
+
 		// create tags
 		Tag tag1 = new Tag(tagName1);
 		Tag tag2 = new Tag(tagName2);
 		tagRepository.save(tag1);
 		tagRepository.save(tag2);
 		assertEquals(2, tagRepository.count());
-		
+
 		// add tags to first project
 		ProjectTag projectTag1 = new ProjectTag(new ProjectTagId(project1.getId(), tag1.getId()));
 		projectTag1.setProject(project1);
@@ -178,20 +176,20 @@ public class TagRepositoryTest {
 		projectTagRepository.save(projectTag1);
 		projectTagRepository.save(projectTag2);
 		assertEquals(2, projectTagRepository.count());
-		
+
 		// add tags to second project
 		ProjectTag projectTag1Project2 = new ProjectTag(new ProjectTagId(project2.getId(), tag1.getId()));
 		projectTag1Project2.setProject(project2);
 		projectTag1Project2.setTag(tag1);
 		projectTagRepository.save(projectTag1Project2);
 		assertEquals(3, projectTagRepository.count());
-		
+
 		// test that project tags are available in tag class
 		entityManager.flush();
 		entityManager.clear();
 		tag1 = tagRepository.getReferenceById(tag1.getId());
 		assertEquals(2, tag1.getProjectTags().size());
-		
+
 		// test that project tags are deleted if tags are deleted
 		tagRepository.delete(tag1);
 		assertEquals(2, projectRepository.count());

@@ -5,7 +5,6 @@ import com.artflow.artflow.model.ProjectTagId;
 import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.UserProjectId;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class ProjectTagRepositoryTest {
-	private static final Logger LOG = LoggerFactory.getLogger(ProjectTagRepositoryTest.class);
-	private final String EMAIL = "testEmail";
-	private final String PASSWORD = "testPassword";
-	private final String PROJECT_NAME = "test project";
-	private final String TAG_1_NAME = "tag 1";
-	private final String TAG_2_NAME = "tag 2";
+	private static final Logger log = LoggerFactory.getLogger(ProjectTagRepositoryTest.class);
+	private final String email = "testEmail";
+	private final String password = "testPassword";
+	private final String projectName = "test project";
+	private final String tagName1 = "tag 1";
+	private final String tagName2 = "tag 2";
 	
 	@Autowired
 	private EntityManager entityManager;
@@ -119,24 +118,22 @@ public class ProjectTagRepositoryTest {
 	
 	@BeforeEach
 	public void setup() {
-		user = new User(EMAIL, PASSWORD);
+		user = new User(email, password);
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
-		LOG.info("created test user");
+		log.info("created test user");
 		
-		UserProjectId projectId = new UserProjectId(user.getId(), PROJECT_NAME);
-		project = new UserProject(projectId);
-		project.setUser(user);
+		project = new UserProject(user, projectName);
 		projectRepository.save(project);
-		project = projectRepository.getReferenceById(projectId);
-		LOG.info("created test project");
+		project = projectRepository.getReferenceById(project.getId());
+		log.info("created test project");
 		
-		tag1 = new Tag(TAG_1_NAME);
-		tag2 = new Tag(TAG_2_NAME);
+		tag1 = new Tag(tagName1);
+		tag2 = new Tag(tagName2);
 		tagRepository.save(tag1);
 		tagRepository.save(tag2);
 		tag1 = tagRepository.getReferenceById(tag1.getId());
 		tag2 = tagRepository.getReferenceById(tag2.getId());
-		LOG.info("created test tags");
+		log.info("created test tags");
 	}
 }

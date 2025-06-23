@@ -1,21 +1,21 @@
 package com.artflow.artflow.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -23,13 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user_project")
+@Table(name = "user_project", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "project_name"}))
 public class UserProject {
-	@EmbeddedId
-	@AttributeOverrides({
-			@AttributeOverride(name = "projectName", column = @Column(name = "project_name"))
-	})
-	private UserProjectId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "project_id")
+	private Long id;
+
+	@Column(name = "project_name", nullable = false)
+	private String projectName;
 	
 	@Column(name = "description")
 	private String description;
@@ -47,10 +49,9 @@ public class UserProject {
 	@Column(name = "visibility", nullable = false)
 	private Visibility visibility;
 	
-	@MapsId("userId")
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	private User user;
+	private User owner;
 	
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
 	@OrderBy("position ASC")
@@ -83,17 +84,26 @@ public class UserProject {
 		this.visibility = Visibility.PRIVATE;
 	}
 	
-	public UserProject(UserProjectId id) {
+	public UserProject(User owner, String projectName) {
 		this();
-		this.id = id;
+		this.owner = owner;
+		this.projectName = projectName;
 	}
 	
-	public UserProjectId getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(UserProjectId id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getProjectName() {
+		return projectName;
+	}
+	
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 	
 	public String getDescription() {
@@ -128,18 +138,18 @@ public class UserProject {
 		this.visibility = visibility;
 	}
 	
-	public User getUser() {
-		return user;
+	public User getOwner() {
+		return owner;
 	}
 	
-	public void setUser(User user) {
-		this.user = user;
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 	
 	public List<ProjectImage> getImages() {
 		return images;
 	}
-
+	
 	public void setImages(List<ProjectImage> images) {
 		this.images = images;
 	}
