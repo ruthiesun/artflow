@@ -1,6 +1,7 @@
 package com.artflow.artflow.controller;
 
 import com.artflow.artflow.common.AuthConstants;
+import com.artflow.artflow.controller.common.JsonUtil;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
@@ -9,11 +10,8 @@ import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.UserProjectRepository;
-import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
 import com.artflow.artflow.service.ProjectService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +24,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -71,7 +66,7 @@ public class ProjectControllerTest {
 
 	@Test
 	public void canCreateProject() throws Exception {
-		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", Visibility.PUBLIC);
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		
 		mockMvc.perform(post("/api/projects")
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
@@ -85,7 +80,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotCreateProjectsWithSameName() throws Exception {
-		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj", "desc", Visibility.PUBLIC);
+		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		projectService.create(projectCreateDto1, user.getEmail());
 		
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto();
@@ -103,15 +98,17 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
 		projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
-		Set<String> expectedProjects = new HashSet<>(List.of(projectCreateDto1.getProjectName(),
-				projectCreateDto2.getProjectName()));
 		
 		MvcResult res = mockMvc.perform(get("/api/projects")
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
 		
-		checkProjectsMockResponse(res, expectedProjects);
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName()))),
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto2.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
 	}
 	
 	@Test
@@ -123,7 +120,7 @@ public class ProjectControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 		
-		checkProjectsMockResponse(res, expectedProjects);
+		JsonUtil.checkMockResponses(objectMapper, new HashSet<>(), res);
 	}
 	
 	@Test
@@ -132,14 +129,16 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
 		projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
-		Set<String> expectedProjects = new HashSet<>(List.of(projectCreateDto1.getProjectName()));
 		
 		MvcResult res = mockMvc.perform(get("/api/projects/public")
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
 		
-		checkProjectsMockResponse(res, expectedProjects);
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
 	}
 	
 	@Test
@@ -149,12 +148,15 @@ public class ProjectControllerTest {
 		ProjectDto projectDto1 = projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
 		
-		MvcResult res = mockMvc.perform(get("/api/projects/" + projectDto1.getId())
+		MvcResult res = mockMvc.perform(get("/api/projects/" + projectDto1.getProjectName())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
 		
-		checkProjectMockResponse(res, projectCreateDto1.getProjectName());
+		Set<JsonUtil.Field> expectedProject = new HashSet<>(
+				List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName()))
+		);
+		JsonUtil.checkMockResponse(objectMapper, expectedProject, res);
 	}
 	
 	@Test
@@ -204,7 +206,7 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", Visibility.PRIVATE);
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.getEmail());
 		
-		mockMvc.perform(delete("/api/projects/" + projectDto.getId())
+		mockMvc.perform(delete("/api/projects/" + projectDto.getProjectName())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
@@ -225,33 +227,6 @@ public class ProjectControllerTest {
 	public void setup() {
 		user = new User("testemail", "testpassword");
 		token = authService.register(new SignupDto(user.getEmail(), user.getPassword())).getToken();
-	}
-	
-	private void checkProjectMockResponse(MvcResult res, String expectedProjectName) throws UnsupportedEncodingException, JsonProcessingException {
-		JsonNode projectNodeJson = objectMapper.readTree(res.getResponse().getContentAsString());
-		assertEquals(expectedProjectName, projectNodeJson.get("projectName").asText());
-	}
-	
-	private void checkProjectsMockResponse(MvcResult res, Set<String> expectedProjectNames) throws UnsupportedEncodingException, JsonProcessingException {
-		Iterator<JsonNode> projectNodeJsons = getProjectNodesFromMockResponse(res);
-		assertExpectedProjectNodes(expectedProjectNames, projectNodeJsons);
-	}
-	
-	private Iterator<JsonNode> getProjectNodesFromMockResponse(MvcResult res)
-			throws UnsupportedEncodingException, JsonProcessingException {
-		String resBody = res.getResponse().getContentAsString();
-		JsonNode resBodyJson = objectMapper.readTree(resBody);
-		return resBodyJson.elements();
-	}
-	
-	private void assertExpectedProjectNodes(Set<String> expectedProjectNames, Iterator<JsonNode> projectNodeJsons) {
-		while (projectNodeJsons.hasNext()) {
-			JsonNode currElem = projectNodeJsons.next();
-			String currElemName = currElem.get("projectName").asText();
-			assertTrue(expectedProjectNames.contains(currElemName));
-			expectedProjectNames.remove(currElemName);
-		}
-		assertTrue(expectedProjectNames.isEmpty());
 	}
 }
 

@@ -49,9 +49,9 @@ public class ProjectService {
 		return projects.map(this::toDto).orElseGet(ArrayList::new);
 	}
 
-	public ProjectDto getProject(Long projectId, String userEmail) {
-		UserProject project = projectRepo.findByOwner_EmailAndId(userEmail, projectId)
-				.orElseThrow(() -> new ProjectNotFoundException(projectId, userEmail));
+	public ProjectDto getProject(String projectName, String userEmail) {
+		UserProject project = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectName)
+				.orElseThrow(() -> new ProjectNotFoundException(projectName, userEmail));
 		return toDto(project);
 	}
 
@@ -69,8 +69,8 @@ public class ProjectService {
 		return toDto(projectRepo.save(project));
 	}
 
-	public void deleteProject(Long projectId, String userEmail) {
-		Optional<UserProject> foundProject = projectRepo.findByOwner_EmailAndId(userEmail, projectId);
+	public void deleteProject(String projectName, String userEmail) {
+		Optional<UserProject> foundProject = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectName);
 		if (foundProject.isEmpty()) {
 			return;
 		}

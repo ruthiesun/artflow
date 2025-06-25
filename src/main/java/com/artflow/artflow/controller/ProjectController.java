@@ -1,5 +1,6 @@
 package com.artflow.artflow.controller;
 
+import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
@@ -33,7 +34,7 @@ public class ProjectController {
 	public ResponseEntity<ProjectDto> create(@RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.email());
 		return ResponseEntity
-				.created(URI.create("/api/projects/" + projectDto.getId()))
+				.created(URI.create("/api/projects/" + UriUtil.toSlug(projectDto.getProjectName())))
 				.body(projectDto);
 	}
 	
@@ -47,9 +48,9 @@ public class ProjectController {
 		return ResponseEntity.ok(projectService.getPublicUserProjects(user.email()));
 	}
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<ProjectDto> getProject(@PathVariable Long id, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectService.getProject(id, user.email()));
+	@GetMapping("/{projectName}")
+	public ResponseEntity<ProjectDto> getProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectService.getProject(UriUtil.fromSlug(projectName), user.email()));
 	}
 	
 	@PutMapping()
@@ -57,9 +58,9 @@ public class ProjectController {
 		return ResponseEntity.ok(projectService.updateProject(projectUpdateDto, user.email()));
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal AuthUser user) {
-		projectService.deleteProject(id, user.email());
+	@DeleteMapping("/{projectName}")
+	public ResponseEntity<Void> delete(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		projectService.deleteProject(UriUtil.fromSlug(projectName), user.email());
 		return ResponseEntity.noContent().build();
 	}
 }

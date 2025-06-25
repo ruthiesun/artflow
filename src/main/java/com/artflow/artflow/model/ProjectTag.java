@@ -25,6 +25,11 @@ public class ProjectTag {
 	
 	public ProjectTag() {}
 	
+	public ProjectTag(Tag tag, UserProject project) {
+		this.tag = tag;
+		this.project = project;
+	}
+	
 	public ProjectTag(ProjectTagId id) {
 		this.id = id;
 	}
