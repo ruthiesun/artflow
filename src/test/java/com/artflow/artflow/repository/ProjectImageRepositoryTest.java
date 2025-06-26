@@ -121,7 +121,6 @@ public class ProjectImageRepositoryTest {
 		assertThrows(RuntimeException.class, () -> {
 			image1.setPosition(position2);
 			entityManager.flush();
-			entityManager.clear();
 		});
 	}
 	
@@ -136,7 +135,6 @@ public class ProjectImageRepositoryTest {
 		assertThrows(RuntimeException.class, () -> {
 			image.setPosition(null);
 			entityManager.flush();
-			entityManager.clear();
 		});
 	}
 	
@@ -218,12 +216,12 @@ public class ProjectImageRepositoryTest {
 		
 		ProjectImage image = new ProjectImage(project, position, url);
 		projectImageRepository.save(image);
-		
 		assertEquals(1, projectImageRepository.count());
 		entityManager.refresh(project);
 		assertEquals(1, project.getImages().size());
 		project.getImages().remove(0);
 		entityManager.flush();
+		
 		assertEquals(0, projectImageRepository.count());
 		entityManager.refresh(project);
 		assertEquals(0, project.getImages().size());

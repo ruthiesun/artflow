@@ -99,6 +99,7 @@ public class ProjectTagRepositoryTest {
 		projectTag2.setTag(tag1);
 		projectTagRepository.save(projectTag1);
 		projectTagRepository.save(projectTag2);
+		
 		assertEquals(1, projectTagRepository.count());
 	}
 	
@@ -113,6 +114,7 @@ public class ProjectTagRepositoryTest {
 		assertEquals(1, projectTagRepository.count());
 		ProjectTag foundProjectTag = projectTagRepository.getReferenceById(projectTagId);
 		projectTagRepository.delete(foundProjectTag);
+		
 		assertEquals(0, projectTagRepository.count());
 	}
 	

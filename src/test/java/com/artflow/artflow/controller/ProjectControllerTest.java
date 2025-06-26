@@ -113,8 +113,6 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canGetAllZeroProjects() throws Exception {
-		Set<String> expectedProjects = new HashSet<>();
-		
 		MvcResult res = mockMvc.perform(get("/api/projects")
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
@@ -221,6 +219,53 @@ public class ProjectControllerTest {
 		mockMvc.perform(delete("/api/projects/" + id)
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void canSignUpAndManageProjects() throws Exception {
+		SignupDto signupDto = new SignupDto("anothertestemail", "testpassword");
+		MvcResult signupResult = mockMvc.perform(post("/api/auth/signup")
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(signupDto)))
+				.andExpect(status().isOk())
+				.andReturn();
+		
+		String token = objectMapper.readTree(signupResult.getResponse().getContentAsString()).get("token").asText();
+		
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		MvcResult createResult = mockMvc.perform(post("/api/projects")
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+				.andExpect(status().isCreated())
+				.andReturn();
+		
+		Long projectId = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("id").asLong();
+		String projectName = "a new project name";
+		String description = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("description").asText();
+		Visibility visibility = Visibility.valueOf(objectMapper.readTree(createResult.getResponse().getContentAsString()).get("visibility").asText());
+		
+		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectId, projectName, description, visibility);
+		MvcResult updateResult = mockMvc.perform(put("/api/projects")
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
+				.andExpect(status().isOk())
+				.andReturn();
+		
+		projectName = objectMapper.readTree(updateResult.getResponse().getContentAsString()).get("projectName").asText();
+		
+		mockMvc.perform(get("/api/projects/" + projectName)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk());
+		
+		mockMvc.perform(delete("/api/projects/" + projectName)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isNoContent());
+		
+		mockMvc.perform(get("/api/projects/" + projectName)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isNotFound());
 	}
 	
 	@BeforeEach

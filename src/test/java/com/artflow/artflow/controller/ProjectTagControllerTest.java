@@ -2,13 +2,18 @@ package com.artflow.artflow.controller;
 
 import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.controller.common.JsonUtil;
+import com.artflow.artflow.dto.ProjectCreateDto;
+import com.artflow.artflow.dto.ProjectImageCreateDto;
+import com.artflow.artflow.dto.ProjectImageUpdateDto;
 import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.ProjectTagId;
 import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectTagRepository;
 import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
@@ -26,6 +31,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +43,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -254,6 +261,47 @@ public class ProjectTagControllerTest {
 		mockMvc.perform(delete("/api/projecttags/blah/blah")
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void canCreateProjectAndManageTags() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		MvcResult projectCreateResult = mockMvc.perform(post("/api/projects")
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+				.andExpect(status().isCreated())
+				.andReturn();
+		
+		Long projectId = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("id").asLong();
+		String projectName = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("projectName").asText();
+		String description = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("description").asText();
+		Visibility visibility = Visibility.valueOf(objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("visibility").asText());
+		
+		ProjectTagCreateDto projectTagCreateDto = new ProjectTagCreateDto(projectName, "an excellent tag");
+		MvcResult createResult = mockMvc.perform(post("/api/projecttags")
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+				.andExpect(status().isCreated())
+				.andReturn();
+		
+		String projectNameFromCreate = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("projectName").asText();
+		assertEquals(projectName, projectNameFromCreate);
+		String tagNameFromCreate = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("tagName").asText();
+		assertEquals(projectTagCreateDto.getTagName(), tagNameFromCreate);
+		
+		mockMvc.perform(get("/api/projecttags/" + projectName+ "/" + tagNameFromCreate)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk());
+		
+		mockMvc.perform(delete("/api/projecttags/" + projectName+ "/" + tagNameFromCreate)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isNoContent());
+		
+		mockMvc.perform(get("/api/projecttags/" + projectName+ "/" + tagNameFromCreate)
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isNotFound());
 	}
 	
 	@BeforeEach
