@@ -46,6 +46,14 @@ public class ProjectImage {
 		this.url = url;
 	}
 	
+	public ProjectImage(Integer position, String caption, LocalDateTime dateTime, String url, UserProject project) {
+		this.position = position;
+		this.caption = caption;
+		this.dateTime = dateTime;
+		this.url = url;
+		this.project = project;
+	}
+	
 	public Long getId() {
 		return id;
 	}

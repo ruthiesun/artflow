@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProjectTagRepository extends JpaRepository<ProjectTag, ProjectTagId> {
-	Optional<ProjectTag> findByTagNameAndProject_ProjectName(String tagName, String projectName);
-	Optional<List<ProjectTag>> findByProject_Owner_Email(String userEmail);
-	Optional<List<ProjectTag>> findByProject_ProjectName(String projectName);
+	Optional<ProjectTag> findByTagNameAndProject_ProjectNameAndProject_Owner_Email(String tagName, String projectName, String email);
+	List<ProjectTag> findByProject_Owner_Email(String userEmail);
+	List<ProjectTag> findByProject_ProjectNameAndProject_Owner_Email(String projectName, String email);
 }

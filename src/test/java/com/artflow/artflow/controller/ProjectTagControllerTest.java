@@ -14,7 +14,6 @@ import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
-import com.artflow.artflow.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,9 +69,6 @@ public class ProjectTagControllerTest {
 	@Autowired
 	private AuthService authService;
 	
-	@Autowired
-	private ProjectService projectService;
-	
 	private User user;
 	private UserProject project;
 	private Tag tag1;
@@ -92,7 +88,8 @@ public class ProjectTagControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
 				.andExpect(status().isCreated());
 		
-		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectName(tagName, projectName);
+		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(
+				tagName, projectName, project.getOwner().getEmail());
 		assertTrue(foundProjectTag.isPresent());
 	}
 	
@@ -109,7 +106,8 @@ public class ProjectTagControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
 				.andExpect(status().isCreated());
 		
-		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectName(tagName, projectName);
+		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(
+				tagName, projectName, project.getOwner().getEmail());
 		assertTrue(foundProjectTag.isPresent());
 	}
 	
@@ -182,7 +180,7 @@ public class ProjectTagControllerTest {
 	}
 	
 	@Test
-	public void canGetProjectTag() throws Exception {
+	public void canGetProjectTagForProject() throws Exception {
 		ProjectTag projectTag = new ProjectTag(new ProjectTagId(project.getId(), tag1.getId()));
 		projectTag.setProject(project);
 		projectTag.setTag(tag1);
@@ -201,7 +199,7 @@ public class ProjectTagControllerTest {
 	}
 	
 	@Test
-	public void canGetProjectTagsForParticularProject() throws Exception {
+	public void canGetProjectTagsForProject() throws Exception {
 		ProjectTag projectTag1 = new ProjectTag(new ProjectTagId(project.getId(), tag1.getId()));
 		projectTag1.setProject(project);
 		projectTag1.setTag(tag1);

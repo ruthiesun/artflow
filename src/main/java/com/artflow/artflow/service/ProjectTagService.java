@@ -31,7 +31,11 @@ public class ProjectTagService {
 	}
 	
 	public ProjectTagDto create(ProjectTagCreateDto projectTagCreateDto, String userEmail) {
-		if (projectTagRepo.findByTagNameAndProject_ProjectName(projectTagCreateDto.getTagName(), projectTagCreateDto.getProjectName()).isPresent()) {
+		if (projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(
+				projectTagCreateDto.getTagName(),
+				projectTagCreateDto.getProjectName(),
+				userEmail)
+				.isPresent()) {
 			throw new ProjectTagNameInUseException(projectTagCreateDto.getTagName(), projectTagCreateDto.getProjectName());
 		}
 		UserProject project = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectTagCreateDto.getProjectName())
@@ -43,24 +47,26 @@ public class ProjectTagService {
 		return toDto(projectTagRepo.save(projectTag));
 	}
 	
-	public ProjectTagDto getTagForProject(String projectName, String tagName) {
-		ProjectTag projectTag = projectTagRepo.findByTagNameAndProject_ProjectName(tagName, projectName)
+	public ProjectTagDto getTagForProject(String projectName, String tagName, String email) {
+		projectRepo.findByOwner_EmailAndProjectName(email, projectName)
+				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
+		ProjectTag projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email)
 				.orElseThrow(() -> new ProjectTagNotFoundException(tagName, projectName));
 		return toDto(projectTag);
 	}
 	
 	public List<ProjectTagDto> getTags(String userEmail) {
-		Optional<List<ProjectTag>> projectTags = projectTagRepo.findByProject_Owner_Email(userEmail);
-		return projectTags.map(this::toDto).orElseGet(ArrayList::new);
+		List<ProjectTag> projectTags = projectTagRepo.findByProject_Owner_Email(userEmail);
+		return toDto(projectTags);
 	}
 	
-	public List<ProjectTagDto> getTagsForProject(String projectName) {
-		Optional<List<ProjectTag>> projectTags = projectTagRepo.findByProject_ProjectName(projectName);
-		return projectTags.map(this::toDto).orElseGet(ArrayList::new);
+	public List<ProjectTagDto> getTagsForProject(String projectName, String email) {
+		List<ProjectTag> projectTags = projectTagRepo.findByProject_ProjectNameAndProject_Owner_Email(projectName, email);
+		return toDto(projectTags);
 	}
 	
-	public void deleteTag(String projectName, String tagName) {
-		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectName(tagName, projectName);
+	public void deleteTag(String projectName, String tagName, String email) {
+		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email);
 		projectTag.ifPresent(projectTagRepo::delete);
 	}
 	

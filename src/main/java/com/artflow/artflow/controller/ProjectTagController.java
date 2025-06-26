@@ -39,27 +39,29 @@ public class ProjectTagController {
 	}
 	
 	@GetMapping("/{projectName}/{tagName}")
-	public ResponseEntity<ProjectTagDto> get(@PathVariable String projectName, @PathVariable String tagName) {
+	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTagForProject(
 				UriUtil.fromSlug(projectName),
-				UriUtil.fromSlug(tagName)));
+				UriUtil.fromSlug(tagName),
+				user.email()));
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<ProjectTagDto>> get(@AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<List<ProjectTagDto>> getTags(@AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTags(user.email()));
 	}
 	
 	@GetMapping("/{projectName}")
-	public ResponseEntity<List<ProjectTagDto>> getMyPublicProjects(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectTagService.getTagsForProject(UriUtil.fromSlug(projectName)));
+	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectTagService.getTagsForProject(UriUtil.fromSlug(projectName), user.email()));
 	}
 	
 	@DeleteMapping("/{projectName}/{tagName}")
-	public ResponseEntity<Void> delete(@PathVariable String projectName, @PathVariable String tagName) {
+	public ResponseEntity<Void> delete(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		projectTagService.deleteTag(
 				UriUtil.fromSlug(projectName),
-				UriUtil.fromSlug(tagName));
+				UriUtil.fromSlug(tagName),
+				user.email());
 		return ResponseEntity.noContent().build();
 	}
 

@@ -220,8 +220,13 @@ public class ProjectImageRepositoryTest {
 		projectImageRepository.save(image);
 		
 		assertEquals(1, projectImageRepository.count());
-		projectImageRepository.delete(projectImageRepository.getReferenceById(image.getId()));
+		entityManager.refresh(project);
+		assertEquals(1, project.getImages().size());
+		project.getImages().remove(0);
+		entityManager.flush();
 		assertEquals(0, projectImageRepository.count());
+		entityManager.refresh(project);
+		assertEquals(0, project.getImages().size());
 	}
 	
 	@BeforeEach

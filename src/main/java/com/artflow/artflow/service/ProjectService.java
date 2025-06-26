@@ -40,13 +40,13 @@ public class ProjectService {
 	}
 	
 	public List<ProjectDto> getUserProjects(String userEmail) {
-		Optional<List<UserProject>> projects = projectRepo.findByOwner_Email(userEmail);
-		return projects.map(this::toDto).orElseGet(ArrayList::new);
+		List<UserProject> projects = projectRepo.findByOwner_Email(userEmail);
+		return toDto(projects);
 	}
 
 	public List<ProjectDto> getPublicUserProjects(String userEmail) {
-		Optional<List<UserProject>> projects = projectRepo.findByOwner_EmailAndVisibility(userEmail, Visibility.PUBLIC);
-		return projects.map(this::toDto).orElseGet(ArrayList::new);
+		List<UserProject> projects = projectRepo.findByOwner_EmailAndVisibility(userEmail, Visibility.PUBLIC);
+		return toDto(projects);
 	}
 
 	public ProjectDto getProject(String projectName, String userEmail) {
@@ -56,7 +56,7 @@ public class ProjectService {
 	}
 
 	public ProjectDto updateProject(ProjectUpdateDto projectUpdateDto, String userEmail) {
-		UserProject project = projectRepo.findByOwner_EmailAndId(userEmail, projectUpdateDto.getId())
+		UserProject project = projectRepo.findById(projectUpdateDto.getId())
 				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), userEmail));
 		Optional<UserProject> projectWithRequestedName = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectUpdateDto.getProjectName());
 		if (projectWithRequestedName.isPresent() && !Objects.equals(projectWithRequestedName.get().getId(), project.getId())) {

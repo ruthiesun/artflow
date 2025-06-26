@@ -53,7 +53,7 @@ public class UserProject {
 	@JoinColumn(name = "user_id")
 	private User owner;
 	
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("position ASC")
 	private List<ProjectImage> images = new ArrayList<>();
 	
