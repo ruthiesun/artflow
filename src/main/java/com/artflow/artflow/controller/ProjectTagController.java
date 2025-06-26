@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/projecttags")
+@RequestMapping(UriUtil.BASE + UriUtil.TAGS)
 public class ProjectTagController {
 	private final ProjectTagService projectTagService;
 	
@@ -27,18 +27,17 @@ public class ProjectTagController {
 		this.projectTagService = projectTagService;
 	}
 	
-	@PostMapping
+	@PostMapping(UriUtil.PROJECT)
 	public ResponseEntity<ProjectTagDto> create(@RequestBody ProjectTagCreateDto projectTagCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectTagDto tagDto = projectTagService.create(projectTagCreateDto, user.email());
 		return ResponseEntity
-				.created(URI.create("/api/projecttags/" +
-						UriUtil.toSlug(projectTagCreateDto.getProjectName()) +
-						"/" +
-						UriUtil.toSlug(tagDto.getTagName())))
+				.created(URI.create(UriUtil.getProjectTagUri(
+						UriUtil.toSlug(projectTagCreateDto.getProjectName()),
+						UriUtil.toSlug(tagDto.getTagName()))))
 				.body(tagDto);
 	}
 	
-	@GetMapping("/{projectName}/{tagName}")
+	@GetMapping(UriUtil.PROJECT + UriUtil.TAG)
 	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTagForProject(
 				UriUtil.fromSlug(projectName),
@@ -51,12 +50,12 @@ public class ProjectTagController {
 		return ResponseEntity.ok(projectTagService.getTags(user.email()));
 	}
 	
-	@GetMapping("/{projectName}")
+	@GetMapping(UriUtil.PROJECT)
 	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTagsForProject(UriUtil.fromSlug(projectName), user.email()));
 	}
 	
-	@DeleteMapping("/{projectName}/{tagName}")
+	@DeleteMapping(UriUtil.PROJECT + UriUtil.TAG)
 	public ResponseEntity<Void> delete(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		projectTagService.deleteTag(
 				UriUtil.fromSlug(projectName),

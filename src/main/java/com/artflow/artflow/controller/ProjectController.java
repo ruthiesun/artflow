@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping(UriUtil.BASE + UriUtil.PROJECTS)
 public class ProjectController {
 	
 	private final ProjectService projectService;
@@ -34,7 +34,7 @@ public class ProjectController {
 	public ResponseEntity<ProjectDto> create(@RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.email());
 		return ResponseEntity
-				.created(URI.create("/api/projects/" + UriUtil.toSlug(projectDto.getProjectName())))
+				.created(URI.create(UriUtil.getProjectUri(UriUtil.toSlug(projectDto.getProjectName()))))
 				.body(projectDto);
 	}
 	
@@ -43,14 +43,14 @@ public class ProjectController {
 		return ResponseEntity.ok(projectService.getUserProjects(user.email()));
 	}
 	
-	@GetMapping("/public")
+	@GetMapping(UriUtil.PUBLIC_PROJECTS)
 	public ResponseEntity<List<ProjectDto>> getMyPublicProjects(@AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectService.getPublicUserProjects(user.email()));
 	}
 	
-	@GetMapping("/{projectName}")
+	@GetMapping(UriUtil.PROJECT)
 	public ResponseEntity<ProjectDto> getProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectService.getProject(UriUtil.fromSlug(projectName), user.email()));
+		return ResponseEntity.ok(projectService.getProject(projectName, user.email()));
 	}
 	
 	@PutMapping()
@@ -58,7 +58,7 @@ public class ProjectController {
 		return ResponseEntity.ok(projectService.updateProject(projectUpdateDto, user.email()));
 	}
 	
-	@DeleteMapping("/{projectName}")
+	@DeleteMapping(UriUtil.PROJECT)
 	public ResponseEntity<Void> delete(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
 		projectService.deleteProject(UriUtil.fromSlug(projectName), user.email());
 		return ResponseEntity.noContent().build();

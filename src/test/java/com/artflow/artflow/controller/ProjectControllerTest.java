@@ -1,6 +1,7 @@
 package com.artflow.artflow.controller;
 
 import com.artflow.artflow.common.AuthConstants;
+import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
@@ -68,7 +69,7 @@ public class ProjectControllerTest {
 	public void canCreateProject() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		
-		mockMvc.perform(post("/api/projects")
+		mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
@@ -85,7 +86,7 @@ public class ProjectControllerTest {
 		
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto();
 		projectCreateDto2.setProjectName(projectCreateDto1.getProjectName());
-		mockMvc.perform(post("/api/projects")
+		mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto2)))
@@ -99,7 +100,7 @@ public class ProjectControllerTest {
 		projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
 		
-		MvcResult res = mockMvc.perform(get("/api/projects")
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -113,7 +114,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canGetAllZeroProjects() throws Exception {
-		MvcResult res = mockMvc.perform(get("/api/projects")
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -128,7 +129,7 @@ public class ProjectControllerTest {
 		projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
 		
-		MvcResult res = mockMvc.perform(get("/api/projects/public")
+		MvcResult res = mockMvc.perform(get(UriUtil.getPublicProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -145,8 +146,8 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
 		ProjectDto projectDto1 = projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
-		
-		MvcResult res = mockMvc.perform(get("/api/projects/" + projectDto1.getProjectName())
+
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectUri(projectDto1.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -159,9 +160,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotGetProjectThatDoesNotExist() throws Exception {
-		Long id = 0L;
-
-		mockMvc.perform(get("/api/projects/" + id)
+		mockMvc.perform(get(UriUtil.getProjectUri("adgsfd"))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
@@ -175,7 +174,7 @@ public class ProjectControllerTest {
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.getEmail());
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId(), projectDto.getProjectName(), projectDto.getDescription(), visibility2);
 		
-		mockMvc.perform(put("/api/projects")
+		mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
@@ -192,7 +191,7 @@ public class ProjectControllerTest {
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.getEmail());
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId() + 1, projectDto.getProjectName(), projectDto.getDescription(), projectDto.getVisibility());
 		
-		mockMvc.perform(put("/api/projects")
+		mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
@@ -204,7 +203,7 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", Visibility.PRIVATE);
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.getEmail());
 		
-		mockMvc.perform(delete("/api/projects/" + projectDto.getProjectName())
+		mockMvc.perform(delete(UriUtil.getProjectUri(projectDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
@@ -214,9 +213,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canDeleteProjectThatDoesNotExist() throws Exception {
-		Long id = 0L;
-		
-		mockMvc.perform(delete("/api/projects/" + id)
+		mockMvc.perform(delete(UriUtil.getProjectUri("sfdgfd"))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 	}
@@ -224,7 +221,7 @@ public class ProjectControllerTest {
 	@Test
 	public void canSignUpAndManageProjects() throws Exception {
 		SignupDto signupDto = new SignupDto("anothertestemail", "testpassword");
-		MvcResult signupResult = mockMvc.perform(post("/api/auth/signup")
+		MvcResult signupResult = mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(signupDto)))
 				.andExpect(status().isOk())
@@ -233,7 +230,7 @@ public class ProjectControllerTest {
 		String token = objectMapper.readTree(signupResult.getResponse().getContentAsString()).get("token").asText();
 		
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		MvcResult createResult = mockMvc.perform(post("/api/projects")
+		MvcResult createResult = mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
@@ -246,7 +243,7 @@ public class ProjectControllerTest {
 		Visibility visibility = Visibility.valueOf(objectMapper.readTree(createResult.getResponse().getContentAsString()).get("visibility").asText());
 		
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectId, projectName, description, visibility);
-		MvcResult updateResult = mockMvc.perform(put("/api/projects")
+		MvcResult updateResult = mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
@@ -255,15 +252,15 @@ public class ProjectControllerTest {
 		
 		projectName = objectMapper.readTree(updateResult.getResponse().getContentAsString()).get("projectName").asText();
 		
-		mockMvc.perform(get("/api/projects/" + projectName)
+		mockMvc.perform(get(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk());
 		
-		mockMvc.perform(delete("/api/projects/" + projectName)
+		mockMvc.perform(delete(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
-		mockMvc.perform(get("/api/projects/" + projectName)
+		mockMvc.perform(get(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}

@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/projects/images")
+@RequestMapping(UriUtil.BASE + UriUtil.PROJECTS + UriUtil.PROJECT + UriUtil.IMAGES)
 public class ProjectImageController {
 	private final ProjectImageService projectImageService;
 	
@@ -29,32 +29,31 @@ public class ProjectImageController {
 		this.projectImageService = projectImageService;
 	}
 	
-	@PostMapping("/{projectName}")
+	@PostMapping
 	public ResponseEntity<ProjectImageDto> create(@PathVariable String projectName, @RequestBody ProjectImageCreateDto projectImageCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectImageDto projectImageDto = projectImageService.create(projectName, projectImageCreateDto, user.email());
-		return ResponseEntity
-				.created(URI.create("/api/projects/images/" +
-						UriUtil.toSlug(projectImageDto.getProjectName()) +
-						"/" +
-						UriUtil.toSlug(Long.toString(projectImageDto.getId()))))
+		return ResponseEntity.created(URI.create(
+				UriUtil.getImageUri(
+						UriUtil.toSlug(projectImageDto.getProjectName()),
+						projectImageDto.getId())))
 				.body(projectImageDto);
 	}
 	
-	@GetMapping("/{projectName}")
+	@GetMapping
 	public ResponseEntity<List<ProjectImageDto>> getImagesForProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectImageService.getImagesForProject(UriUtil.fromSlug(projectName), user.email()));
 	}
 	
-	@GetMapping("/{projectName}/{imageId}")
+	@GetMapping(UriUtil.IMAGE)
 	public ResponseEntity<ProjectImageDto> getImageForProject(@PathVariable String projectName, @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectImageService.getImageForProject(UriUtil.fromSlug(projectName), imageId, user.email()));
 	}
-	@PutMapping()
+	@PutMapping
 	public ResponseEntity<ProjectImageDto> update(@RequestBody ProjectImageUpdateDto projectImageUpdateDto) {
 		return ResponseEntity.ok(projectImageService.updateProjectImage(projectImageUpdateDto));
 	}
 	
-	@DeleteMapping("/{projectName}/{imageId}")
+	@DeleteMapping(UriUtil.IMAGE)
 	public ResponseEntity<Void> delete(@PathVariable String projectName, @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
 		projectImageService.deleteProjectImage(imageId);
 		return ResponseEntity.noContent().build();

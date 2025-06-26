@@ -1,5 +1,6 @@
 package com.artflow.artflow.controller;
 
+import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(UriUtil.BASE + UriUtil.AUTH)
 public class AuthController {
 	private final AuthService authService;
 	
@@ -19,12 +20,12 @@ public class AuthController {
 		this.authService = authService;
 	}
 
-	@PostMapping("/signup")
+	@PostMapping(UriUtil.SIGNUP)
 	public ResponseEntity<TokenDto> register(@RequestBody SignupDto request) {
 		return ResponseEntity.ok(authService.register(request));
 	}
 	
-	@PostMapping("/login")
+	@PostMapping(UriUtil.LOGIN)
 	public ResponseEntity<TokenDto> login(@RequestBody LoginDto request) {
 		return ResponseEntity.ok(authService.login(request));
 	}

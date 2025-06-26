@@ -1,27 +1,20 @@
 package com.artflow.artflow.controller;
 
 import com.artflow.artflow.common.AuthConstants;
+import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
-import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
 import com.artflow.artflow.model.ProjectImage;
-import com.artflow.artflow.model.ProjectTag;
-import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectImageRepository;
-import com.artflow.artflow.repository.ProjectTagRepository;
-import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
-import com.artflow.artflow.repository.UserProjectRepositoryTest;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
-import com.artflow.artflow.service.ProjectService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -36,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +80,7 @@ public class ProjectImageControllerTest {
 	public void canCreateProjectImage() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
 		
-		MvcResult res = mockMvc.perform(post("/api/projects/images/" + project.getProjectName())
+		MvcResult res = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -112,7 +104,7 @@ public class ProjectImageControllerTest {
 	public void cannotCreateProjectImageForProjectThatDoesNotExist() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
 		
-		mockMvc.perform(post("/api/projects/images/yuh")
+		mockMvc.perform(post(UriUtil.getImagesUri("yah"))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -128,7 +120,7 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image1);
 		projectImageRepository.save(image2);
 		
-		MvcResult res = mockMvc.perform(get("/api/projects/images/" + project.getProjectName() + "/" + image1.getId())
+		MvcResult res = mockMvc.perform(get(UriUtil.getImageUri(project.getProjectName(), image1.getId()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -141,7 +133,14 @@ public class ProjectImageControllerTest {
 	
 	@Test
 	public void cannotGetProjectImageForProjectThatDoesNotExist() throws Exception {
-		mockMvc.perform(get("/api/projects/images/yuhh")
+		mockMvc.perform(get(UriUtil.getImageUri("yah", 0L))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void cannotGetProjectImageThatDoesNotExist() throws Exception {
+		mockMvc.perform(get(UriUtil.getImageUri(project.getProjectName(), 0L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
@@ -161,7 +160,7 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image2);
 		projectImageRepository.save(image3);
 		
-		MvcResult res = mockMvc.perform(get("/api/projects/images/" + project.getProjectName())
+		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -189,7 +188,7 @@ public class ProjectImageControllerTest {
 				image1.getDateTime(),
 				"url3"
 		);
-		MvcResult res = mockMvc.perform(put("/api/projects/images")
+		MvcResult res = mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -221,7 +220,7 @@ public class ProjectImageControllerTest {
 				image1.getDateTime(),
 				image1.getUrl()
 		);
-		mockMvc.perform(put("/api/projects/images")
+		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -251,7 +250,7 @@ public class ProjectImageControllerTest {
 				image1.getUrl()
 		);
 		
-		mockMvc.perform(put("/api/projects/images")
+		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -270,7 +269,7 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image2);
 		projectImageRepository.save(image3);
 		
-		mockMvc.perform(delete("/api/projects/images/" + project.getProjectName() + "/" + image2.getId())
+		mockMvc.perform(delete(UriUtil.getImageUri(project.getProjectName(), image2.getId()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
@@ -285,7 +284,7 @@ public class ProjectImageControllerTest {
 	
 	@Test
 	public void canDeleteProjectImageThatDoesNotExist() throws Exception {
-		mockMvc.perform(delete("/api/projects/images/" + project.getProjectName() + "/123")
+		mockMvc.perform(delete(UriUtil.getImageUri(project.getProjectName(), 123L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 	}
@@ -293,7 +292,7 @@ public class ProjectImageControllerTest {
 	@Test
 	public void canCreateProjectAndManageImages() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		MvcResult projectCreateResult = mockMvc.perform(post("/api/projects")
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
@@ -303,7 +302,7 @@ public class ProjectImageControllerTest {
 		String projectName = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("projectName").asText();
 		
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
-		MvcResult createResult = mockMvc.perform(post("/api/projects/images/" + projectName)
+		MvcResult createResult = mockMvc.perform(post(UriUtil.getImagesUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -325,7 +324,7 @@ public class ProjectImageControllerTest {
 				dateTime,
 				url
 		);
-		MvcResult updateResult = mockMvc.perform(put("/api/projects/images")
+		MvcResult updateResult = mockMvc.perform(put(UriUtil.getImagesUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -338,15 +337,15 @@ public class ProjectImageControllerTest {
 		assertEquals(projectName, projectNameFromUpdate);
 		assertEquals(caption, captionFromUpdate);
 		
-		mockMvc.perform(get("/api/projects/images/" + projectName + "/" + imageId)
+		mockMvc.perform(get(UriUtil.getImageUri(projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk());
 		
-		mockMvc.perform(delete("/api/projects/images/" + projectName + "/" + imageId)
+		mockMvc.perform(delete(UriUtil.getImageUri(projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
-		mockMvc.perform(get("/api/projects/images/" + projectName + "/" + imageId)
+		mockMvc.perform(get(UriUtil.getImageUri(projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}

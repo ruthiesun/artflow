@@ -1,5 +1,6 @@
 package com.artflow.artflow.controller;
 
+import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
 import com.artflow.artflow.model.User;
@@ -47,7 +48,7 @@ public class AuthControllerTest {
 	public void canSignUp() throws Exception {
 		SignupDto signupDto = new SignupDto("testemail", "testpassword");
 		
-		mockMvc.perform(post("/api/auth/signup")
+		mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(signupDto)))
 				.andExpect(status().isOk());
@@ -65,7 +66,7 @@ public class AuthControllerTest {
 		userRepository.save(new User(email, password1));
 		SignupDto signupDto = new SignupDto(email, password2);
 		
-		mockMvc.perform(post("/api/auth/signup")
+		mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(signupDto)))
 				.andExpect(status().isConflict());
@@ -77,7 +78,7 @@ public class AuthControllerTest {
 		authService.register(new SignupDto(user.getEmail(), user.getPassword()));
 		LoginDto loginDto = new LoginDto(user.getEmail(), user.getPassword());
 		
-		mockMvc.perform(post("/api/auth/login")
+		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isOk());
@@ -93,7 +94,7 @@ public class AuthControllerTest {
 		authService.register(new SignupDto(user.getEmail(), user.getPassword()));
 		LoginDto loginDto = new LoginDto(email2, password);
 		
-		mockMvc.perform(post("/api/auth/login")
+		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isUnauthorized());
@@ -109,7 +110,7 @@ public class AuthControllerTest {
 		authService.register(new SignupDto(user.getEmail(), user.getPassword()));
 		LoginDto loginDto = new LoginDto(email, password2);
 		
-		mockMvc.perform(post("/api/auth/login")
+		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isUnauthorized());
