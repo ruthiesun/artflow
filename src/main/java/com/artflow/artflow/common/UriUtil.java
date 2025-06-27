@@ -1,8 +1,10 @@
 package com.artflow.artflow.common;
 
+import com.artflow.artflow.model.Visibility;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class UriUtil {
 	public static final String BASE = "/api";
@@ -38,8 +40,25 @@ public class UriUtil {
 		return BASE + PROJECTS;
 	}
 	
-	public static String getPublicProjectsUri() {
-		return getProjectsUri() + PUBLIC_PROJECTS;
+	public static String getProjectsUriWithQueryParams(List<String> tags, Visibility visibility) {
+		StringBuilder query = new StringBuilder();
+		if (tags != null && !tags.isEmpty()) {
+			query.append("?tags=");
+			for (int i = 0; i < tags.size() - 1; i++) {
+				query.append(tags.get(i)).append(",");
+			}
+			query.append(tags.get(tags.size() - 1));
+		}
+		if (visibility != null) {
+			if (query.isEmpty()) {
+				query.append("?");
+			}
+			else {
+				query.append("&");
+			}
+			query.append("visibility=").append(visibility);
+		}
+		return BASE + PROJECTS + query;
 	}
 	
 	public static String getProjectUri(String name) {
@@ -59,7 +78,7 @@ public class UriUtil {
 	}
 	
 	public static String getProjectTagsUri(String projectName) {
-		return getTagsUri() + "/" + projectName;
+		return getProjectUri(projectName) + TAGS;
 	}
 	
 	public static String getProjectTagUri(String projectName, String tagName) {

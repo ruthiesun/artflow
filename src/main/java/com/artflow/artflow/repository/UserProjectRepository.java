@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserProjectRepository extends JpaRepository<UserProject, Long> {
 	List<UserProject> findByOwner_Email(String email);
@@ -17,4 +18,28 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 	Optional<UserProject> findByIdWithImages(@Param("id") Long id);
 	@Query("SELECT p FROM UserProject p LEFT JOIN FETCH p.projectTags WHERE p.id = :id")
 	Optional<UserProject> findByIdWithTags(@Param("id") Long id);
+	@Query("""
+    SELECT DISTINCT p FROM UserProject p
+    LEFT JOIN p.projectTags t
+    WHERE p.owner.email = :ownerEmail
+	AND t.tag.name IN :tags
+	""")
+	List<UserProject> findByEmailAndTags(
+			@Param("ownerEmail") String ownerEmail,
+			@Param("tags") Set<String> tags
+	);
+	@Query("""
+    SELECT DISTINCT p FROM UserProject p
+    LEFT JOIN p.projectTags t
+    WHERE p.owner.email = :ownerEmail
+    AND p.visibility = :visibility
+	AND t.tag.name IN :tags
+	""")
+	List<UserProject> findByEmailAndVisibilityAndTags(
+			@Param("ownerEmail") String ownerEmail,
+			@Param("visibility") Visibility visibility,
+			@Param("tags") Set<String> tags
+	);
+
+	
 }

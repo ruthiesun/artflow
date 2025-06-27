@@ -14,6 +14,7 @@ import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectTagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
+import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
 import com.artflow.artflow.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,6 +67,9 @@ public class ProjectControllerTest {
 	
 	@Autowired
 	private ProjectTagRepository projectTagRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Autowired
 	private AuthService authService;
@@ -174,7 +178,7 @@ public class ProjectControllerTest {
 		projectService.create(projectCreateDto1, user.getEmail());
 		projectService.create(projectCreateDto2, user.getEmail());
 		
-		MvcResult res = mockMvc.perform(get(UriUtil.getPublicProjectsUri())
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(null, Visibility.PUBLIC))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -183,6 +187,84 @@ public class ProjectControllerTest {
 				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
 		));
 		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
+	}
+	
+	@Test
+	public void canGetAllProjectsWithTags() throws Exception {
+		String tag1 = "some tag 1";
+		String tag2 = "some tag 2";
+		String tag3 = "some tag 3";
+		User anotherUser = new User("asdfemail", "asdfpass");
+		userRepository.save(anotherUser);
+		
+		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
+		projectCreateDto1.setTagStrings(List.of(tag1, tag2, tag3));
+		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
+		projectCreateDto2.setTagStrings(List.of(tag1, tag3));
+		ProjectCreateDto projectCreateDto3 = new ProjectCreateDto("proj 3", null, Visibility.PUBLIC);
+		projectCreateDto3.setTagStrings(List.of(tag3));
+		projectService.create(projectCreateDto1, user.getEmail());
+		projectService.create(projectCreateDto2, user.getEmail());
+		projectService.create(projectCreateDto3, user.getEmail());
+		
+		ProjectCreateDto projectCreateDto4 = new ProjectCreateDto("proj 4", null, Visibility.PUBLIC);
+		projectCreateDto4.setTagStrings(List.of(tag1, tag2, tag3));
+		projectService.create(projectCreateDto4, anotherUser.getEmail());
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(List.of(tag1, tag2), null))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName()))),
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto2.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
+	}
+	
+	// testing that:
+	// other user's projects are filtered out
+	// only the desired visibility is included
+	// if the project contains at least one of the tags, it's included (union)
+	@Test
+	public void canGetAllProjectsWithQuery() throws Exception {
+		String tag1 = "some tag 1";
+		String tag2 = "some tag 2";
+		String tag3 = "some tag 3";
+		User anotherUser = new User("asdfemail", "asdfpass");
+		userRepository.save(anotherUser);
+		
+		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
+		projectCreateDto1.setTagStrings(List.of(tag1, tag2, tag3));
+		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
+		projectCreateDto2.setTagStrings(List.of(tag1, tag3));
+		ProjectCreateDto projectCreateDto3 = new ProjectCreateDto("proj 3", null, Visibility.PUBLIC);
+		projectCreateDto3.setTagStrings(List.of(tag3));
+		projectService.create(projectCreateDto1, user.getEmail());
+		projectService.create(projectCreateDto2, user.getEmail());
+		projectService.create(projectCreateDto3, user.getEmail());
+		
+		ProjectCreateDto projectCreateDto4 = new ProjectCreateDto("proj 4", null, Visibility.PUBLIC);
+		projectCreateDto4.setTagStrings(List.of(tag1, tag2, tag3));
+		projectService.create(projectCreateDto4, anotherUser.getEmail());
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(List.of(tag1, tag2), Visibility.PUBLIC))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
+	}
+	
+	@Test
+	public void cannotGetProjectsWithInvalidVisibility() throws Exception {
+		mockMvc.perform(get(UriUtil.getProjectsUri() + "?visibility=bad")
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test

@@ -29,4 +29,10 @@ public class ApiExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(Map.of("error", ex.getMessage()));
 	}
+	
+	@ExceptionHandler(QueryException.class)
+	public ResponseEntity<?> handleNotFound(QueryException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("error", ex.getMessage()));
+	}
 }
