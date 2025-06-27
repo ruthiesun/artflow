@@ -15,4 +15,6 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 	Optional<UserProject> findByOwner_EmailAndProjectName(String email, String projectName);
 	@Query("SELECT p FROM UserProject p LEFT JOIN FETCH p.images i WHERE p.id = :id ORDER BY i.position ASC")
 	Optional<UserProject> findByIdWithImages(@Param("id") Long id);
+	@Query("SELECT p FROM UserProject p LEFT JOIN FETCH p.projectTags WHERE p.id = :id")
+	Optional<UserProject> findByIdWithTags(@Param("id") Long id);
 }

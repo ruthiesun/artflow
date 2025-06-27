@@ -7,13 +7,17 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.model.ProjectImage;
+import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.Visibility;
+import com.artflow.artflow.repository.ProjectTagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.service.AuthService;
 import com.artflow.artflow.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -47,6 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		"jwt.signing-secret=test-secret"
 })
 public class ProjectControllerTest {
+	@Autowired
+	private EntityManager entityManager;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -56,6 +63,9 @@ public class ProjectControllerTest {
 	
 	@Autowired
 	private UserProjectRepository projectRepository;
+	
+	@Autowired
+	private ProjectTagRepository projectTagRepository;
 	
 	@Autowired
 	private AuthService authService;
@@ -77,6 +87,41 @@ public class ProjectControllerTest {
 		
 		Optional<UserProject> foundProject = projectRepository.findByOwner_EmailAndProjectName(user.getEmail(), projectCreateDto.getProjectName());
 		assertTrue(foundProject.isPresent());
+	}
+	
+	@Test
+	public void canCreateProjectWithTags() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		projectCreateDto.setTagStrings(List.of("some tag", "some tag", "some other tag", "yet another tag"));
+		
+		mockMvc.perform(post(UriUtil.getProjectsUri())
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+				.andExpect(status().isCreated());
+		
+		
+		List<ProjectTag> tagsFromProjectTagRepo = projectTagRepository.findByProject_ProjectNameAndProject_Owner_Email(
+				projectCreateDto.getProjectName(), user.getEmail());
+		Set<String> expectedTags = new HashSet<>(projectCreateDto.getTagStrings());
+		for (ProjectTag tag : tagsFromProjectTagRepo) {
+			String tagString = tag.getTag().getName();
+			assertTrue(expectedTags.contains(tagString));
+			expectedTags.remove(tagString);
+		}
+		assertTrue(expectedTags.isEmpty());
+		
+		entityManager.clear();
+		Optional<UserProject> foundProject = projectRepository.findByIdWithTags(tagsFromProjectTagRepo.get(0).getProject().getId());
+		assertTrue(foundProject.isPresent());
+		List<ProjectTag> tagsFromProjectReference = foundProject.get().getProjectTags();
+		expectedTags = new HashSet<>(projectCreateDto.getTagStrings());
+		for (ProjectTag tag : tagsFromProjectReference) {
+			String tagString = tag.getTag().getName();
+			assertTrue(expectedTags.contains(tagString));
+			expectedTags.remove(tagString);
+		}
+		assertTrue(expectedTags.isEmpty());
 	}
 	
 	@Test

@@ -12,6 +12,7 @@ import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.repository.ProjectTagRepository;
 import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class ProjectTagService {
 		this.projectRepo = projectRepo;
 	}
 	
+	@Transactional
 	public ProjectTagDto create(ProjectTagCreateDto projectTagCreateDto, String userEmail) {
 		if (projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(
 				projectTagCreateDto.getTagName(),
@@ -65,6 +67,7 @@ public class ProjectTagService {
 		return toDto(projectTags);
 	}
 	
+	@Transactional
 	public void deleteTag(String projectName, String tagName, String email) {
 		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email);
 		projectTag.ifPresent(projectTagRepo::delete);

@@ -33,6 +33,7 @@ public class ProjectImageService {
 		this.projectImageRepo = projectImageRepo;
 	}
 	
+	@Transactional
 	public ProjectImageDto create(String projectName, ProjectImageCreateDto projectImageCreateDto, String email) {
 		UserProject project = projectRepo.findByOwner_EmailAndProjectName(email, projectName)
 				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
@@ -99,6 +100,7 @@ public class ProjectImageService {
 		return toDto(image);
 	}
 	
+	@Transactional
 	public void deleteProjectImage(Long imageId) {
 		Optional<ProjectImage> image = projectImageRepo.findById(imageId);
 		if (image.isPresent()) {

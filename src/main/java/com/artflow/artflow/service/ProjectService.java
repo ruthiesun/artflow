@@ -2,14 +2,17 @@ package com.artflow.artflow.service;
 
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
+import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.exception.ProjectNameInUseException;
 import com.artflow.artflow.exception.ProjectNotFoundException;
+import com.artflow.artflow.exception.ProjectTagNameInUseException;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,12 +24,15 @@ import java.util.Optional;
 public class ProjectService {
 	private final UserProjectRepository projectRepo;
 	private final UserRepository userRepo;
+	private final ProjectTagService projectTagService;
 	
-	public ProjectService(UserProjectRepository projectRepo, UserRepository userRepo) {
+	public ProjectService(UserProjectRepository projectRepo, UserRepository userRepo, ProjectTagService projectTagService) {
 		this.projectRepo = projectRepo;
 		this.userRepo = userRepo;
+		this.projectTagService = projectTagService;
 	}
 	
+	@Transactional
 	public ProjectDto create(ProjectCreateDto projectInitDto, String userEmail) {
 		User user = userRepo.findByEmail(userEmail).get();
 		if (projectRepo.findByOwner_EmailAndProjectName(userEmail, projectInitDto.getProjectName()).isPresent()) {
@@ -34,9 +40,11 @@ public class ProjectService {
 		}
 		UserProject project = new UserProject(user, projectInitDto.getProjectName());
 		project.setDescription(projectInitDto.getDescription());
-		createAndAddTagsToProject(projectInitDto.getTagStrings(), project);
 		setProjectVisibility(projectInitDto.getVisibility(), project);
-		return toDto(projectRepo.save(project));
+		
+		projectRepo.save(project);
+		createAndAddTagsToProject(projectInitDto.getTagStrings(), project);
+		return toDto(project);
 	}
 	
 	public List<ProjectDto> getUserProjects(String userEmail) {
@@ -54,7 +62,8 @@ public class ProjectService {
 				.orElseThrow(() -> new ProjectNotFoundException(projectName, userEmail));
 		return toDto(project);
 	}
-
+	
+	@Transactional
 	public ProjectDto updateProject(ProjectUpdateDto projectUpdateDto, String userEmail) {
 		UserProject project = projectRepo.findById(projectUpdateDto.getId())
 				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), userEmail));
@@ -68,7 +77,8 @@ public class ProjectService {
 		createAndAddTagsToProject(projectUpdateDto.getTagStrings(), project);
 		return toDto(projectRepo.save(project));
 	}
-
+	
+	@Transactional
 	public void deleteProject(String projectName, String userEmail) {
 		Optional<UserProject> foundProject = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectName);
 		if (foundProject.isEmpty()) {
@@ -78,9 +88,18 @@ public class ProjectService {
 	}
 	
 	private void createAndAddTagsToProject(List<String> tagStrings, UserProject project) {
-		// todo
-		// call tagservice to add tags that don't exist yet
-		// ensure project tags are added to projecttagservice
+		if (tagStrings == null || tagStrings.isEmpty()) {
+			return;
+		}
+		for (String tagString : tagStrings) {
+			ProjectTagCreateDto projectTagCreateDto = new ProjectTagCreateDto(project.getProjectName(), tagString);
+			try {
+				projectTagService.create(projectTagCreateDto, project.getOwner().getEmail());
+			}
+			catch (ProjectTagNameInUseException e) {
+				// this is fine; user inputted duplicate tags
+			}
+		}
 	}
 	
 	private void setProjectVisibility(Visibility visibility, UserProject project) {
