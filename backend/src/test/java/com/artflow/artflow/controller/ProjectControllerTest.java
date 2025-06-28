@@ -7,7 +7,6 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
