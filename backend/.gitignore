@@ -56,7 +56,8 @@ Icon?
 .env.development
 .env.test
 .env.production
-src/main/resources/my.application.properties
+/src/main/resources/application.properties
+/src/main/resources/my.application.properties
 
 # Logs
 *.log
