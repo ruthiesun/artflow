@@ -9,7 +9,6 @@ import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.UserProject;
 import com.artflow.artflow.repository.ProjectImageRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +24,8 @@ public class ProjectImageService {
 	private static final Logger log = LoggerFactory.getLogger(ProjectImageService.class);
 	private final UserProjectRepository projectRepo;
 	private final ProjectImageRepository projectImageRepo;
-	private final EntityManager entityManager;
 	
-	public ProjectImageService(EntityManager entityManager, UserProjectRepository projectRepo, ProjectImageRepository projectImageRepo) {
-		this.entityManager = entityManager;
+	public ProjectImageService(UserProjectRepository projectRepo, ProjectImageRepository projectImageRepo) {
 		this.projectRepo = projectRepo;
 		this.projectImageRepo = projectImageRepo;
 	}
@@ -94,7 +91,7 @@ public class ProjectImageService {
 				project.getImages().sort(Comparator.comparing(ProjectImage::getPosition));
 				updateProjectImagePositions(project.getImages(), currPos, newPos); // images are lazily loaded, so the temp pos does not cause a conflict, and the old pos is now free
 			}
-			entityManager.flush(); // need this for the db to know that the new pos is now free. above: did not need flush because the lazy load implicitly flushes (this is my hypothesis)
+			projectRepo.flush(); // need this for the db to know that the new pos is now free. above: did not need flush because the lazy load implicitly flushes (this is my hypothesis)
 			image.setPosition(newPos);
 		}
 		return toDto(image);
@@ -109,7 +106,7 @@ public class ProjectImageService {
 			UserProject project = projectRepo.findByIdWithImages(image.get().getProject().getId()).get();
 //			UserProject project = image.get().getProject(); // removal with this doesn't get flushed
 			project.getImages().remove(pos);
-			entityManager.flush(); // need the removal to propagate to images and make the removed position available again
+			projectRepo.flush(); // need the removal to propagate to images and make the removed position available again
 			updateProjectImagePositions(project.getImages(), pos, project.getImages().size());
 		}
 	}
