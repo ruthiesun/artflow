@@ -73,7 +73,8 @@ public class ProjectTagService {
 		projectTag.ifPresent(projectTagRepo::delete);
 	}
 	
-	private Tag getOrCreateTag(String tagName) {
+	@Transactional
+	public Tag getOrCreateTag(String tagName) {
 		return tagRepo.findByName(tagName)
 				.orElseGet(() -> tagRepo.save(new Tag(tagName)));
 	}

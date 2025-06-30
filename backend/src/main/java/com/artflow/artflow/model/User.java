@@ -30,7 +30,7 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("createdDateTime ASC")
 	private List<UserProject> projects = new ArrayList<>();
 	

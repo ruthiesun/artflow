@@ -25,7 +25,7 @@ public class Tag {
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
 	
-	@OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProjectTag> projectTags = new ArrayList<>();
 	
 	public Tag() {}

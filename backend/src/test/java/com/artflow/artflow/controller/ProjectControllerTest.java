@@ -29,12 +29,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -346,6 +346,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canSignUpAndManageProjects() throws Exception {
+		// sign up and get token
 		SignupDto signupDto = new SignupDto("anothertestemail", "testpassword");
 		MvcResult signupResult = mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
@@ -355,37 +356,84 @@ public class ProjectControllerTest {
 		
 		String token = objectMapper.readTree(signupResult.getResponse().getContentAsString()).get("token").asText();
 		
+		// create a project with some tags
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		projectCreateDto.setTagStrings(List.of("a tag!", "another tag"));
 		MvcResult createResult = mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
 				.andExpect(status().isCreated())
 				.andReturn();
+
+		MvcResult projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectCreateDto.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		Set<Set<JsonUtil.Field>> expectedTags = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("tagName", projectCreateDto.getTagStrings().get(0)))),
+				new HashSet<>(List.of(new JsonUtil.Field("tagName", projectCreateDto.getTagStrings().get(1))))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedTags, projectTagsResult);
 		
 		Long projectId = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("id").asLong();
 		String projectName = "a new project name";
 		String description = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("description").asText();
 		Visibility visibility = Visibility.valueOf(objectMapper.readTree(createResult.getResponse().getContentAsString()).get("visibility").asText());
 		
+		// update the project with another tag
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectId, projectName, description, visibility);
+		projectUpdateDto.setTagStrings(new ArrayList<>(projectCreateDto.getTagStrings()));
+		projectUpdateDto.getTagStrings().add("yet another");
 		MvcResult updateResult = mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
 				.andExpect(status().isOk())
 				.andReturn();
+
+		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectCreateDto.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		expectedTags = new HashSet<>(List.of(
+				new HashSet<>(List.of(new JsonUtil.Field("tagName", projectUpdateDto.getTagStrings().get(0)))),
+				new HashSet<>(List.of(new JsonUtil.Field("tagName", projectUpdateDto.getTagStrings().get(1)))),
+				new HashSet<>(List.of(new JsonUtil.Field("tagName", projectUpdateDto.getTagStrings().get(2))))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedTags, projectTagsResult);
 		
 		projectName = objectMapper.readTree(updateResult.getResponse().getContentAsString()).get("projectName").asText();
 		
+		// check that the project still exists
 		mockMvc.perform(get(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk());
 		
+		// delete the project
 		mockMvc.perform(delete(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
+		// check that the associated tags are deleted when the refcount reaches 0
+		MvcResult tagsResult = mockMvc.perform(get(UriUtil.getTagsUri())
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		JsonUtil.checkMockResponses(objectMapper, new HashSet<>(), tagsResult);
+		
+		// and check that the project tags have been deleted too
+		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectCreateDto.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		JsonUtil.checkMockResponses(objectMapper, new HashSet<>(), projectTagsResult);
+		
+		// and check that the project itself has been deleted
 		mockMvc.perform(get(UriUtil.getProjectUri(projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());

@@ -57,7 +57,7 @@ public class UserProject {
 	@OrderBy("position ASC")
 	private List<ProjectImage> images = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProjectTag> projectTags = new ArrayList<>();
 	
 	@PrePersist

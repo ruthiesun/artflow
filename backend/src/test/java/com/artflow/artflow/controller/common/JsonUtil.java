@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class JsonUtil {
 	public static void checkMockResponse(ObjectMapper objectMapper, Set<Field> expectedFields, MvcResult res) throws UnsupportedEncodingException, JsonProcessingException {
@@ -47,6 +48,7 @@ public class JsonUtil {
 	
 	private static void assertExpectedNodes(Set<Set<Field>> expectedFields, Iterator<JsonNode> nodes) {
 		if (expectedFields.isEmpty()) {
+			assertFalse(nodes.hasNext());
 			return;
 		}
 		List<String> fieldsToRecord = new ArrayList<>();
