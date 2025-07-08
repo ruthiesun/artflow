@@ -1,5 +1,6 @@
 package com.artflow.artflow.model;
 
+import com.artflow.artflow.service.ProjectService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +18,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import java.util.List;
 @Entity
 @Table(name = "user_project", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "project_name"}))
 public class UserProject {
+	private static final Logger log = LoggerFactory.getLogger(UserProject.class);
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "project_id")
@@ -67,6 +72,7 @@ public class UserProject {
 	
 	@PreUpdate
 	public void preUpdate() {
+		log.info("updating project datetime");
 		updateDateTime();
 	}
 	

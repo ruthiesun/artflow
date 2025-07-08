@@ -2,6 +2,7 @@ package com.artflow.artflow.service;
 
 import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.ProjectTagDto;
+import com.artflow.artflow.dto.TagDto;
 import com.artflow.artflow.exception.ProjectNotFoundException;
 import com.artflow.artflow.exception.ProjectTagNameInUseException;
 import com.artflow.artflow.exception.ProjectTagNotFoundException;
@@ -57,9 +58,8 @@ public class ProjectTagService {
 		return toDto(projectTag);
 	}
 	
-	public List<ProjectTagDto> getTags(String userEmail) {
-		List<ProjectTag> projectTags = projectTagRepo.findByProject_Owner_Email(userEmail);
-		return toDto(projectTags);
+	public List<TagDto> getTags(String userEmail) {
+		return toTagDto(projectTagRepo.findDistinctTagNameByProject_Owner_Email(userEmail));
 	}
 	
 	public List<ProjectTagDto> getTagsForProject(String projectName, String email) {
@@ -91,6 +91,20 @@ public class ProjectTagService {
 		return new ProjectTagDto(
 				projectTag.getProject().getProjectName(),
 				projectTag.getTag().getName()
+		);
+	}
+	
+	private List<TagDto> toTagDto(List<String> tagNames) {
+		List<TagDto> tagDtos = new ArrayList<>();
+		for (String name : tagNames) {
+			tagDtos.add(toTagDto(name));
+		}
+		return tagDtos;
+	}
+	
+	private TagDto toTagDto(String tagName) {
+		return new TagDto(
+				tagName
 		);
 	}
 }

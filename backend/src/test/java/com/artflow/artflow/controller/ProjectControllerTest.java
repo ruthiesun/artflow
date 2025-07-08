@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -293,12 +294,16 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canUpdateProject() throws Exception {
+		String name1 = "sdf";
+		String name2 = "asdf";
+		String desc1 = "desc";
+		String desc2 = "desc!";
 		Visibility visibility1 = Visibility.PUBLIC;
 		Visibility visibility2 = Visibility.PRIVATE;
 		
-		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", visibility1);
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto(name1, desc1, visibility1);
 		ProjectDto projectDto = projectService.create(projectCreateDto, user.getEmail());
-		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId(), projectDto.getProjectName(), projectDto.getDescription(), visibility2);
+		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId(), name2, desc2, visibility2);
 		
 		mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
@@ -306,9 +311,11 @@ public class ProjectControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
 				.andExpect(status().isOk());
 		
-		Optional<UserProject> foundProject = projectRepository.findByOwner_EmailAndProjectName(user.getEmail(), projectDto.getProjectName());
+		Optional<UserProject> foundProject = projectRepository.findByOwner_EmailAndProjectName(user.getEmail(), projectUpdateDto.getProjectName());
 		assertTrue(foundProject.isPresent());
 		assertSame(visibility2, foundProject.get().getVisibility());
+		assertEquals(name2, foundProject.get().getProjectName());
+		assertEquals(desc2, foundProject.get().getDescription());
 	}
 	
 	@Test
@@ -365,7 +372,7 @@ public class ProjectControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
 				.andExpect(status().isCreated())
 				.andReturn();
-
+		
 		MvcResult projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectCreateDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
@@ -384,8 +391,10 @@ public class ProjectControllerTest {
 		
 		// update the project with another tag
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectId, projectName, description, visibility);
-		projectUpdateDto.setTagStrings(new ArrayList<>(projectCreateDto.getTagStrings()));
+		projectUpdateDto.setTagStrings(new ArrayList<>());
+		projectUpdateDto.getTagStrings().add(projectCreateDto.getTagStrings().get(0));
 		projectUpdateDto.getTagStrings().add("yet another");
+		projectUpdateDto.getTagStrings().add("and another");
 		MvcResult updateResult = mockMvc.perform(put(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
@@ -393,7 +402,7 @@ public class ProjectControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 
-		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectCreateDto.getProjectName()))
+		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(projectUpdateDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();

@@ -1,15 +1,20 @@
 package com.artflow.artflow.model;
 
+import com.artflow.artflow.service.ProjectService;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "project_tag")
 public class ProjectTag {
+	private static final Logger log = LoggerFactory.getLogger(ProjectTag.class);
 	@EmbeddedId
 	private ProjectTagId id;
 	
@@ -22,6 +27,13 @@ public class ProjectTag {
 	@ManyToOne
 	@JoinColumn(name = "project_id", referencedColumnName = "project_id")
 	private UserProject project;
+	
+	@PrePersist
+	public void checkValues() {
+		log.info("tag_id=" + id.getTagId());
+		log.info("project_id=" + id.getUserProjectId());
+		log.info("project_name=" + project.getProjectName());
+	}
 	
 	public ProjectTag() {}
 	

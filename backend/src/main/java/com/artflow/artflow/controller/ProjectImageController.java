@@ -49,7 +49,7 @@ public class ProjectImageController {
 		return ResponseEntity.ok(projectImageService.getImageForProject(UriUtil.fromSlug(projectName), imageId, user.email()));
 	}
 	@PutMapping
-	public ResponseEntity<ProjectImageDto> update(@RequestBody ProjectImageUpdateDto projectImageUpdateDto) {
+	public ResponseEntity<ProjectImageDto> update(@RequestBody ProjectImageUpdateDto projectImageUpdateDto, @PathVariable String projectName) {
 		return ResponseEntity.ok(projectImageService.updateProjectImage(projectImageUpdateDto));
 	}
 	

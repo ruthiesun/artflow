@@ -38,6 +38,7 @@ public class ProjectImageService {
 				projectName,
 				email
 		);
+		log.info("creating new image with position=" + currentNumImages);
 		ProjectImage image = new ProjectImage(
 				(int) currentNumImages,
 				projectImageCreateDto.getCaption(),
@@ -53,7 +54,7 @@ public class ProjectImageService {
 	public List<ProjectImageDto> getImagesForProject(String projectName, String email) {
 		projectRepo.findByOwner_EmailAndProjectName(email, projectName)
 				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
-		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_Email(projectName, email);
+		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(projectName, email);
 		return toDto(images);
 	}
 	
@@ -78,18 +79,20 @@ public class ProjectImageService {
 		int currPos = image.getPosition();
 
 		if (newPos != currPos) {
-			log.info("updating image from pos " + currPos + " to " + newPos);
+			log.info("updateProjectImage: about to update image from pos " + currPos + " to " + newPos);
 			UserProject project = image.getProject();
 			int numImagesInProject = project.getImages().size();
 			if (newPos < currPos) {
 				image.setPosition(-1);
+				log.info("set image pos to temp pos=" + image.getPosition());
 				project.getImages().sort(Comparator.comparing(ProjectImage::getPosition));
-				updateProjectImagePositions(project.getImages(), newPos + 1, currPos + 1);
+				updateProjectImagePositionsDescending(project.getImages(), newPos + 1, currPos + 1);
 			}
 			else {
 				image.setPosition(numImagesInProject);
+				log.info("set image pos to temp pos=" + image.getPosition());
 				project.getImages().sort(Comparator.comparing(ProjectImage::getPosition));
-				updateProjectImagePositions(project.getImages(), currPos, newPos); // images are lazily loaded, so the temp pos does not cause a conflict, and the old pos is now free
+				updateProjectImagePositionsAscending(project.getImages(), currPos, newPos); // images are lazily loaded, so the temp pos does not cause a conflict, and the old pos is now free
 			}
 			projectRepo.flush(); // need this for the db to know that the new pos is now free. above: did not need flush because the lazy load implicitly flushes (this is my hypothesis)
 			image.setPosition(newPos);
@@ -107,15 +110,25 @@ public class ProjectImageService {
 //			UserProject project = image.get().getProject(); // removal with this doesn't get flushed
 			project.getImages().remove(pos);
 			projectRepo.flush(); // need the removal to propagate to images and make the removed position available again
-			updateProjectImagePositions(project.getImages(), pos, project.getImages().size());
+			updateProjectImagePositionsAscending(project.getImages(), pos, project.getImages().size());
 		}
 	}
 	
-	private void updateProjectImagePositions(List<ProjectImage> images, int startIndex, int endIndex) {
-		log.info("updating image positions from " + startIndex + " to " + (endIndex - 1) + " (inclusive)");
+	private void updateProjectImagePositionsAscending(List<ProjectImage> images, int startIndex, int endIndex) {
+		log.info("updating image positions from " + startIndex + " to " + (endIndex - 1) + " (inclusive):");
 		for (int i = startIndex; i < endIndex; i++) {
 			ProjectImage image = images.get(i);
 			log.info("updating position from " + images.get(i).getPosition() + " to " + i);
+			image.setPosition(i);
+		}
+	}
+	
+	private void updateProjectImagePositionsDescending(List<ProjectImage> images, int startIndex, int endIndex) {
+		log.info("updating image positions from " + (endIndex - 1) + " to " + startIndex + " (inclusive):");
+		for (int i = endIndex - 1; i >= startIndex ; i--) {
+			ProjectImage image = images.get(i);
+			log.info("updating position from " + images.get(i).getPosition() + " to " + i);
+			projectImageRepo.flush(); //for some reason, we need a flush here but not for the ascending function
 			image.setPosition(i);
 		}
 	}

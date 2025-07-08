@@ -134,7 +134,7 @@ public class ProjectTagControllerTest {
 	}
 	
 	@Test
-	public void canGetAllProjectTags() throws Exception {
+	public void canGetAllDistinctProjectTagNames() throws Exception {
 		UserProject otherProject = projectRepository.save(new UserProject(user, "another test project"));
 		
 		ProjectTag projectTag1 = new ProjectTag(new ProjectTagId(project.getId(), tag1.getId()));
@@ -160,14 +160,9 @@ public class ProjectTagControllerTest {
 		
 		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
 				new HashSet<>(List.of(
-						new JsonUtil.Field("tagName", tag1.getName()),
-						new JsonUtil.Field("projectName", project.getProjectName()))),
+						new JsonUtil.Field("tagName", tag1.getName()))),
 				new HashSet<>(List.of(
-						new JsonUtil.Field("tagName", tag2.getName()),
-						new JsonUtil.Field("projectName", project.getProjectName()))),
-				new HashSet<>(List.of(
-						new JsonUtil.Field("tagName", tag1.getName()),
-						new JsonUtil.Field("projectName", otherProject.getProjectName())))
+						new JsonUtil.Field("tagName", tag2.getName())))
 				));
 		JsonUtil.checkMockResponses(objectMapper, expected, res);
 	}

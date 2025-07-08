@@ -101,6 +101,36 @@ public class ProjectImageControllerTest {
 	}
 	
 	@Test
+	public void canCreateProjectImages() throws Exception {
+		ProjectImageCreateDto projectImageCreateDto1 = new ProjectImageCreateDto("a caption 2", LocalDateTime.now(), "url1");
+		MvcResult res1 = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectImageCreateDto1)))
+				.andExpect(status().isCreated())
+				.andReturn();
+		
+		ProjectImageCreateDto projectImageCreateDto2 = new ProjectImageCreateDto("a caption 1", LocalDateTime.now(), "url2");
+		MvcResult res2 = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectImageCreateDto2)))
+				.andExpect(status().isCreated())
+				.andReturn();
+		
+		int position1 = Integer.parseInt(objectMapper.readTree(res1.getResponse().getContentAsString()).get("position").asText());
+		assertEquals(0, position1);
+		int position2 = Integer.parseInt(objectMapper.readTree(res2.getResponse().getContentAsString()).get("position").asText());
+		assertEquals(1, position2);
+		
+		long numImages = projectImageRepository.countByProject_ProjectNameAndProject_Owner_Email(
+				project.getProjectName(), project.getOwner().getEmail());
+		assertEquals(2, numImages);
+		
+		assertEquals(2, project.getImages().size());
+	}
+	
+	@Test
 	public void cannotCreateProjectImageForProjectThatDoesNotExist() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
 		
@@ -202,7 +232,7 @@ public class ProjectImageControllerTest {
 	}
 	
 	@Test
-	public void canUpdateProjectImagePosition() throws Exception {
+	public void canIncreaseProjectImagePosition() throws Exception {
 		ProjectImage image1 = new ProjectImage(project, 0, "url1");
 		ProjectImage image2 = new ProjectImage(project, 1, "url2");
 		ProjectImage image3 = new ProjectImage(project, 2, "url3");
@@ -215,7 +245,7 @@ public class ProjectImageControllerTest {
 		
 		ProjectImageUpdateDto projectImageUpdateDto = new ProjectImageUpdateDto(
 				image1.getId(),
-				1,
+				2,
 				image1.getCaption(),
 				image1.getDateTime(),
 				image1.getUrl()
@@ -232,8 +262,43 @@ public class ProjectImageControllerTest {
 		assertEquals(1, images.get(1).getPosition());
 		assertEquals(2, images.get(2).getPosition());
 		assertEquals(image2.getId(), images.get(0).getId());
+		assertEquals(image3.getId(), images.get(1).getId());
+		assertEquals(image1.getId(), images.get(2).getId());
+	}
+	
+	@Test
+	public void canDecreaseProjectImagePosition() throws Exception {
+		ProjectImage image1 = new ProjectImage(project, 0, "url1");
+		ProjectImage image2 = new ProjectImage(project, 1, "url2");
+		ProjectImage image3 = new ProjectImage(project, 2, "url3");
+		project.getImages().add(image1);
+		project.getImages().add(image2);
+		project.getImages().add(image3);
+		projectImageRepository.save(image1);
+		projectImageRepository.save(image2);
+		projectImageRepository.save(image3);
+		
+		ProjectImageUpdateDto projectImageUpdateDto = new ProjectImageUpdateDto(
+				image3.getId(),
+				0,
+				image3.getCaption(),
+				image3.getDateTime(),
+				image3.getUrl()
+		);
+		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
+						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+						.contentType(APPLICATION_JSON)
+						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
+				.andExpect(status().isOk());
+		
+		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(
+				project.getProjectName(), project.getOwner().getEmail());
+		assertEquals(0, images.get(0).getPosition());
+		assertEquals(1, images.get(1).getPosition());
+		assertEquals(2, images.get(2).getPosition());
+		assertEquals(image3.getId(), images.get(0).getId());
 		assertEquals(image1.getId(), images.get(1).getId());
-		assertEquals(image3.getId(), images.get(2).getId());
+		assertEquals(image2.getId(), images.get(2).getId());
 	}
 	
 	@Test

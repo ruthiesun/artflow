@@ -3,6 +3,7 @@ package com.artflow.artflow.controller;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.ProjectTagDto;
+import com.artflow.artflow.dto.TagDto;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectTagService;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class ProjectTagController {
 	}
 	
 	@GetMapping(UriUtil.TAGS)
-	public ResponseEntity<List<ProjectTagDto>> getTags(@AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<List<TagDto>> getTags(@AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTags(user.email()));
 	}
 	

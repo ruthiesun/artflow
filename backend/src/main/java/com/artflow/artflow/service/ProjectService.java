@@ -57,7 +57,7 @@ public class ProjectService {
 		setProjectVisibility(projectInitDto.getVisibility(), project);
 		
 		projectRepo.save(project);
-		createAndAddTagsToProject(projectInitDto.getTagStrings(), project);
+		ensureProjectTags(projectInitDto.getTagStrings(), project);
 		user.getProjects().add(project);
 		return toDto(project);
 	}
@@ -107,10 +107,10 @@ public class ProjectService {
 		if (projectWithRequestedName.isPresent() && !Objects.equals(projectWithRequestedName.get().getId(), project.getId())) {
 			throw new ProjectNameInUseException(projectUpdateDto.getProjectName());
 		}
-		project.setProjectName(project.getProjectName());
+		project.setProjectName(projectUpdateDto.getProjectName());
 		project.setDescription(projectUpdateDto.getDescription());
 		project.setVisibility(projectUpdateDto.getVisibility());
-		createAndAddTagsToProject(projectUpdateDto.getTagStrings(), project);
+		ensureProjectTags(projectUpdateDto.getTagStrings(), project);
 		return toDto(projectRepo.save(project));
 	}
 	
@@ -134,18 +134,33 @@ public class ProjectService {
 		project.getOwner().getProjects().remove(project);
 	}
 	
-	private void createAndAddTagsToProject(List<String> tagStrings, UserProject project) {
-		if (tagStrings == null || tagStrings.isEmpty()) {
-			return;
+	private void ensureProjectTags(List<String> tagStrings, UserProject project) {
+		if (tagStrings == null) {
+			tagStrings = new ArrayList<>();
 		}
+		
+		List<ProjectTag> tagsToRemove = new ArrayList<>();
+		for (ProjectTag projectTag : project.getProjectTags()) {
+			if (!tagStrings.contains(projectTag.getTag().getName())) {
+				projectTag.getTag().getProjectTags().remove(projectTag);
+				if (projectTag.getTag().getProjectTags().isEmpty()) {
+					tagRepo.delete(projectTag.getTag());
+				}
+				tagsToRemove.add(projectTag);
+			}
+		}
+		
+		project.getProjectTags().removeAll(tagsToRemove);
+		
 		for (String tagString : tagStrings) {
-
+			log.info("checking if project \"" + project.getProjectName() + "\" under user with email \"" + project.getOwner().getEmail() + "\" is already tagged with \"" + tagString + "\"");
 			if (projectTagRepo.existsByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagString, project.getProjectName(), project.getOwner().getEmail())) {
 				log.info("project " + project.getProjectName() + " already contains tag " + tagString);
 				continue; // project already contains tag
 			}
 
 			Tag tag = projectTagService.getOrCreateTag(tagString);
+			log.info("creating new project tag with id \"" + tag.getId() + "\" and name \"" + tag.getName() + "\" for project \"" + project.getProjectName()+ "\"");
 			ProjectTag projectTag = new ProjectTag(new ProjectTagId(project.getId(), tag.getId()));
 			projectTag.setTag(tag);
 			projectTag.setProject(project);
