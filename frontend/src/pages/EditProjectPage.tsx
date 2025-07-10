@@ -7,7 +7,7 @@ import {ProjectNameInput} from "../components/ProjectNameInput.tsx";
 import {ProjectDescriptionInput} from "../components/ProjectDescriptionInput.tsx";
 import {ProjectVisibilityRadio} from "../components/ProjectVisibilityRadio.tsx";
 import {ProjectTagInput} from "../components/ProjectTagInput.tsx";
-import type {ProjectImage, ProjectImageElem, ProjectImagePrePersist} from "../types/image";
+import type {ProjectImage, ProjectImageElem} from "../types/image";
 import {ImageEditor} from "../components/ImageEditor.tsx";
 import {createImage, deleteImage, getAllImagesForProject, updateImage} from "../api/images.ts";
 import {HttpStatusCode} from "axios";
@@ -78,17 +78,11 @@ export function EditProjectPage() {
             return;
         }
 
-        updateProject(project.id, name, description, visibility, tags)
-            .then((updatedProject: Project) => {
-                console.log(updatedProject)
-                nav('/projects/' + updatedProject.projectName)
-            }).catch((err) => {
-            console.log(err)
-        });
+        await updateProject(project.id, name, description, visibility, tags)
 
         // delete images
         for (const img of deletedImages) {
-            await deleteImage(projectName, img.id)
+            await deleteImage(name, img.id)
                 .then((res) => {
                     if (res.status !== HttpStatusCode.NoContent) {
                         console.error(`Failed to delete image ${img.id}:`, res.statusText);
@@ -120,8 +114,8 @@ export function EditProjectPage() {
                 console.log("adding image with prev pos=" + image.position + " to queue in new position " + i)
                 positionToImageMap.set(i, image);
             } else {
-                await createImage(projectName, image.url, image.caption, image.dateTime).then(newImage => [i, newImage] as [number, ProjectImage]);
-                // const promise = createImage(projectName, image.url, image.caption, image.dateTime).then(newImage => [i, newImage] as [number, ProjectImage]);
+                await createImage(name, image.url, image.caption, image.dateTime).then(newImage => [i, newImage] as [number, ProjectImage]);
+                // const promise = createImage(name, image.url, image.caption, image.dateTime).then(newImage => [i, newImage] as [number, ProjectImage]);
                 // imageCreatePromises.push(promise);
             }
         }
@@ -133,8 +127,10 @@ export function EditProjectPage() {
         // update all images
         for (let i = 0; i < images.length; i++) {
             const image: ProjectImage = positionToImageMap.get(i)
-            await updateImage(projectName, image.id, i, image.url, image.caption, image.dateTime)
+            await updateImage(name, image.id, i, image.url, image.caption, image.dateTime)
         }
+
+        nav("/projects/" + name)
     };
 
     return (

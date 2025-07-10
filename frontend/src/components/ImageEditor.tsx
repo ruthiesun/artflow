@@ -30,6 +30,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
     const [editingImage, setEditingImage] = useState<ProjectImageElem | null>(null);
 
     const prepareToEdit = ((image: ProjectImageElem) => {
+        console.log("edit")
         setEditingImage(image)
         setShowEditImageModal(true)
     })
@@ -65,7 +66,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                     <SortableContext items={images.map(image => image.position)} strategy={verticalListSortingStrategy}>
                         <div className="flex flex-wrap">
                             {images.map((image) => (
-                                <SortableImage key={image.position} image={image} onClick={prepareToEdit} onDelete={prepareToDelete} />
+                                <SortableImage key={image.position} image={image} onEdit={prepareToEdit} onDelete={prepareToDelete} />
                                 // <SortableImage key={image.position} image={image} onClick={(()=>console.log("click"))} />
                             ))}
                         </div>
@@ -108,24 +109,36 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
             ref={setNodeRef}
             style={style}
             {...attributes}
+
             className="w-32 h-32 m-2 border rounded overflow-hidden relative"
-            onClick={() => onEdit(image)}
         >
-            <img src={image.url} alt="thumb" className="object-cover w-full h-full cursor-pointer" />
+            <img src={image.url} alt="thumb" className="object-cover w-full h-full" />
 
             {/* Optional: Add a visible drag handle icon */}
             <div
-                {...listeners}
-                className="absolute top-1 left-1 w-4 h-4 bg-gray-300 rounded cursor-grab z-10"
-                onClick={(e) => e.stopPropagation()} // prevent drag handle click from triggering modal
-            />
+                className="absolute top-1 left-1 w-8 h-5 bg-gray-300 rounded cursor-pointer z-10"
+                onClick={(e) => {
+                    e.stopPropagation()// prevent drag handle click from triggering modal
+                    onEdit(image)
+                }}
+            >
+                <p>edit</p>
+            </div>
             <div
-                className="absolute top-1 right-1 w-4 h-4 bg-gray-300 rounded cursor-pointer z-10"
+                {...listeners}
+                className="absolute top-1 left-10 w-8 h-5 bg-gray-300 rounded cursor-grab z-10"
+            >
+                <p>move</p>
+            </div>
+            <div
+                className="absolute top-1 right-1 w-8 h-5 bg-gray-300 rounded cursor-pointer z-10"
                 onClick={(e) => {
                     e.stopPropagation()// prevent drag handle click from triggering modal
                     onDelete(image)
                 }}
-            />
+            >
+                <p>delete</p>
+            </div>
         </div>
     );
 }
