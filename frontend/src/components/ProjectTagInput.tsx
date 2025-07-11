@@ -6,16 +6,16 @@ type ProjectTagInputProps = {
 };
 
 export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
-    const [currTag, setCurrTag] = useState<string>('');
+    const [currTag, setCurrTag] = useState<string>("");
 
     const addTag = (e) => {
-        if ((e.key === 'Enter' || e.key === ',') && currTag.trim() !== '') {
+        if ((e.key === "Enter" || e.key === ",") && currTag.trim() !== "") {
             e.preventDefault();
             const newTag = currTag.trim();
             if (!tags.includes(newTag)) {
                 setTags([...tags, newTag]);
             }
-            setCurrTag('');
+            setCurrTag("");
         }
     };
 

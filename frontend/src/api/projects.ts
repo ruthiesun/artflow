@@ -1,5 +1,5 @@
-import api from './axios'
-import type { Project } from '../types/project'
+import api from "./axios"
+import type {Project} from "../types/project"
 import type {Tag} from "../types/tag";
 
 export async function getAllProjects(): Promise<Project[]> {
@@ -8,7 +8,8 @@ export async function getAllProjects(): Promise<Project[]> {
 }
 
 export async function getAllPublicProjects(): Promise<Project[]> {
-    return api.get<Project[]>('/projects?visibility=public')
+    const params = new URLSearchParams({ visibility: 'public' });
+    return api.get<Project[]>(`/projects?${params.toString()}`)
         .then(res => res.data as Project[]);
 }
 
@@ -16,17 +17,18 @@ export async function getAllProjectsWithTags(tags: Tag[]): Promise<Project[]> {
     if (tags.length == 0) {
         return getAllProjects();
     }
-    let params = "";
+    let tagParams = "";
     for (const tag of tags) {
-        params += tag.tagName + ","
+        tagParams += tag.tagName + ","
     }
+    const params = new URLSearchParams({ tags: tagParams.substring(0, tagParams.length - 1) });
 
-    return api.get<Project[]>('/projects?tags=' + params.substring(0, params.length - 1))
+    return api.get<Project[]>(`/projects?${params.toString()}`)
         .then(res => res.data as Project[]);
 }
 
 export async function getProject(projectName: string): Promise<Project> {
-    return api.get<Project>('/projects/' + projectName)
+    return api.get<Project>(`/projects/${projectName}`)
         .then(res => res.data as Project);
 }
 
@@ -54,5 +56,5 @@ export async function updateProject(id: number, name: string, description: strin
 }
 
 export async function deleteProject(projectName: string) {
-    return api.delete<void>('/projects/' + projectName)
+    return api.delete<void>(`/projects/${projectName}`)
 }

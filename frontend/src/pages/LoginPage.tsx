@@ -1,13 +1,16 @@
-import {useEffect, useState} from 'react';
-import axios from "axios";
+import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import {EmailInput} from "../components/EmailInput.tsx";
+import {PasswordInput} from "../components/PasswordInput.tsx";
+import {login} from "../api/auth.ts";
 
 export function LoginPage() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
-    const handleLoginSubmit = (e) => {
+
+    const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
 
@@ -16,35 +19,20 @@ export function LoginPage() {
             return;
         }
 
-        axios
-                .post("http://localhost:8080/api/auth/login", {email: email, password: password})
-                .then((res) => {
-                        localStorage.setItem('authToken', res.data.token);
-                        nav('/projects');
-                }).catch(err => setError(err.message))
+        login(email, password)
+            .then((res) => {
+                localStorage.setItem("authToken", res.data.token);
+                nav("/projects");
+            })
+            .catch(err => setError(err.message));
     };
 
     return (
         <div>
             <div>
-                <form onSubmit={handleLoginSubmit}>
-                    <div>
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                        />
-                    </div>
+                <form onSubmit={handleSubmit}>
+                    <EmailInput email={email} setEmail={setEmail} />
+                    <PasswordInput password={password} setPassword={setPassword} />
 
                     {error && <p>{error}</p>}
 

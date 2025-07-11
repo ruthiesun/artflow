@@ -80,16 +80,16 @@ public class ProjectService {
 		}
 		
 		if (tags == null && visibility == null) {
-			return toDto(projectRepo.findByOwner_Email(userEmail));
+			return toDto(projectRepo.findByOwner_EmailOrderByCreatedDateTimeDesc(userEmail));
 		}
 		if (tags == null) {
-			return toDto(projectRepo.findByOwner_EmailAndVisibility(userEmail, visibility));
+			return toDto(projectRepo.findByOwner_EmailAndVisibilityOrderByCreatedDateTimeDesc(userEmail, visibility));
 		}
 		if (visibility == null) {
-			return toDto(projectRepo.findByEmailAndTags(userEmail, tags));
+			return toDto(projectRepo.findByEmailAndTagsOrderByCreatedDateTime(userEmail, tags));
 		}
 		else {
-			return toDto(projectRepo.findByEmailAndVisibilityAndTags(userEmail, visibility, tags));
+			return toDto(projectRepo.findByEmailAndVisibilityAndTagsOrderByCreatedDateTime(userEmail, visibility, tags));
 		}
 	}
 	

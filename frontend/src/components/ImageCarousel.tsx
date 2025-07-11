@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import type {ProjectImage} from "../types/image";
-import {getAllImagesForProject} from "../api/images.ts";
+import {getImagesForProject} from "../api/images.ts";
 
 type ImageCarouselProps = {
     projectName: string;
@@ -8,33 +8,36 @@ type ImageCarouselProps = {
 
 export function ImageCarousel({ projectName }: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getAllImagesForProject(projectName)
-            .then((retrievedImages) =>
-                setImages(retrievedImages)
-            );}, []);
+        getImagesForProject(projectName)
+            .then((projectImages) =>
+                setImages(projectImages)
+            )
+            .catch((err) => {
+                setError(err)
+            })
+        }, []);
+
+    if (error) return <div>{error}</div>;
 
     return (
         <div>
-            {images.map((src, index) => (
+            {images.map((image, index) => (
                 <div key={index}>
                     <img
-
-                        src={src.url}
+                        src={image.url}
                         alt={`Image ${index + 1}`}
                         className="h-40 rounded-xl shadow-md inline-block"
                     />
-                    {src.dateTime == null ? (
+                    {image.dateTime == null ? (
                         <p>Date: unknown</p>
                     ) : (
-                        <p>Date: {src.dateTime}</p>
+                        <p>Date: {image.dateTime}</p>
                     )}
-                    <p>{src.caption}
-                    </p>
-                    <p>
-                        position: {src.position}
-                    </p>
+                    <p>{image.caption}</p>
+                    <p>position: {image.position}</p>
                 </div>
             ))}
         </div>
@@ -43,19 +46,26 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
 
 export function ImageCarouselPreview({ projectName }: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getAllImagesForProject(projectName)
-            .then((retrievedImages) =>
-                setImages(retrievedImages)
-            );}, []);
+        getImagesForProject(projectName)
+            .then((projectImages) =>
+                setImages(projectImages)
+            )
+            .catch((err) => {
+                setError(err)
+            })
+    }, []);
+
+    if (error) return <div>{error}</div>;
 
     return (
         <div className="overflow-x-auto whitespace-nowrap space-x-4 flex p-2">
-            {images.map((src, index) => (
+            {images.map((image, index) => (
                 <img
                     key={index}
-                    src={src.url}
+                    src={image.url}
                     alt={`Image ${index + 1}`}
                     className="h-40 rounded-xl shadow-md inline-block"
                 />

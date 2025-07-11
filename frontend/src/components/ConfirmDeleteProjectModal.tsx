@@ -14,26 +14,23 @@ export function ConfirmDeleteProjectModal({ projectName }: ConfirmDeleteProjectP
     const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
-        console.log(typedName)
-        console.log(projectName)
+
         if (typedName !== projectName) {
             setError("Entered name does not match project name");
-            return;
         }
 
         deleteProject(projectName)
             .then(() => {
-                nav('/projects')
-            }).catch((err) => {
-            console.log(err)
-        });
+                nav("/projects")
+            })
+            .catch((err) => {
+                setError(err)
+            });
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <p>
-                Confirm that you want to delete {projectName} by typing in the project name below:
-            </p>
+            <p>Confirm that you want to delete {projectName} by typing in the project name below:</p>
             {error && <p>{error}</p>}
             <input
                 type="text"

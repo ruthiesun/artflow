@@ -3,49 +3,51 @@ import type {Project} from "../types/project";
 import {getProject} from "../api/projects.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import type {ProjectTag} from "../types/tag";
-import {getAllTagsForProject} from "../api/tags.ts";
+import {getTagsForProject} from "../api/tags.ts";
 import {ConfirmDeleteProjectModal} from "../components/ConfirmDeleteProjectModal.tsx";
-import {ImageCarousel, ImageCarouselPreview} from "../components/ImageCarousel.tsx";
+import {ImageCarousel} from "../components/ImageCarousel.tsx";
 
 export function ProjectPage() {
-    const [project, setProject] = useState<Project>(null)
-    const { projectName } = useParams<{ projectName: string }>()
-    const [error, setError] = useState<string | null>(null)
-    const [tags, setTags] = useState<ProjectTag[]>([])
-    const [loading, setLoading] = useState(true);
-    const nav = useNavigate();
+    const {projectName} = useParams<{ projectName: string }>();
+    const [project, setProject] = useState<Project>(null);
+    const [tags, setTags] = useState<ProjectTag[]>([]);
     const [showModal, setShowModal] = useState(false);
-
-    if (projectName == null) {
-        setError("Null project name")
-        return <div>{error}</div>;
-    }
+    const [error, setError] = useState<string | null>(null);
+    const nav = useNavigate();
 
     useEffect(() => {
+        if (!projectName) {
+            setError("Null project name");
+            return;
+        }
+
         getProject(projectName)
             .then((retrievedProject) => {
-                setProject(retrievedProject)
-                setLoading(false)
-            });}, []);
+                setProject(retrievedProject);
+            })
+            .catch(err => {
+                setError(err.message);
+            });
 
+        getTagsForProject(projectName)
+            .then((projectTags) => {
+                setTags(projectTags);
+            })
+            .catch(err => {
+                setError(err.message);
+            });
 
+    }, [projectName]);
 
-    useEffect(() => {
-        getAllTagsForProject(projectName)
-            .then((retrievedTags) => {
-                setTags(retrievedTags)
-            });}, []);
-
-    if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
-    if (!project) return <div>No project found</div>;
+    if (!projectName || !project) return <div>Loading...</div>;
 
     return (
         <div>
             <h1>{project.projectName}</h1>
             <button
                 type="button"
-                onClick={() => nav('edit')}
+                onClick={() => nav("edit")}
                 >
                 Edit
             </button>
@@ -56,7 +58,7 @@ export function ProjectPage() {
                 Delete project
             </button>
             <div>
-                {tags.map((tag) => (
+                {tags.map((tag: ProjectTag) => (
                     <p key={tag.tagName}>{tag.tagName}</p>
                 ))}
             </div>

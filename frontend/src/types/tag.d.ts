@@ -1,8 +1,8 @@
-export interface ProjectTag {
-    projectName: string
+export type Tag = {
     tagName: string
 }
 
-export interface Tag {
+export type ProjectTag = {
+    projectName: string
     tagName: string
 }

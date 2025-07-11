@@ -9,18 +9,12 @@ import {
 } from "@dnd-kit/sortable";
 import {closestCenter, DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {AddImageModal, EditImageModal} from "./ImageModal.tsx";
-import type {Project} from "../types/project";
 
 type ImageEditorProps = {
     projectName: string
     images: ProjectImageElem[];
     setImages: ((newImages: ProjectImageElem[]) => void)
     addDeletedImage: ((imageToDelete: ProjectImage) => void)
-};
-
-type SortableImageProps = {
-    image: ProjectImageElem;
-    onClick: (image: ProjectImageElem) => void;
 };
 
 export function ImageEditor({projectName, images, setImages, addDeletedImage}: ImageEditorProps) {
@@ -30,7 +24,6 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
     const [editingImage, setEditingImage] = useState<ProjectImageElem | null>(null);
 
     const prepareToEdit = ((image: ProjectImageElem) => {
-        console.log("edit")
         setEditingImage(image)
         setShowEditImageModal(true)
     })
@@ -39,13 +32,13 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
         if ("id" in image) {
             addDeletedImage(image as ProjectImage)
         }
-        const newImages: ProjectImageElem[] = []
-        for (const img of images) {
-            if (image.position !== img.position) {
-                newImages.push(img)
+        const updatedImages: ProjectImageElem[] = []
+        for (const currImage of images) {
+            if (image.position !== currImage.position) {
+                updatedImages.push(currImage)
             }
         }
-        setImages(newImages)
+        setImages(updatedImages)
     })
 
     return (
@@ -59,7 +52,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                         if (over && active.id !== over.id) {
                             const oldIndex = images.findIndex((img) => img.position === active.id);
                             const newIndex = images.findIndex((img) => img.position === over.id);
-                            setImages(((imgs) => arrayMove(imgs, oldIndex, newIndex)) as ProjectImageElem[]);
+                            setImages(((prev) => arrayMove(prev, oldIndex, newIndex)) as ProjectImageElem[]);
                         }
                     }}
                 >
@@ -67,28 +60,29 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                         <div className="flex flex-wrap">
                             {images.map((image) => (
                                 <SortableImage key={image.position} image={image} onEdit={prepareToEdit} onDelete={prepareToDelete} />
-                                // <SortableImage key={image.position} image={image} onClick={(()=>console.log("click"))} />
                             ))}
                         </div>
                     </SortableContext>
                 </DndContext>
             </div>
-            <button type='button' onClick={() => setShowAddImageModal(true)}>
+            <button type="button" onClick={() => setShowAddImageModal(true)}>
                 Add new image
             </button>
-            {showAddImageModal && (
-                <div>
-                    <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))}/>
-                </div>
-            )}
-            {showEditImageModal && editingImage != null && (
-                <div>
-                    <EditImageModal editingImage={editingImage} setImages={setImages} images={images} onClose={(() => setShowEditImageModal(false))}/>
-                </div>
-            )}
+            {showAddImageModal &&
+                <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))} />
+            }
+            {showEditImageModal && editingImage != null &&
+                <EditImageModal editingImage={editingImage} setImages={setImages} images={images} onClose={(() => setShowEditImageModal(false))} />
+            }
         </div>
     )
 }
+
+type SortableImageProps = {
+    image: ProjectImageElem;
+    onEdit: (image: ProjectImageElem) => void;
+    onDelete: (image: ProjectImageElem) => void;
+};
 
 function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
     const {
@@ -112,7 +106,7 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
 
             className="w-32 h-32 m-2 border rounded overflow-hidden relative"
         >
-            <img src={image.url} alt="thumb" className="object-cover w-full h-full" />
+            <img src={image.url} alt="A project image" className="object-cover w-full h-full" />
 
             {/* Optional: Add a visible drag handle icon */}
             <div

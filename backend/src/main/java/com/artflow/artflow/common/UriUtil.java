@@ -9,7 +9,7 @@ import java.util.List;
 public class UriUtil {
 	public static final String BASE = "/api";
 	public static final String AUTH = "/auth";
-	public static final String SIGNUP = "/signup";
+	public static final String SIGNUP = "/register";
 	public static final String LOGIN = "/login";
 	public static final String PROJECTS = "/projects";
 	

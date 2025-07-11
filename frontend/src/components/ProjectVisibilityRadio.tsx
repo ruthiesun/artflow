@@ -1,6 +1,6 @@
 type ProjectVisibilityRadioProps = {
-    visibility: 'public' | 'private';
-    setVisibility: ((newValue: 'public' | 'private') => void)
+    visibility: "public" | "private";
+    setVisibility: ((newValue: "public" | "private") => void)
 };
 
 export function ProjectVisibilityRadio({ visibility, setVisibility }: ProjectVisibilityRadioProps) {
@@ -13,8 +13,8 @@ export function ProjectVisibilityRadio({ visibility, setVisibility }: ProjectVis
                         type="radio"
                         name="visibility"
                         value="public"
-                        checked={visibility == 'public'}
-                        onChange={() => setVisibility('public')}
+                        checked={visibility == "public"}
+                        onChange={() => setVisibility("public")}
                     />
                     Public
                 </label>
@@ -23,8 +23,8 @@ export function ProjectVisibilityRadio({ visibility, setVisibility }: ProjectVis
                         type="radio"
                         name="visibility"
                         value="private"
-                        checked={visibility == 'private'}
-                        onChange={() => setVisibility('private')}
+                        checked={visibility == "private"}
+                        onChange={() => setVisibility("private")}
                     />
                     Private
                 </label>

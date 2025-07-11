@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from "react"
 
-import type { Project } from '../types/project'
+import type {Project} from "../types/project"
 import {getAllProjectsWithTags} from "../api/projects.ts";
 import {ImageCarouselPreview} from "../components/ImageCarousel.tsx";
 import {Link} from "react-router-dom";
-import {getAllTags} from "../api/tags.ts";
+import {getTagsForUser} from "../api/tags.ts";
 import type {Tag} from "../types/tag";
 import {useNavigate} from "react-router-dom";
 
@@ -12,34 +12,40 @@ export function HomePage() {
     const [projects, setProjects] = useState<Project[]>([])
     const [deselectedTags, setDeselectedTags] = useState<Tag[]>([])
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
-        console.log("calling getAllTags")
-        getAllTags()
-            .then((retrievedTags) => {
-                setSelectedTags(retrievedTags)
-                console.log("getAllTags: " + retrievedTags)
-            });}, []);
+        getTagsForUser()
+            .then((allTags) => {
+                setDeselectedTags(allTags)
+            })
+            .catch(err => {
+                setError(err.message)
+            })
+        }, []);
 
     useEffect(() => {
-        console.log("calling getAllProjectsWithTags")
         getAllProjectsWithTags(selectedTags)
-            .then((retrievedProjects) => {
-                setProjects(retrievedProjects)
-                console.log("getAllProjectsWithTags: " + retrievedProjects)
-            });}, [selectedTags]);
+            .then((allProjects) => {
+                setProjects(allProjects)
+            })
+            .catch(err => {
+                setError(err.message)
+            })
+        }, [selectedTags, deselectedTags]);
 
-
-    const selectTag = (tag: Tag) => {
-        setSelectedTags(prev => [...prev, tag]);
-        setDeselectedTags(prev => prev.filter(t => t.tagName !== tag.tagName));
+    const selectTag = (selectedTag: Tag) => {
+        setSelectedTags(prev => [...prev, selectedTag]);
+        setDeselectedTags(prev => prev.filter(tag => tag.tagName !== selectedTag.tagName));
     };
 
-    const deselectTag = (tag: Tag) => {
-        setDeselectedTags(prev => [...prev, tag]);
-        setSelectedTags(prev => prev.filter(t => t.tagName !== tag.tagName));
+    const deselectTag = (deselectedTag: Tag) => {
+        setDeselectedTags(prev => [...prev, deselectedTag]);
+        setSelectedTags(prev => prev.filter(tag => tag.tagName !== deselectedTag.tagName));
     };
+
+    if (error) return <div>{error}</div>;
 
     return (
         <div>
@@ -53,7 +59,7 @@ export function HomePage() {
                 </button>
             </div>
             <div>
-                {selectedTags.map((tag) => (
+                {selectedTags.map((tag: Tag) => (
                     <div key={tag.tagName}>
                         <button
                             type="button"
@@ -64,7 +70,7 @@ export function HomePage() {
                         </button>
                     </div>
                 ))}
-                {deselectedTags.map((tag) => (
+                {deselectedTags.map((tag: Tag) => (
                     <div key={tag.tagName}>
                         <button
                             type="button"
@@ -76,13 +82,14 @@ export function HomePage() {
                 ))}
             </div>
             <div>
-                {projects.map((project) => (
+                {projects.map((project: Project) => (
                     <div key={project.projectName}>
                         <h2>
                             <Link to={project.projectName}>
                                 {project.projectName}
                             </Link>
                         </h2>
+                        <p>{project.description}</p>
                         <ImageCarouselPreview projectName={project.projectName} />
                     </div>
                 ))}
