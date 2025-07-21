@@ -1,0 +1,33 @@
+import {AxiosError} from "axios";
+import {H1, H3, Text} from "../components/Text.tsx";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import { useLocation, useNavigate } from 'react-router-dom';
+
+type ErrorState = {
+    status?: number;
+    message?: string;
+    details?: any;
+};
+
+export function ErrorPage() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const state = location.state as ErrorState;
+
+    return (
+        <Background className="px-4" content={
+            <BackgroundBorder className="max-w-lg" content={
+                <div>
+                    <H3 content="Something went wrong" className="text-text text-center"/>
+                    <Text className="mt-2" content={`Status: ${state?.status ?? 'Unknown'}`}/>
+                    <Text className="text-gray-700" content={`Message: ${state?.message ?? 'None'}`}/>
+                    {state?.details && (
+                        <pre className="mt-4 p-2 rounded text-sm overflow-auto">
+          {JSON.stringify(state.details, null, 2)}
+                    </pre>
+                    )}
+                </div>
+            }/>
+        }/>
+    )
+}

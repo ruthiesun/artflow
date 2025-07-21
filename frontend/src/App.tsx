@@ -5,6 +5,7 @@ import {RegisterPage} from "./pages/RegisterPage.tsx";
 import {ProjectPage} from "./pages/ProjectPage.tsx";
 import {NewProjectPage} from "./pages/NewProjectPage.tsx";
 import {EditProjectPage} from "./pages/EditProjectPage.tsx";
+import {ErrorPage} from "./pages/ErrorPage.tsx";
 
 const App = () => {
     return (
@@ -16,6 +17,7 @@ const App = () => {
                 <Route path="/projects/new" element={<NewProjectPage />} />
                 <Route path="/projects/:projectName" element={<ProjectPage />} />
                 <Route path="/projects/:projectName/edit" element={<EditProjectPage />} />
+                <Route path="/error" element={<ErrorPage />} />
             </Routes>
         </Router>
     );

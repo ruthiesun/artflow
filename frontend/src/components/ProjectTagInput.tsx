@@ -40,7 +40,7 @@ export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
             </div>
 
             <input
-                className="border px-3 py-2 rounded w-full"
+                className="border px-3 py-2 rounded w-full placeholder:text-gray-500 placeholder:italic"
                 placeholder="Type a tag and press Enter"
                 value={currTag}
                 onChange={e => setCurrTag(e.target.value)}

@@ -44,7 +44,7 @@ export function ProjectPage() {
 
     return (
         <div>
-            <h1>{project.projectName}</h1>
+            <h1 className="text-header">{project.projectName}</h1>
             <button
                 type="button"
                 onClick={() => nav("edit")}
@@ -69,7 +69,7 @@ export function ProjectPage() {
             </div>
             <ImageCarousel projectName={project.projectName} />
             {showModal && (
-                <ConfirmDeleteProjectModal projectName={project.projectName} />
+                <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>
             )}
         </div>
     )

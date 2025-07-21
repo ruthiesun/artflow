@@ -3,10 +3,12 @@ import {useEffect, useState} from "react"
 import type {Project} from "../types/project"
 import {getAllProjectsWithTags} from "../api/projects.ts";
 import {ImageCarouselPreview} from "../components/ImageCarousel.tsx";
-import {Link} from "react-router-dom";
 import {getTagsForUser} from "../api/tags.ts";
 import type {Tag} from "../types/tag";
 import {useNavigate} from "react-router-dom";
+import {NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import {H1, H3, Text} from "../components/Text.tsx";
 
 export function HomePage() {
     const [projects, setProjects] = useState<Project[]>([])
@@ -48,52 +50,40 @@ export function HomePage() {
     if (error) return <div>{error}</div>;
 
     return (
-        <div>
-            <h1>My Projects</h1>
-            <div>
-                <button
-                    type={"button"}
-                    onClick={() => nav("new")}
-                >
-                    New project
-                </button>
-            </div>
-            <div>
-                {selectedTags.map((tag: Tag) => (
-                    <div key={tag.tagName}>
-                        <button
-                            type="button"
-                            className="bg-blue-500"
-                            onClick={() => deselectTag(tag)}
-                        >
-                            {tag.tagName}
-                        </button>
+        <Background className="px-10 py-5" content={
+            <BackgroundBorder content={
+                <div>
+                    <H1 content="My Projects" />
+                    <div>
+                        <NavButton type="button" text="New project" onClick={() => nav("new")} />
                     </div>
-                ))}
-                {deselectedTags.map((tag: Tag) => (
-                    <div key={tag.tagName}>
-                        <button
-                            type="button"
-                            onClick={() => selectTag(tag)}
-                        >
-                            {tag.tagName}
-                        </button>
+                    <div>
+                        <div className="flex flex-wrap">
+                            {selectedTags.map((tag: Tag) => (
+                                <div key={tag.tagName}>
+                                    <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
+                                </div>
+                            ))}
+                            {deselectedTags.map((tag: Tag) => (
+                                <div key={tag.tagName}>
+                                    <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                ))}
-            </div>
-            <div>
-                {projects.map((project: Project) => (
-                    <div key={project.projectName}>
-                        <h2>
-                            <Link to={project.projectName}>
-                                {project.projectName}
-                            </Link>
-                        </h2>
-                        <p>{project.description}</p>
-                        <ImageCarouselPreview projectName={project.projectName} />
+                    <div className="mt-4">
+                        {projects.map((project: Project) => (
+                            <div key={project.projectName} className="rounded-xl p-2 bg-project-preview-bg mb-4 group cursor-pointer border border-project-preview-border" onClick={() => nav(project.projectName)}>
+                                <H3 className="text-project-name group-hover:opacity-50 transition-opacity" content={project.projectName} />
+                                <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
+                                <div className="rounded-lg bg-white group-hover:opacity-50 transition-opacity">
+                                    <ImageCarouselPreview projectName={project.projectName} />
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-        </div>
-    )
+                </div>
+            } />
+        } />
+    );
 }

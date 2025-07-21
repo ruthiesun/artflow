@@ -1,3 +1,5 @@
+import {Input} from "./Input.tsx";
+
 type PasswordInputProps = {
     password: string;
     setPassword: ((newValue: string) => void)
@@ -12,14 +14,5 @@ export function ConfirmPasswordInput({ password, setPassword }: PasswordInputPro
 }
 
 function GenericPasswordInput({ password, setPassword, label}) {
-    return (
-        <div>
-            <label>{label}</label>
-            <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-            />
-        </div>
-    )
+    return (<Input label={label} type="password" value={password} setValue={setPassword} />)
 }

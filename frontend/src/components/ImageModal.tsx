@@ -60,14 +60,11 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
     const [caption, setCaption] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = ((e) => {
-        e.preventDefault();
-
+    const updateImages = (() => {
         if (!url) {
             setError("URL must be nonempty")
             return
         }
-
         const newImage: ProjectImagePrePersist = {position: images.length, caption: caption, dateTime: date, url: url, projectName: projectName}
         setImages([...images, newImage]);
         onClose()
@@ -75,15 +72,13 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
                 {error && <p>{error}</p>}
                 <UrlInput url={url} setUrl={setUrl}/>
                 <CaptionInput caption={caption} setCaption={setCaption}/>
                 <DateInput date={date} setDate={setDate}/>
-                <button type='submit'>
+                <button type="button" onClick={updateImages}>
                     Create
                 </button>
-            </form>
         </div>
     )
 }

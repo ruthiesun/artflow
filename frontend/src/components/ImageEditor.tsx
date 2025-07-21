@@ -120,7 +120,7 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
             </div>
             <div
                 {...listeners}
-                className="absolute top-1 left-10 w-8 h-5 bg-gray-300 rounded cursor-grab z-10"
+                className="absolute top-1 left-10 w-8 h-5 bg-violet-500 hover:bg-violet-600 focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700 z-10"
             >
                 <p>move</p>
             </div>

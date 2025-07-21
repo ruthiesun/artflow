@@ -1,1 +1,34 @@
+@import "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap";
 @import "tailwindcss";
+
+@theme {
+    --font-display-font: "Playfair Display", sans-serif;
+    --font-header-font: "DM Sans", sans-serif;
+    --font-text-font: "Urbanist", sans-serif;
+    --color-bg: var(--color-indigo-400);
+    --color-backing: var(--color-stone-100);
+    --color-header: var(--color-indigo-400);
+    --color-label: var(--color-indigo-800);
+    --color-text: var(--color-indigo-950);
+    --color-input-text: var(--color-indigo-800);
+    --color-input-border: var(--color-indigo-800);
+    --color-input-border-focus: var(--color-indigo-800);
+    --color-tag-text-selected: var(--color-stone-100);
+    --color-tag-selected: var(--color-indigo-400);
+    --color-tag-text-deselected: var(--color-stone-100);
+    --color-tag-deselected: var(--color-stone-400);
+    --color-disabled-button: var(--color-stone-600);
+    --color-submit-button: var(--color-indigo-600);
+    --color-submit-button-hover: var(--color-indigo-400);
+    --color-submit-button-text: var(--color-stone-100);
+    --color-nav-button: var(--color-fuchsia-600);
+    --color-nav-button-hover: var(--color-fuchsia-400);
+    --color-nav-button-text: var(--color-stone-100);
+    --color-link: var(--color-indigo-800);
+    --color-link-hover: var(--color-indigo-400);
+    --color-shadow: var(--color-stone-300);
+    --color-project-name: var(--color-fuchsia-600);
+    --color-project-preview-bg: var(--color-stone-200);
+    --color-project-preview-border: var(--color-stone-300);
+    --color-error-color: var(--color-red-500);
+}
