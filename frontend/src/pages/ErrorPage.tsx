@@ -18,9 +18,9 @@ export function ErrorPage() {
         <Background className="px-4" content={
             <BackgroundBorder className="max-w-lg" content={
                 <div>
-                    <H3 content="Something went wrong" className="text-text text-center"/>
+                    <H3 content="Something went wrong" className="text-text-color text-center"/>
                     <Text className="mt-2" content={`Status: ${state?.status ?? 'Unknown'}`}/>
-                    <Text className="text-gray-700" content={`Message: ${state?.message ?? 'None'}`}/>
+                    <Text content={`Message: ${state?.message ?? 'None'}`}/>
                     {state?.details && (
                         <pre className="mt-4 p-2 rounded text-sm overflow-auto">
           {JSON.stringify(state.details, null, 2)}
@@ -30,4 +30,14 @@ export function ErrorPage() {
             }/>
         }/>
     )
+}
+
+export function navToErrorPage(nav, err) {
+    nav("/error", {
+        state: {
+            status: err.response?.status,
+            message: err.message,
+            details: err.response?.data
+        }
+   });
 }

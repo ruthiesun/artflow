@@ -9,12 +9,13 @@ import {useNavigate} from "react-router-dom";
 import {NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
 import {Background, BackgroundBorder} from "../components/Background.tsx";
 import {H1, H3, Text} from "../components/Text.tsx";
+import {LazyComponent} from "../components/LazyComponent.tsx";
+import { navToErrorPage } from "./ErrorPage.tsx";
 
 export function HomePage() {
     const [projects, setProjects] = useState<Project[]>([])
     const [deselectedTags, setDeselectedTags] = useState<Tag[]>([])
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
@@ -23,7 +24,7 @@ export function HomePage() {
                 setDeselectedTags(allTags)
             })
             .catch(err => {
-                setError(err.message)
+                navToErrorPage(nav, err);
             })
         }, []);
 
@@ -33,7 +34,7 @@ export function HomePage() {
                 setProjects(allProjects)
             })
             .catch(err => {
-                setError(err.message)
+                navToErrorPage(nav, err);
             })
         }, [selectedTags, deselectedTags]);
 
@@ -47,7 +48,6 @@ export function HomePage() {
         setSelectedTags(prev => prev.filter(tag => tag.tagName !== deselectedTag.tagName));
     };
 
-    if (error) return <div>{error}</div>;
 
     return (
         <Background className="px-10 py-5" content={
@@ -60,26 +60,24 @@ export function HomePage() {
                     <div>
                         <div className="flex flex-wrap">
                             {selectedTags.map((tag: Tag) => (
-                                <div key={tag.tagName}>
-                                    <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
-                                </div>
+                                <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
                             ))}
                             {deselectedTags.map((tag: Tag) => (
-                                <div key={tag.tagName}>
-                                    <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
-                                </div>
+                                <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
                             ))}
                         </div>
                     </div>
                     <div className="mt-4">
                         {projects.map((project: Project) => (
-                            <div key={project.projectName} className="rounded-xl p-2 bg-project-preview-bg mb-4 group cursor-pointer border border-project-preview-border" onClick={() => nav(project.projectName)}>
-                                <H3 className="text-project-name group-hover:opacity-50 transition-opacity" content={project.projectName} />
-                                <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
-                                <div className="rounded-lg bg-white group-hover:opacity-50 transition-opacity">
-                                    <ImageCarouselPreview projectName={project.projectName} />
+//                             <LazyComponent key={project.projectName}>
+                                <div key={project.projectName} className="rounded-xl p-2 bg-project-preview-bg mb-4 group cursor-pointer border border-project-preview-border" onClick={() => nav(project.projectName)}>
+                                    <H3 className="text-project-name group-hover:opacity-50 transition-opacity" content={project.projectName} />
+                                    <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
+                                    <div className="rounded-lg bg-white group-hover:opacity-50 transition-opacity">
+                                        <ImageCarouselPreview projectName={project.projectName} />
+                                    </div>
                                 </div>
-                            </div>
+//                             </LazyComponent>
                         ))}
                     </div>
                 </div>

@@ -6,6 +6,7 @@ import {login} from "../api/auth.ts";
 import {SubmitButton} from "../components/Button.tsx";
 import {Background, BackgroundBorder} from "../components/Background.tsx";
 import {ErrorText, H1} from "../components/Text.tsx";
+import { navToErrorPage } from "./ErrorPage.tsx";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
@@ -24,16 +25,10 @@ export function LoginPage() {
             })
             .catch(err => {
                 if (err.response?.status === 401) {
-                    setError("Invalid login credentials")
+                    setError("Invalid login credentials");
                 }
                 else {
-                    nav("/error", {
-                        state: {
-                            status: err.response?.status,
-                            message: err.message,
-                            details: err.response?.data
-                        }
-                    });
+                    navToErrorPage(nav, err);
                 }
             });
     };

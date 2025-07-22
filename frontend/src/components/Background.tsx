@@ -5,7 +5,7 @@ type Props = {
 
 export function Background({className, content}: Props) {
     return (
-        <div className={`min-h-screen flex items-center justify-center bg-bg ${className}`}>
+        <div className={`min-h-screen flex items-center justify-center bg-bg-color ${className}`}>
             {content}
         </div>
     )
@@ -13,7 +13,7 @@ export function Background({className, content}: Props) {
 
 export function BackgroundBorder({className, content}: Props) {
     return (
-        <div className={`w-full rounded-2xl shadow-lg p-8 bg-backing ${className}`}>
+        <div className={`w-full rounded-2xl shadow-lg p-8 bg-backing-color ${className}`}>
             {content}
         </div>
     )

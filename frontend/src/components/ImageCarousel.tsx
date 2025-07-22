@@ -2,6 +2,9 @@ import {useEffect, useState} from "react";
 import type {ProjectImage} from "../types/image";
 import {getImagesForProject} from "../api/images.ts";
 import {Modal} from "./Modal.tsx";
+import { navToErrorPage } from "../pages/ErrorPage.tsx";
+import {useNavigate} from "react-router-dom";
+import {H1, H3, Text, TimestampText} from "./Text.tsx";
 
 type ImageDisplayProps = {
     image: ProjectImage
@@ -12,7 +15,7 @@ function ImageDisplaySmall({image}: ImageDisplayProps) {
         <img
         src={image.url}
         alt={`image in position: ${image.position}`}
-        className="h-full rounded-sm inline-block object-contain"
+        className="h-full rounded-sm inline-block object-contain shadow-sm"
     />)
 }
 
@@ -21,7 +24,7 @@ function ImageDisplayLarge({image}: ImageDisplayProps) {
         <img
             src={image.url}
             alt={`image in position: ${image.position}`}
-            className="h-40 shadow-sm inline-block"
+            className="h-auto max-h-[90vh] max-w-full rounded-lg object-contain shadow-sm"
         />)
 }
 
@@ -55,6 +58,7 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     const [selectedImage, setSelectedImage] = useState<ProjectImage>(null)
     const [showImageDetailsModal, setShowImageDetailsModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const nav = useNavigate()
 
     useEffect(() => {
         getImagesForProject(projectName)
@@ -62,11 +66,9 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
                 setImages(projectImages)
             )
             .catch((err) => {
-                setError(err)
+                navToErrorPage(nav, err);
             })
         }, []);
-
-    if (error) return <div>{error}</div>;
 
     const prepareToShowImageDetails = (img: ProjectImage) => {
         setSelectedImage(img);
@@ -75,22 +77,28 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
 
     return (
         <div>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6">
             {images.map((image, index) => (
-                <div key={index} onClick={() => prepareToShowImageDetails(image)}>
-                    <ImageDisplaySmall image={image} />
-                    <p>position: {image.position}</p>
+                <div key={index} className="flex-col flex">
+                    <div className="cursor-pointer hover:opacity-50 h-max w-max max-w-full"
+                        onClick={() => prepareToShowImageDetails(image)}>
+                        <ImageDisplayLarge image={image} />
+                        <div>
+                        test
+                        </div>
+                    </div>
+                    <div className="h-10 sm:h-12 md:h-14 lg:h-16">
+                    </div>
                 </div>
             ))}
-        </div>
             {selectedImage && showImageDetailsModal && <ImageDetails image={selectedImage} onClose={() => setShowImageDetailsModal(false)} />}
         </div>
     )
 }
 
-export function ImageCarouselPreview({ projectName }: ImageCarouselProps) {
+export function ImageCarouselPreview({ projectName, }: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
     const [error, setError] = useState<string | null>(null);
+    const nav = useNavigate()
 
     useEffect(() => {
         getImagesForProject(projectName)
@@ -98,11 +106,9 @@ export function ImageCarouselPreview({ projectName }: ImageCarouselProps) {
                 setImages(projectImages)
             )
             .catch((err) => {
-                setError(err)
+                navToErrorPage(nav, err);
             })
     }, []);
-
-    if (error) return <div>{error}</div>;
 
     return (
         <div className="overflow-x-auto whitespace-nowrap
@@ -112,7 +118,7 @@ export function ImageCarouselPreview({ projectName }: ImageCarouselProps) {
         scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             {images.map((image, index) => (
                 <div key={index} className="flex-shrink-0
-                h-40 sm:h-48 md:h-56 md:h-64">
+                h-40 sm:h-48 md:h-56 lg:h-64">
                     <ImageDisplaySmall image={image} />
                 </div>
             ))}

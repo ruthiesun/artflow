@@ -6,6 +6,9 @@ import type {ProjectTag} from "../types/tag";
 import {getTagsForProject} from "../api/tags.ts";
 import {ConfirmDeleteProjectModal} from "../components/ConfirmDeleteProjectModal.tsx";
 import {ImageCarousel} from "../components/ImageCarousel.tsx";
+import {DisplayOnlyTagButton, DeleteButton, NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import {H1, H3, Text, TimestampText} from "../components/Text.tsx";
 
 export function ProjectPage() {
     const {projectName} = useParams<{ projectName: string }>();
@@ -26,7 +29,7 @@ export function ProjectPage() {
                 setProject(retrievedProject);
             })
             .catch(err => {
-                setError(err.message);
+                navToErrorPage(nav, err);
             });
 
         getTagsForProject(projectName)
@@ -34,43 +37,40 @@ export function ProjectPage() {
                 setTags(projectTags);
             })
             .catch(err => {
-                setError(err.message);
+                navToErrorPage(nav, err);
             });
 
     }, [projectName]);
 
-    if (error) return <div>{error}</div>;
     if (!projectName || !project) return <div>Loading...</div>;
 
     return (
-        <div>
-            <h1 className="text-header">{project.projectName}</h1>
-            <button
-                type="button"
-                onClick={() => nav("edit")}
-                >
-                Edit
-            </button>
-            <button
-                type="button"
-                onClick={() => setShowModal(true)}
-            >
-                Delete project
-            </button>
-            <div>
-                {tags.map((tag: ProjectTag) => (
-                    <p key={tag.tagName}>{tag.tagName}</p>
-                ))}
-            </div>
-            <div>
-                <p>Created {project.createdDateTime}</p>
-                <p>Last updated {project.updatedDateTime}</p>
-                <p>{project.description}</p>
-            </div>
-            <ImageCarousel projectName={project.projectName} />
-            {showModal && (
-                <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>
-            )}
-        </div>
-    )
+        <Background className="px-10 py-5" content={
+            <BackgroundBorder content={
+                <div>
+                    <H1 content={project.projectName} />
+                    <NavButton type="button" text="Edit" onClick={() => nav("edit")} />
+                    <DeleteButton type="button" text="Delete project" onClick={() => setShowModal(true)} />
+                    <div>
+                        {tags.map((tag: ProjectTag) => (
+                            <DisplayOnlyTagButton key={tag.tagName} type="button" text={tag.tagName} />
+                        ))}
+                    </div>
+                    <div className="mt-5 mb-5">
+                        <TimestampText content={`Created: ${project.createdDateTime}`} />
+                        <TimestampText content={`Last updated: ${project.updatedDateTime}`} />
+                        <Text content={project.description} />
+                    </div>
+                    <div className="flex justify-center items-center rounded-lg bg-white">
+                    <div className="max-w-full w-max p-4 sm:p-6 md:p-8 lg:p-10">
+                        <ImageCarousel projectName={project.projectName} />
+                    </div>
+                    </div>
+                    {showModal && (
+                        <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>
+                    )}
+                </div>
+            } />
+        } />
+    );
 }
