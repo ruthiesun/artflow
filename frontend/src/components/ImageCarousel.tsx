@@ -79,17 +79,21 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     }
 
     return (
-        <div className="flex-col flex justify-center items-center">
+        <div className="flex-col flex justify-center items-center lg:items-start">
             {images.map((image, index) => (
                 <div key={image.position} className=" max-w-full bg-white-100 pb-10">
-                    <div className="flex flex-col items-center">
-                        <ImageDisplayLarge image={image} className="cursor-pointer" onClick={() => prepareToShowImageDetails(image)} />
-                        {image.dateTime == null ? (
-                            <TimestampText content="Date: unknown" className="max-w-full" />
-                        ) : (
-                            <TimestampText content={`Date: ${image.dateTime}`} className="max-w-full" />
-                        )}
-                        <Text content={image.caption} className="max-w-full" />
+                    <div className="flex flex-col items-center
+                    lg:flex-row lg:items-start">
+                        <ImageDisplayLarge image={image} className="cursor-pointer lg:max-w-1/2" onClick={() => prepareToShowImageDetails(image)} />
+                        <div className="flex flex-col items-center max-w-full
+                        lg:items-start lg:pl-5 lg:max-w-1/2">
+                            {image.dateTime == null ? (
+                                <TimestampText content="Date: unknown" className="max-w-full" />
+                            ) : (
+                                <TimestampText content={`Date: ${image.dateTime}`} className="max-w-full" />
+                            )}
+                            <Text content={image.caption} className="max-w-full" />
+                        </div>
                     </div>
                 </div>
             ))}
