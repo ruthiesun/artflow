@@ -61,10 +61,10 @@ export function ProjectPage() {
                         <TimestampText content={`Last updated: ${project.updatedDateTime}`} />
                         <Text content={project.description} />
                     </div>
-                    <div className="flex justify-center items-center rounded-lg bg-white">
-                    <div className="max-w-full w-max p-4 sm:p-6 md:p-8 lg:p-10">
-                        <ImageCarousel projectName={project.projectName} />
-                    </div>
+                    <div className="flex justify-center items-center">
+                        <div className="max-w-full w-max p-4 sm:p-6 md:p-8 lg:p-10">
+                            <ImageCarousel projectName={project.projectName} />
+                        </div>
                     </div>
                     {showModal && (
                         <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>

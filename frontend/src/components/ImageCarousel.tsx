@@ -1,30 +1,33 @@
 import {useEffect, useState} from "react";
 import type {ProjectImage} from "../types/image";
 import {getImagesForProject} from "../api/images.ts";
-import {Modal} from "./Modal.tsx";
+import {SmallModal} from "./Modal.tsx";
 import { navToErrorPage } from "../pages/ErrorPage.tsx";
 import {useNavigate} from "react-router-dom";
 import {H1, H3, Text, TimestampText} from "./Text.tsx";
 
 type ImageDisplayProps = {
-    image: ProjectImage
+    image: ProjectImage;
+    className?: string;
+    onClick?: () => void;
 }
 
-function ImageDisplaySmall({image}: ImageDisplayProps) {
+function ImageDisplaySmall({image, className}: ImageDisplayProps) {
     return (
         <img
         src={image.url}
         alt={`image in position: ${image.position}`}
-        className="h-full rounded-sm inline-block object-contain shadow-sm"
+        className={`${className} h-full rounded-sm inline-block object-contain shadow-sm`}
     />)
 }
 
-function ImageDisplayLarge({image}: ImageDisplayProps) {
+function ImageDisplayLarge({image, className, onClick}: ImageDisplayProps) {
     return (
         <img
             src={image.url}
             alt={`image in position: ${image.position}`}
-            className="h-auto max-h-[90vh] max-w-full rounded-lg object-contain shadow-sm"
+            className={`${className} h-auto max-h-[70vh] w-min rounded-lg object-contain shadow-sm`}
+            onClick={onClick}
         />)
 }
 
@@ -35,7 +38,7 @@ type ImageDetailsProps = {
 
 function ImageDetails({image, onClose}: ImageDetailsProps) {
     return (
-        <Modal content={
+        <SmallModal content={
             <div>
                 <ImageDisplayLarge image={image} />
                 {image.dateTime == null ? (
@@ -76,17 +79,17 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     }
 
     return (
-        <div>
+        <div className="flex-col flex justify-center items-center">
             {images.map((image, index) => (
-                <div key={index} className="flex-col flex">
-                    <div className="cursor-pointer hover:opacity-50 h-max w-max max-w-full"
-                        onClick={() => prepareToShowImageDetails(image)}>
-                        <ImageDisplayLarge image={image} />
-                        <div>
-                        test
-                        </div>
-                    </div>
-                    <div className="h-10 sm:h-12 md:h-14 lg:h-16">
+                <div key={image.position} className=" max-w-full bg-white-100 pb-10">
+                    <div className="flex flex-col items-center">
+                        <ImageDisplayLarge image={image} className="cursor-pointer" onClick={() => prepareToShowImageDetails(image)} />
+                        {image.dateTime == null ? (
+                            <TimestampText content="Date: unknown" className="max-w-full" />
+                        ) : (
+                            <TimestampText content={`Date: ${image.dateTime}`} className="max-w-full" />
+                        )}
+                        <Text content={image.caption} className="max-w-full" />
                     </div>
                 </div>
             ))}

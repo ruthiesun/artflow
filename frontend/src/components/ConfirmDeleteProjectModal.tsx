@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {deleteProject} from "../api/projects.ts";
-import {Modal} from "./Modal.tsx";
+import {SmallModal} from "./Modal.tsx";
 import {Input} from "../components/Input.tsx";
 import {SubmitButton} from "../components/Button.tsx";
 import {Text} from "../components/Text.tsx";
@@ -30,7 +30,7 @@ export function ConfirmDeleteProjectModal({ projectName, onClose }: ConfirmDelet
     };
 
     return (
-        <Modal content={
+        <SmallModal content={
             (
                 <div>
                 <Text content="Confirm the name of the project to delete." />

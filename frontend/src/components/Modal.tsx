@@ -5,7 +5,7 @@ type ModalProps = {
     onClose: () => void;
 };
 
-export function Modal({ content, onClose }: ModalProps) {
+export function SmallModal({ content, onClose }: ModalProps) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
         {/* Background overlay */}
@@ -24,3 +24,4 @@ export function Modal({ content, onClose }: ModalProps) {
     </div>
     )
 }
+
