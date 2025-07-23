@@ -1,4 +1,4 @@
-# Artflow 🎨
+# Artflow (README is out-of-date/WIP) 🎨
 
 Artflow is a full-stack web application for uploading and organizing works-in-progress, final art pieces, and project timelines. It allows artists to keep their work organized, private or public, and optionally tagged by medium, style, or other categories.
 
