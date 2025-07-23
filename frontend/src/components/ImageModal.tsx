@@ -15,9 +15,7 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
     const [caption, setCaption] = useState<string>(editingImage.caption);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = ((e) => {
-        e.preventDefault();
-
+    const updateImage = (() => {
         if (!url) {
             setError("URL must be nonempty")
             return
@@ -34,15 +32,13 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
                 {error && <p>{error}</p>}
                 <UrlInput url={url} setUrl={setUrl}/>
                 <CaptionInput caption={caption} setCaption={setCaption}/>
                 <DateInput date={date} setDate={setDate}/>
-                <button type='submit'>
+                <button type='button' onClick={updateImage}>
                     Update
                 </button>
-            </form>
         </div>
     )
 }
