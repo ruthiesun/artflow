@@ -46,7 +46,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
     return (
         <div className="mb-4">
             <label className={labelClass}>Images</label>
-            <div className="rounded-lg bg-white mt-2 mb-2 w-full flex justify-center items-center">
+            <div className="rounded-lg bg-white mt-2 mb-2 w-full flex justify-center items-center sm:justify-start">
                 <DndContext
                     collisionDetection={closestCenter}
                     sensors={sensors}

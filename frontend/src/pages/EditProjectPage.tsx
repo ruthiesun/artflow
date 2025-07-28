@@ -115,6 +115,7 @@ export function EditProjectPage() {
             nav("/projects/" + name)
         }
         catch (err) {
+            // todo handle unavailable names without nav
             navToErrorPage(nav, err);
         }
     };

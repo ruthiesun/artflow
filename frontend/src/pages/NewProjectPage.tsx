@@ -5,6 +5,10 @@ import {ProjectNameInput} from "../components/ProjectNameInput.tsx";
 import {ProjectDescriptionInput} from "../components/ProjectDescriptionInput.tsx";
 import {ProjectVisibilityRadio} from "../components/ProjectVisibilityRadio.tsx";
 import {ProjectTagInput} from "../components/ProjectTagInput.tsx";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import {H1} from "../components/Text.tsx";
+import {SubmitButton} from "../components/Button.tsx";
+import {navToErrorPage} from "./ErrorPage.tsx";
 
 export function NewProjectPage() {
     const [name, setName] = useState<string>("")
@@ -27,23 +31,25 @@ export function NewProjectPage() {
                 nav("/projects/" + createdProject.projectName)
             })
             .catch(err => {
-                setError(err.message)
+                // todo handle unavailable names without nav
+                navToErrorPage(nav, err);
             });
     }
 
-    if (error) return <div>{error}</div>;
-
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <ProjectNameInput name={name} setName={setName}/>
-                <ProjectDescriptionInput description={description} setDescription={setDescription}/>
-                <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility}/>
-                <ProjectTagInput tags={tags} setTags={setTags}/>
-                <button type="submit">
-                    Save
-                </button>
-            </form>
-        </div>
+        <Background className="px-10 py-5" content={
+            <BackgroundBorder content={
+                <div>
+                    <H1 content="New Project" />
+                    <form onSubmit={handleSubmit}>
+                        <ProjectNameInput name={name} setName={setName}/>
+                        <ProjectDescriptionInput description={description} setDescription={setDescription}/>
+                        <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility}/>
+                        <ProjectTagInput tags={tags} setTags={setTags}/>
+                        <SubmitButton type="submit" text="Save" disabled={name.trim() === "" | visibility.trim() === ""} />
+                    </form>
+                </div>
+            } />
+        } />
     )
 }
