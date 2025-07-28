@@ -11,6 +11,10 @@ import type {ProjectImage, ProjectImageElem} from "../types/image";
 import {ImageEditor} from "../components/ImageEditor.tsx";
 import {createImageForProject, deleteImageForProject, getImagesForProject, updateImageForProject} from "../api/images.ts";
 import {HttpStatusCode} from "axios";
+import {navToErrorPage} from "./ErrorPage.tsx";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import {H1} from "../components/Text.tsx";
+import {SubmitButton} from "../components/Button.tsx";
 
 export function EditProjectPage() {
     const {projectName} = useParams<{ projectName: string }>()
@@ -24,14 +28,10 @@ export function EditProjectPage() {
     const [error, setError] = useState<string | null>(null)
     const nav = useNavigate();
 
-    if (projectName == null) {
-        setError("Null project name")
-    }
-
     useEffect(() => {
         if (!projectName) {
             setError("Null project name");
-            return;
+            navToErrorPage(nav, err);
         }
 
         getProject(projectName)
@@ -42,7 +42,7 @@ export function EditProjectPage() {
                 setVisibility(retrievedProject.visibility.toLowerCase() as ("public" | "private"))
             })
             .catch(err => {
-                setError(err.message)
+                navToErrorPage(nav, err);
             })
 
         getTagsForProject(projectName)
@@ -54,7 +54,7 @@ export function EditProjectPage() {
                 setTags(tagStrings)
             })
             .catch(err => {
-                setError(err.message)
+                navToErrorPage(nav, err);
             })
 
         getImagesForProject(projectName)
@@ -62,7 +62,7 @@ export function EditProjectPage() {
                 setImages(retrievedImages)
             })
             .catch(err => {
-                setError(err.message)
+                navToErrorPage(nav, err);
             })
 
     }, [projectName]);
@@ -88,6 +88,7 @@ export function EditProjectPage() {
                 const res = await deleteImageForProject(name, img.id)
                 if (res.status !== HttpStatusCode.NoContent) {
                     setError(`${res.statusText}: Failed to delete image with id=${img.id}`)
+                    navToErrorPage(nav, err);
                 }
             }
 
@@ -114,25 +115,27 @@ export function EditProjectPage() {
             nav("/projects/" + name)
         }
         catch (err) {
-            setError(err.message)
+            navToErrorPage(nav, err);
         }
     };
 
-    if (error || projectName == null) return <div>{error}</div>;
     if (!projectName || !project) return <div>Loading...</div>;
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <ProjectNameInput name={name} setName={setName} />
-                <ProjectDescriptionInput description={description} setDescription={setDescription} />
-                <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />
-                <ProjectTagInput tags={tags} setTags={setTags} />
-                <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>
-                <button type="submit">
-                    Save changes
-                </button>
-            </form>
-        </div>
-    )
+        <Background className="px-10 py-5" content={
+            <BackgroundBorder content={
+                <div>
+                    <H1 content="Edit Project" />
+                    <form onSubmit={handleSubmit}>
+                        <ProjectNameInput name={name} setName={setName} />
+                        <ProjectDescriptionInput description={description} setDescription={setDescription} />
+                        <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />
+                        <ProjectTagInput tags={tags} setTags={setTags} />
+                        <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>
+                        <SubmitButton type="submit" text="Save changes" disabled={name.trim() === "" | visibility.trim() === ""} />
+                    </form>
+                </div>
+            } />
+        } />
+    );
 }

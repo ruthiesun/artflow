@@ -1,3 +1,5 @@
+import {RadioInput, labelClass} from "./Input.tsx";
+
 type ProjectVisibilityRadioProps = {
     visibility: "public" | "private";
     setVisibility: ((newValue: "public" | "private") => void)
@@ -5,30 +7,10 @@ type ProjectVisibilityRadioProps = {
 
 export function ProjectVisibilityRadio({ visibility, setVisibility }: ProjectVisibilityRadioProps) {
     return (
-        <div>
-            <label>Visibility</label>
-            <div>
-                <label>
-                    <input
-                        type="radio"
-                        name="visibility"
-                        value="public"
-                        checked={visibility == "public"}
-                        onChange={() => setVisibility("public")}
-                    />
-                    Public
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="visibility"
-                        value="private"
-                        checked={visibility == "private"}
-                        onChange={() => setVisibility("private")}
-                    />
-                    Private
-                </label>
-            </div>
+        <div className="mb-4">
+            <label className={labelClass}>Visibility</label>
+            <RadioInput label="Public" name="visibility" value={visibility} checked={visibility == "public"} onChange={() => setVisibility("public")} />
+            <RadioInput label="Private" name="visibility" value={visibility} checked={visibility == "private"} onChange={() => setVisibility("private")} />
         </div>
     )
 }

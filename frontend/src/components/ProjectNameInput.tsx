@@ -1,17 +1,10 @@
+import {Input} from "./Input.tsx";
+
 type ProjectNameInputProps = {
     name: string;
     setName: ((newValue: string) => void)
 };
 
 export function ProjectNameInput({ name, setName }: ProjectNameInputProps) {
-    return (
-        <div>
-            <label>Name</label>
-            <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-            />
-        </div>
-    )
+    return (<Input label="Name" type="text" value={name} setValue={setName} />)
 }

@@ -1,7 +1,7 @@
 type ButtonProps = {
     type: "submit" | "reset" | "button" | undefined;
     text: string;
-    disabled: boolean;
+    disabled?: boolean;
     onClick?: (() => (void | Promise<void>)) | undefined;
 };
 

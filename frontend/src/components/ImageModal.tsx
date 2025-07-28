@@ -1,6 +1,8 @@
 import {useState} from "react";
 import type {ProjectImageElem, ProjectImagePrePersist} from "../types/image";
-
+import {SmallModal} from "./Modal.tsx"
+import {SubmitButton} from "./Button.tsx"
+import {Input, TextAreaInput, DateInput} from "./Input.tsx"
 
 type EditImageModalProps = {
     editingImage: ProjectImageElem,
@@ -31,15 +33,17 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
     })
 
     return (
-        <div>
-                {error && <p>{error}</p>}
-                <UrlInput url={url} setUrl={setUrl}/>
-                <CaptionInput caption={caption} setCaption={setCaption}/>
-                <DateInput date={date} setDate={setDate}/>
-                <button type='button' onClick={updateImage}>
-                    Update
-                </button>
-        </div>
+        <SmallModal content={
+            (
+                <div>
+                    {error && <p>{error}</p>}
+                    <Input label="Url" type="text" value={url} setValue={setUrl} />
+                    <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
+                    <DateInput label="Date" type="text" value={date} setValue={setDate} />
+                    <SubmitButton type='button' text="Update" disabled={url.trim() === ""} onClick={updateImage} />
+                </div>
+            )
+        } onClose={onClose}/>
     )
 }
 
@@ -67,53 +71,15 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
     })
 
     return (
-        <div>
+        <SmallModal content={(
+            <div>
                 {error && <p>{error}</p>}
-                <UrlInput url={url} setUrl={setUrl}/>
-                <CaptionInput caption={caption} setCaption={setCaption}/>
-                <DateInput date={date} setDate={setDate}/>
-                <button type="button" onClick={updateImages}>
-                    Create
-                </button>
-        </div>
+                <Input label="Url" type="text" value={url} setValue={setUrl} />
+                <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
+                <DateInput label="Date" type="text" value={date} setValue={setDate} />
+                <SubmitButton type='button' text="Create" disabled={url.trim() === ""} onClick={updateImages} />
+            </div>
+        )} onClose={onClose}/>
     )
 }
 
-function UrlInput({ url, setUrl }) {
-    return (
-        <div>
-            <label>Url</label>
-            <input
-                type="text"
-                value={url}
-                onChange={e => setUrl(e.target.value)}
-            />
-        </div>
-    )
-}
-
-function CaptionInput({ caption, setCaption }) {
-    return (
-        <div>
-            <label>Caption</label>
-            <input
-                type="text"
-                value={caption}
-                onChange={e => setCaption(e.target.value)}
-            />
-        </div>
-    )
-}
-
-function DateInput({ date, setDate }) {
-    return (
-        <div>
-            <label>Date</label>
-            <input
-                type="text"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-            />
-        </div>
-    )
-}

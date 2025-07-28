@@ -9,6 +9,7 @@ import {ImageCarousel} from "../components/ImageCarousel.tsx";
 import {DisplayOnlyTagButton, DeleteButton, NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
 import {Background, BackgroundBorder} from "../components/Background.tsx";
 import {H1, H3, Text, TimestampText} from "../components/Text.tsx";
+import { navToErrorPage } from "./ErrorPage.tsx";
 
 export function ProjectPage() {
     const {projectName} = useParams<{ projectName: string }>();

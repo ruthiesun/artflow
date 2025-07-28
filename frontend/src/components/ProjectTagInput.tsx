@@ -1,4 +1,7 @@
 import {useState} from "react";
+import {Input, labelClass} from "./Input.tsx";
+import {DisplayOnlyTagButton} from "./Button.tsx";
+
 
 type ProjectTagInputProps = {
     tags: string[]
@@ -24,28 +27,23 @@ export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
     };
 
     return (
-        <div>
+        <div className="mb-4">
+            <Input label="Tags" type="text" value={currTag} setValue={setCurrTag}
+            placeholder="Type a tag and press Enter" onKeyDown={addTag}/>
+
             <div>
                 {tags.map(tag => (
-                    <div key={tag}>
-                        {tag}
+                    <div key={tag} className="mb-1">
+                        <DisplayOnlyTagButton type="text" text={tag} />
                         <button
                             onClick={() => removeTag(tag)}
-                            className="ml-2 text-red-500 hover:text-red-700"
+                            className="text-delete-button hover:text-delete-button-hover"
                         >
                             ×
                         </button>
                     </div>
                 ))}
             </div>
-
-            <input
-                className="border px-3 py-2 rounded w-full placeholder:text-gray-500 placeholder:italic"
-                placeholder="Type a tag and press Enter"
-                value={currTag}
-                onChange={e => setCurrTag(e.target.value)}
-                onKeyDown={addTag}
-            />
         </div>
     )
 }

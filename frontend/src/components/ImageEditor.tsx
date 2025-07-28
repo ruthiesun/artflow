@@ -5,10 +5,12 @@ import {
     arrayMove,
     SortableContext,
     useSortable,
-    verticalListSortingStrategy
+    rectSortingStrategy
 } from "@dnd-kit/sortable";
 import {closestCenter, DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {AddImageModal, EditImageModal} from "./ImageModal.tsx";
+import {NavButton} from "./Button.tsx";
+import {labelClass} from "./Input.tsx";
 
 type ImageEditorProps = {
     projectName: string
@@ -42,8 +44,9 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
     })
 
     return (
-        <div>
-            <div>
+        <div className="mb-4">
+            <label className={labelClass}>Images</label>
+            <div className="rounded-lg bg-white mt-2 mb-2 w-full flex justify-center items-center">
                 <DndContext
                     collisionDetection={closestCenter}
                     sensors={sensors}
@@ -56,8 +59,8 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                         }
                     }}
                 >
-                    <SortableContext items={images.map(image => image.position)} strategy={verticalListSortingStrategy}>
-                        <div className="flex flex-wrap">
+                    <SortableContext items={images.map(image => image.position)} strategy={rectSortingStrategy}>
+                        <div className="flex flex-wrap w-min sm:w-auto">
                             {images.map((image) => (
                                 <SortableImage key={image.position} image={image} onEdit={prepareToEdit} onDelete={prepareToDelete} />
                             ))}
@@ -65,9 +68,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                     </SortableContext>
                 </DndContext>
             </div>
-            <button type="button" onClick={() => setShowAddImageModal(true)}>
-                Add new image
-            </button>
+            <NavButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
             {showAddImageModal &&
                 <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))} />
             }
@@ -85,6 +86,8 @@ type SortableImageProps = {
 };
 
 function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
+    const [isBeingMoved, setIsBeingMoved] = useState(false);
+
     const {
         attributes,
         listeners,
@@ -98,41 +101,54 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
         transition,
     };
 
+    const imgOpacity = isBeingMoved ? "opacity-75" : "opacity-100"
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...attributes}
 
-            className="w-32 h-32 m-2 border rounded overflow-hidden relative"
+            className="w-48 h-48 ml-2 mr-2 mt-2 mb-4 shadow-sm rounded-sm overflow-hidden relative focus:z-10 group"
         >
-            <img src={image.url} alt="A project image" className="object-cover w-full h-full" />
+            <img src={image.url} alt="A project image" className={`object-cover w-full h-full z-0 ${imgOpacity} transition`} />
 
-            {/* Optional: Add a visible drag handle icon */}
-            <div
-                className="absolute top-1 left-1 w-8 h-5 bg-gray-300 rounded cursor-pointer z-10"
+            <div className="absolute top-1 left-1 z-1 flex flex-row">
+                <ImageButton iconSrc="/src/assets/icons/edit.svg" alt="Edit" className="cursor-pointer"
                 onClick={(e) => {
-                    e.stopPropagation()// prevent drag handle click from triggering modal
-                    onEdit(image)
-                }}
-            >
-                <p>edit</p>
-            </div>
-            <div
-                {...listeners}
-                className="absolute top-1 left-10 w-8 h-5 bg-violet-500 hover:bg-violet-600 focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700 z-10"
-            >
-                <p>move</p>
-            </div>
-            <div
-                className="absolute top-1 right-1 w-8 h-5 bg-gray-300 rounded cursor-pointer z-10"
+                    e.stopPropagation(); // prevent drag handle click from triggering modal
+                    onEdit(image);
+                }} />
+                <ImageButton iconSrc="/src/assets/icons/delete.svg" alt="Delete" className="cursor-pointer"
                 onClick={(e) => {
-                    e.stopPropagation()// prevent drag handle click from triggering modal
-                    onDelete(image)
-                }}
-            >
-                <p>delete</p>
+                    e.stopPropagation(); // prevent drag handle click from triggering modal
+                    onDelete(image);
+                }} />
+                <div
+                    {...listeners}
+                    onMouseDown={() => setIsBeingMoved(true)}
+                    onMouseUp={() => setIsBeingMoved(false)}>
+                    <ImageButton iconSrc="/src/assets/icons/drag.svg" alt="Move" className="cursor-grab" />
+                </div>
             </div>
         </div>
     );
 }
+
+type ImageButtonProps = {
+    iconSrc: string;
+    alt: string;
+    className: string;
+    onClick?: (e) => void;
+    }
+
+function ImageButton({iconSrc, alt, className, onClick}: ImageButtonProps) {
+    return (
+            <div
+                className={`${className} p-1 mr-1 w-max h-max bg-white rounded`}
+                onClick={onClick}
+            >
+                <img src={iconSrc} alt={alt} className="w-4 h-4" />
+            </div>
+        )
+    }
