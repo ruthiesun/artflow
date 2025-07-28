@@ -3,6 +3,9 @@ import {useNavigate} from "react-router-dom";
 import {EmailInput} from "../components/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/PasswordInput.tsx";
 import {register} from "../api/auth.ts";
+import {Background, BackgroundBorder} from "../components/Background.tsx";
+import {ErrorText, H1} from "../components/Text.tsx";
+import {SubmitButton} from "../components/Button.tsx";
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -32,18 +35,21 @@ export function RegisterPage() {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <EmailInput email={email} setEmail={setEmail} />
-                <PasswordInput password={password} setPassword={setPassword} />
-                <ConfirmPasswordInput password={password} setPassword={setPassword} />
+        <Background className="px-4" content={
+            <BackgroundBorder className="max-w-md" content={
+                <div>
+                    <H1 content="Artflow" />
+                    <form onSubmit={handleSubmit}>
+                        <EmailInput email={email} setEmail={setEmail} />
+                        <PasswordInput password={password} setPassword={setPassword} />
+                        <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
 
-                {error && <p>{error}</p>}
+                        {error && <ErrorText className="mb-4" content={error} />}
 
-                <button type="submit">
-                    Register
-                </button>
-            </form>
-        </div>
+                        <SubmitButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
+                    </form>
+                </div>
+            } />
+        } />
     );
 }
