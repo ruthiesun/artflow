@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {EmailInput} from "../components/EmailInput.tsx";
 import {PasswordInput} from "../components/PasswordInput.tsx";
@@ -7,12 +7,14 @@ import {SubmitButton} from "../components/Button.tsx";
 import {Background, BackgroundBorder} from "../components/Background.tsx";
 import {ErrorText, H1} from "../components/Text.tsx";
 import { navToErrorPage } from "./ErrorPage.tsx";
+import {useAuth} from "../AuthContext.tsx"
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
+    const {setAuth} = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,7 +22,7 @@ export function LoginPage() {
 
         login(email, password)
             .then((res) => {
-                localStorage.setItem("authToken", res.data.token);
+                setAuth(res.data.token);
                 nav("/projects");
             })
             .catch(err => {

@@ -6,18 +6,22 @@ import {ProjectPage} from "./pages/ProjectPage.tsx";
 import {NewProjectPage} from "./pages/NewProjectPage.tsx";
 import {EditProjectPage} from "./pages/EditProjectPage.tsx";
 import {ErrorPage} from "./pages/ErrorPage.tsx";
+import {Root} from "./pages/Root.tsx";
+import {PublicRoute} from "./PublicRoute.tsx"
+import {ProtectedRoute} from "./ProtectedRoute.tsx"
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/projects" element={<HomePage />} />
-                <Route path="/projects/new" element={<NewProjectPage />} />
-                <Route path="/projects/:projectName" element={<ProjectPage />} />
-                <Route path="/projects/:projectName/edit" element={<EditProjectPage />} />
+                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+                <Route path="/projects" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/projects/new" element={<ProtectedRoute><NewProjectPage /></ProtectedRoute>} />
+                <Route path="/projects/:projectName" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} />
+                <Route path="/projects/:projectName/edit" element={<ProtectedRoute><EditProjectPage /></ProtectedRoute>} />
                 <Route path="/error" element={<ErrorPage />} />
+                <Route path="/*" element={<Root />} />
             </Routes>
         </Router>
     );

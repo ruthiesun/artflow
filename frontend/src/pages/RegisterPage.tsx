@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {EmailInput} from "../components/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/PasswordInput.tsx";
@@ -6,6 +6,7 @@ import {register} from "../api/auth.ts";
 import {Background, BackgroundBorder} from "../components/Background.tsx";
 import {ErrorText, H1} from "../components/Text.tsx";
 import {SubmitButton} from "../components/Button.tsx";
+import {useAuth} from "../AuthContext.tsx"
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -13,6 +14,8 @@ export function RegisterPage() {
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
+    const {setAuth} = useAuth();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
@@ -29,7 +32,7 @@ export function RegisterPage() {
 
         register(email, password)
             .then((res) => {
-                localStorage.setItem("authToken", res.data.token);
+                setAuth(res.data.token);
                 nav("/projects");
             }).catch(err => setError(err.message))
     };
