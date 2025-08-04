@@ -1,4 +1,4 @@
-import {RadioInput, labelClass} from "./Input.tsx";
+import {RadioInput, labelClass} from "../ui/Input.tsx";
 
 type ProjectVisibilityRadioProps = {
     visibility: "public" | "private";

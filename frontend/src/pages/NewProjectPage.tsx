@@ -1,14 +1,15 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {createProject} from "../api/projects.ts";
-import {ProjectNameInput} from "../components/ProjectNameInput.tsx";
-import {ProjectDescriptionInput} from "../components/ProjectDescriptionInput.tsx";
-import {ProjectVisibilityRadio} from "../components/ProjectVisibilityRadio.tsx";
-import {ProjectTagInput} from "../components/ProjectTagInput.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {H1} from "../components/Text.tsx";
-import {SubmitButton} from "../components/Button.tsx";
 import {navToErrorPage} from "./ErrorPage.tsx";
+import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
+import {ProjectDescriptionInput} from "../components/business/ProjectDescriptionInput.tsx";
+import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
+import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {H1} from "../components/ui/Text.tsx";
+import {SubmitButton} from "../components/ui/Button.tsx";
+
 
 export function NewProjectPage() {
     const [name, setName] = useState<string>("")

@@ -1,10 +1,10 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {deleteProject} from "../api/projects.ts";
-import {SmallModal} from "./Modal.tsx";
-import {Input} from "../components/Input.tsx";
-import {SubmitButton} from "../components/Button.tsx";
-import {Text} from "../components/Text.tsx";
+import {deleteProject} from "../../api/projects.ts";
+import {SmallModal} from "../ui/Modal.tsx";
+import {Input} from "../ui/Input.tsx";
+import {SubmitButton} from "../ui/Button.tsx";
+import {Text} from "../ui/Text.tsx";
 
 type ConfirmDeleteProjectProps = {
     projectName: string;

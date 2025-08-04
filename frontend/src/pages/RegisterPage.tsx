@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {EmailInput} from "../components/EmailInput.tsx";
-import {ConfirmPasswordInput, PasswordInput} from "../components/PasswordInput.tsx";
 import {register} from "../api/auth.ts";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {ErrorText, H1} from "../components/Text.tsx";
-import {SubmitButton} from "../components/Button.tsx";
 import {useAuth} from "../AuthContext.tsx"
+import {EmailInput} from "../components/business/EmailInput.tsx";
+import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {ErrorText, H1} from "../components/ui/Text.tsx";
+import {SubmitButton} from "../components/ui/Button.tsx";
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");

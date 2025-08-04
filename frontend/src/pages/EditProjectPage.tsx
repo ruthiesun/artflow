@@ -1,20 +1,20 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import type {Project} from "../types/project";
+import type {ProjectImage, ProjectImageElem} from "../types/image";
 import {getProject, updateProject} from "../api/projects.ts";
 import {getTagsForProject} from "../api/tags.ts";
-import {ProjectNameInput} from "../components/ProjectNameInput.tsx";
-import {ProjectDescriptionInput} from "../components/ProjectDescriptionInput.tsx";
-import {ProjectVisibilityRadio} from "../components/ProjectVisibilityRadio.tsx";
-import {ProjectTagInput} from "../components/ProjectTagInput.tsx";
-import type {ProjectImage, ProjectImageElem} from "../types/image";
-import {ImageEditor} from "../components/ImageEditor.tsx";
 import {createImageForProject, deleteImageForProject, getImagesForProject, updateImageForProject} from "../api/images.ts";
 import {HttpStatusCode} from "axios";
 import {navToErrorPage} from "./ErrorPage.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {H1} from "../components/Text.tsx";
-import {SubmitButton} from "../components/Button.tsx";
+import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
+import {ProjectDescriptionInput} from "../components/business/ProjectDescriptionInput.tsx";
+import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
+import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
+import {ImageEditor} from "../components/business/ImageEditor.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {H1} from "../components/ui/Text.tsx";
+import {SubmitButton} from "../components/ui/Button.tsx";
 
 export function EditProjectPage() {
     const {projectName} = useParams<{ projectName: string }>()

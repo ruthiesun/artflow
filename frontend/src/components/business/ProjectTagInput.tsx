@@ -1,6 +1,6 @@
 import {useState} from "react";
-import {Input, labelClass} from "./Input.tsx";
-import {DisplayOnlyTagButton} from "./Button.tsx";
+import {Input, labelClass} from "../ui/Input.tsx";
+import {DisplayOnlyTagButton} from "../ui/Button.tsx";
 
 
 type ProjectTagInputProps = {

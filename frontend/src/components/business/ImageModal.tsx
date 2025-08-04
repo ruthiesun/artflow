@@ -1,8 +1,8 @@
 import {useState} from "react";
-import type {ProjectImageElem, ProjectImagePrePersist} from "../types/image";
-import {SmallModal} from "./Modal.tsx"
-import {SubmitButton} from "./Button.tsx"
-import {Input, TextAreaInput, DateInput} from "./Input.tsx"
+import type {ProjectImageElem, ProjectImagePrePersist} from "../../types/image";
+import {SmallModal} from "../ui/Modal.tsx"
+import {SubmitButton} from "../ui/Button.tsx"
+import {Input, TextAreaInput, DateInput} from "../ui/Input.tsx"
 
 type EditImageModalProps = {
     editingImage: ProjectImageElem,

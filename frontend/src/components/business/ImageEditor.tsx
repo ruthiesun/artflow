@@ -1,5 +1,4 @@
 import {useState} from "react";
-import type {ProjectImage, ProjectImageElem} from "../types/image";
 import {CSS} from '@dnd-kit/utilities';
 import {
     arrayMove,
@@ -8,9 +7,10 @@ import {
     rectSortingStrategy
 } from "@dnd-kit/sortable";
 import {closestCenter, DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import type {ProjectImage, ProjectImageElem} from "../../types/image";
 import {AddImageModal, EditImageModal} from "./ImageModal.tsx";
-import {NavButton} from "./Button.tsx";
-import {labelClass} from "./Input.tsx";
+import {NavButton} from "../ui/Button.tsx";
+import {labelClass} from "../ui/Input.tsx";
 
 type ImageEditorProps = {
     projectName: string

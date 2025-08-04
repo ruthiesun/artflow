@@ -1,7 +1,7 @@
+import {useLocation, useNavigate} from 'react-router-dom';
 import {AxiosError} from "axios";
-import {H1, H3, Text} from "../components/Text.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import { useLocation, useNavigate } from 'react-router-dom';
+import {H1, H3, Text} from "../components/ui/Text.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 
 type ErrorState = {
     status?: number;

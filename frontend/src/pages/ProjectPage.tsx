@@ -1,15 +1,15 @@
 import {useEffect, useState} from "react";
-import type {Project} from "../types/project";
-import {getProject} from "../api/projects.ts";
 import {useNavigate, useParams} from "react-router-dom";
+import type {Project} from "../types/project";
 import type {ProjectTag} from "../types/tag";
+import {getProject} from "../api/projects.ts";
 import {getTagsForProject} from "../api/tags.ts";
-import {ConfirmDeleteProjectModal} from "../components/ConfirmDeleteProjectModal.tsx";
-import {ImageCarousel} from "../components/ImageCarousel.tsx";
-import {DisplayOnlyTagButton, DeleteButton, NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {H1, H3, Text, TimestampText} from "../components/Text.tsx";
-import { navToErrorPage } from "./ErrorPage.tsx";
+import {navToErrorPage} from "./ErrorPage.tsx";
+import {ConfirmDeleteProjectModal} from "../components/business/ConfirmDeleteProjectModal.tsx";
+import {ImageCarousel} from "../components/business/ImageCarousel.tsx";
+import {DisplayOnlyTagButton, DeleteButton, NavButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {H1, H3, Text, TimestampText} from "../components/ui/Text.tsx";
 
 export function ProjectPage() {
     const {projectName} = useParams<{ projectName: string }>();

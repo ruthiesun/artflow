@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {EmailInput} from "../components/EmailInput.tsx";
-import {PasswordInput} from "../components/PasswordInput.tsx";
 import {login} from "../api/auth.ts";
-import {SubmitButton} from "../components/Button.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {ErrorText, H1} from "../components/Text.tsx";
-import { navToErrorPage } from "./ErrorPage.tsx";
+import {navToErrorPage} from "./ErrorPage.tsx";
 import {useAuth} from "../AuthContext.tsx"
+import {EmailInput} from "../components/business/EmailInput.tsx";
+import {PasswordInput} from "../components/business/PasswordInput.tsx";
+import {SubmitButton} from "../components/ui/Button.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {ErrorText, H1} from "../components/ui/Text.tsx";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");

@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import type {ProjectImage} from "../types/image";
-import {getImagesForProject} from "../api/images.ts";
-import {SmallModal} from "./Modal.tsx";
-import { navToErrorPage } from "../pages/ErrorPage.tsx";
 import {useNavigate} from "react-router-dom";
-import {H1, H3, Text, TimestampText} from "./Text.tsx";
+import type {ProjectImage} from "../../types/image";
+import {getImagesForProject} from "../../api/images.ts";
+import {SmallModal} from "../ui/Modal.tsx";
+import { navToErrorPage } from "../../pages/ErrorPage.tsx";
+import {H1, H3, Text, TimestampText} from "../ui/Text.tsx";
 
 type ImageDisplayProps = {
     image: ProjectImage;

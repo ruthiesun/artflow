@@ -1,16 +1,14 @@
 import {useEffect, useState} from "react"
-
-import type {Project} from "../types/project"
-import {getAllProjectsWithTags} from "../api/projects.ts";
-import {ImageCarouselPreview} from "../components/ImageCarousel.tsx";
-import {getTagsForUser} from "../api/tags.ts";
-import type {Tag} from "../types/tag";
 import {useNavigate} from "react-router-dom";
-import {NavButton, DeselectedTagButton, SelectedTagButton} from "../components/Button.tsx";
-import {Background, BackgroundBorder} from "../components/Background.tsx";
-import {H1, H3, Text} from "../components/Text.tsx";
-import {LazyComponent} from "../components/LazyComponent.tsx";
-import { navToErrorPage } from "./ErrorPage.tsx";
+import type {Project} from "../types/project"
+import type {Tag} from "../types/tag";
+import {getAllProjectsWithTags} from "../api/projects.ts";
+import {getTagsForUser} from "../api/tags.ts";
+import {navToErrorPage} from "./ErrorPage.tsx";
+import {ImageCarouselPreview} from "../components/business/ImageCarousel.tsx";
+import {NavButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
+import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {H1, H3, Text} from "../components/ui/Text.tsx";
 
 export function HomePage() {
     const [projects, setProjects] = useState<Project[]>([])
