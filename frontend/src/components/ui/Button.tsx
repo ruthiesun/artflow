@@ -21,11 +21,12 @@ export function SubmitButton({type, text, disabled, onClick}: ButtonProps) {
     )
 }
 
-export function NavButton({type, text, onClick}: ButtonProps) {
+export function NavButton({type, text, disabled, onClick}: ButtonProps) {
     return (
         <button type={type}
                 className={`${clickableButtonClass} ${buttonClass} mb-2 bg-nav-button text-nav-button-text font-semibold hover:bg-nav-button-hover`}
                 onClick={onClick}
+                disabled={disabled}
         >
             {text}
         </button>

@@ -7,6 +7,7 @@ import {getTagsForProject} from "../api/tags.ts";
 import {createImageForProject, deleteImageForProject, getImagesForProject, updateImageForProject} from "../api/images.ts";
 import {HttpStatusCode} from "axios";
 import {navToErrorPage} from "./ErrorPage.tsx";
+import {LoadingOverlay} from "../components/business/LoadingOverlay.tsx";
 import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
 import {ProjectDescriptionInput} from "../components/business/ProjectDescriptionInput.tsx";
 import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
@@ -25,6 +26,9 @@ export function EditProjectPage() {
     const [tags, setTags] = useState<string[]>([])
     const [images, setImages] = useState<ProjectImageElem[]>([])
     const [deletedImages, setDeletedImages] = useState<ProjectImage[]>([])
+    const [isLoadingProject, setIsLoadingProject] = useState(true);
+    const [isLoadingTags, setIsLoadingTags] = useState(true);
+    const [isLoadingImages, setIsLoadingImages] = useState(true);
     const [error, setError] = useState<string | null>(null)
     const nav = useNavigate();
 
@@ -40,6 +44,7 @@ export function EditProjectPage() {
                 setName(retrievedProject.projectName)
                 setDescription(retrievedProject.description)
                 setVisibility(retrievedProject.visibility.toLowerCase() as ("public" | "private"))
+                setIsLoadingProject(false);
             })
             .catch(err => {
                 navToErrorPage(nav, err);
@@ -52,6 +57,7 @@ export function EditProjectPage() {
                     tagStrings.push(tag.tagName)
                 }
                 setTags(tagStrings)
+                setIsLoadingTags(false);
             })
             .catch(err => {
                 navToErrorPage(nav, err);
@@ -60,6 +66,7 @@ export function EditProjectPage() {
         getImagesForProject(projectName)
             .then((retrievedImages) => {
                 setImages(retrievedImages)
+                setIsLoadingImages(false);
             })
             .catch(err => {
                 navToErrorPage(nav, err);
@@ -120,7 +127,7 @@ export function EditProjectPage() {
         }
     };
 
-    if (!projectName || !project) return <div>Loading...</div>;
+    const isLoading = isLoadingProject || isLoadingTags || isLoadingImages;
 
     return (
         <Background className="px-10 py-5" content={
@@ -128,13 +135,14 @@ export function EditProjectPage() {
                 <div>
                     <H1 content="Edit Project" />
                     <form onSubmit={handleSubmit}>
-                        <ProjectNameInput name={name} setName={setName} />
-                        <ProjectDescriptionInput description={description} setDescription={setDescription} />
-                        <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />
-                        <ProjectTagInput tags={tags} setTags={setTags} />
-                        <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>
-                        <SubmitButton type="submit" text="Save changes" disabled={name.trim() === "" | visibility.trim() === ""} />
+                        {!isLoadingProject && <ProjectNameInput name={name} setName={setName} />}
+                        {!isLoadingProject && <ProjectDescriptionInput description={description} setDescription={setDescription} />}
+                        {!isLoadingProject && <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />}
+                        {!isLoadingTags && <ProjectTagInput tags={tags} setTags={setTags} />}
+                        {!isLoadingImages && <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>}
+                        <SubmitButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" | visibility.trim() === "")} />
                     </form>
+                    {isLoading && <LoadingOverlay/>}
                 </div>
             } />
         } />
