@@ -9,6 +9,7 @@ interface TokenPayload {
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  isLoading: boolean;
   setAuth: (token: string) => void;
   removeAuth: () => void;
 };
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -26,6 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       setIsAuthenticated(true);
     }
+
+    setIsLoading(false);
   }, []);
 
 
@@ -40,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setAuth, removeAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, setAuth, removeAuth }}>
       {children}
     </AuthContext.Provider>
   );
