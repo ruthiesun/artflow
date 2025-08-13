@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import type {ProjectImage} from "../../types/image";
 import {getImagesForProject} from "../../api/images.ts";
-import {SmallModal} from "../ui/Modal.tsx";
+import {LargeModal} from "../ui/Modal.tsx";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 import {H1, H3, Text, TimestampText} from "../ui/Text.tsx";
 
@@ -38,16 +38,8 @@ type ImageDetailsProps = {
 
 function ImageDetails({image, onClose}: ImageDetailsProps) {
     return (
-        <SmallModal content={
-            <div>
-                <ImageDisplayLarge image={image} />
-                {image.dateTime == null ? (
-                    <p>Date: unknown</p>
-                ) : (
-                    <p>Date: {image.dateTime}</p>
-                )}
-                <p>{image.caption}</p>
-            </div>
+        <LargeModal content={
+            <img src={image.url} alt="large image" className="object-contain w-full h-full" />
         } onClose={onClose} />
     )
 }
