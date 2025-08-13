@@ -9,7 +9,7 @@ import {
 import {closestCenter, DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import type {ProjectImage, ProjectImageElem} from "../../types/image";
 import {AddImageModal, EditImageModal} from "./ImageModal.tsx";
-import {NavButton} from "../ui/Button.tsx";
+import {SecondaryButton} from "../ui/Button.tsx";
 import {labelClass} from "../ui/Input.tsx";
 
 type ImageEditorProps = {
@@ -68,7 +68,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                     </SortableContext>
                 </DndContext>
             </div>
-            <NavButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
+            <SecondaryButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
             {showAddImageModal &&
                 <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))} />
             }

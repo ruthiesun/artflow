@@ -6,7 +6,7 @@ import {EmailInput} from "../components/business/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
-import {SubmitButton} from "../components/ui/Button.tsx";
+import {PrimaryButton} from "../components/ui/Button.tsx";
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -49,7 +49,7 @@ export function RegisterPage() {
 
                         {error && <ErrorText className="mb-4" content={error} />}
 
-                        <SubmitButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
+                        <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
                     </form>
                 </div>
             } />

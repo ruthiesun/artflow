@@ -6,12 +6,13 @@ type ButtonProps = {
 };
 
 const buttonClass = "mr-1 text-text-font p-2 rounded-lg text-muted-100"
-const clickableButtonClass = "cursor-pointer transition disabled:bg-muted"
+const clickableButtonClass = "cursor-pointer transition disabled:bg-muted disabled:cursor-default"
+const normalButtonClass = "mb-2 font-semibold bg-primary hover:bg-primary-400"
 
-export function SubmitButton({type, text, disabled, onClick}: ButtonProps) {
+export function PrimaryButton({type, text, disabled, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-primary hover:bg-primary-400`}
+                className={`${clickableButtonClass} ${buttonClass} ${normalButtonClass}`}
                 onClick={onClick}
                 disabled={disabled}
         >
@@ -20,10 +21,10 @@ export function SubmitButton({type, text, disabled, onClick}: ButtonProps) {
     )
 }
 
-export function NavButton({type, text, disabled, onClick}: ButtonProps) {
+export function SecondaryButton({type, text, disabled, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-secondary hover:bg-secondary-400`}
+                className={`${clickableButtonClass} ${buttonClass} ${normalButtonClass}`}
                 onClick={onClick}
                 disabled={disabled}
         >

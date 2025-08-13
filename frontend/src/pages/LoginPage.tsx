@@ -5,7 +5,7 @@ import {navToErrorPage} from "./ErrorPage.tsx";
 import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {PasswordInput} from "../components/business/PasswordInput.tsx";
-import {SubmitButton} from "../components/ui/Button.tsx";
+import {PrimaryButton} from "../components/ui/Button.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 
@@ -46,10 +46,10 @@ export function LoginPage() {
 
                         {error && <ErrorText className="mb-4" content={error} />}
 
-                        <SubmitButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
+                        <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
                     </form>
                     <div>
-                        <Link to="register" className="hover:text-primary-400 text-primary cursor-pointer">
+                        <Link to="register" className="text-primary">
                             Create an account
                         </Link>
                     </div>

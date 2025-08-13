@@ -1,7 +1,7 @@
 import {useState} from "react";
 import type {ProjectImageElem, ProjectImagePrePersist} from "../../types/image";
 import {SmallModal} from "../ui/Modal.tsx"
-import {SubmitButton} from "../ui/Button.tsx"
+import {PrimaryButton} from "../ui/Button.tsx"
 import {Input, TextAreaInput, DateInput} from "../ui/Input.tsx"
 
 type EditImageModalProps = {
@@ -40,7 +40,7 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
                     <Input label="Url" type="text" value={url} setValue={setUrl} />
                     <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
                     <DateInput label="Date" type="text" value={date} setValue={setDate} />
-                    <SubmitButton type='button' text="Update" disabled={url.trim() === ""} onClick={updateImage} />
+                    <PrimaryButton type='button' text="Update" disabled={url.trim() === ""} onClick={updateImage} />
                 </div>
             )
         } onClose={onClose}/>
@@ -77,7 +77,7 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
                 <Input label="Url" type="text" value={url} setValue={setUrl} />
                 <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
                 <DateInput label="Date" type="text" value={date} setValue={setDate} />
-                <SubmitButton type='button' text="Create" disabled={url.trim() === ""} onClick={updateImages} />
+                <PrimaryButton type='button' text="Create" disabled={url.trim() === ""} onClick={updateImages} />
             </div>
         )} onClose={onClose}/>
     )

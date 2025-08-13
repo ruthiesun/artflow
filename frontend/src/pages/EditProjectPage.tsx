@@ -15,7 +15,7 @@ import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
 import {ImageEditor} from "../components/business/ImageEditor.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {H1} from "../components/ui/Text.tsx";
-import {SubmitButton} from "../components/ui/Button.tsx";
+import {PrimaryButton} from "../components/ui/Button.tsx";
 
 export function EditProjectPage() {
     const {projectName} = useParams<{ projectName: string }>()
@@ -140,7 +140,7 @@ export function EditProjectPage() {
                         {!isLoadingProject && <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />}
                         {!isLoadingTags && <ProjectTagInput tags={tags} setTags={setTags} />}
                         {!isLoadingImages && <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>}
-                        <SubmitButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" | visibility.trim() === "")} />
+                        <PrimaryButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" | visibility.trim() === "")} />
                     </form>
                     {isLoading && <LoadingOverlay/>}
                 </div>

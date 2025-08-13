@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {deleteProject} from "../../api/projects.ts";
 import {SmallModal} from "../ui/Modal.tsx";
 import {Input} from "../ui/Input.tsx";
-import {SubmitButton} from "../ui/Button.tsx";
+import {PrimaryButton} from "../ui/Button.tsx";
 import {Text} from "../ui/Text.tsx";
 
 type ConfirmDeleteProjectProps = {
@@ -36,7 +36,7 @@ export function ConfirmDeleteProjectModal({ projectName, onClose }: ConfirmDelet
                 <Text content="Confirm the name of the project to delete." />
                 <form onSubmit={handleSubmit}>
                     <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
-                    <SubmitButton disabled={typedName !== projectName} type="submit" text="Delete" />
+                    <PrimaryButton disabled={typedName !== projectName} type="submit" text="Delete" />
                 </form>
                 </div>
             )

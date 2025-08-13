@@ -12,8 +12,8 @@
     --color-secondary-400: var(--color-fuchsia-400);
     --color-background: var(--color-indigo-400); /*main background*/
     --color-background-50: var(--color-indigo-50); /*main background*/
-    --color-surface: var(--color-fuchsia-50); /*elevated panels/cards*/
-    --color-surface-100: var(--color-fuchsia-100);
+    --color-surface: var(--color-stone-50); /*elevated panels/cards*/
+    --color-surface-100: var(--color-stone-100);
     --color-foreground: var(--color-stone-800); /*primary text*/
     --color-muted: var(--color-stone-400); /*subtle text, placeholders*/
     --color-muted-100: var(--color-stone-100);

@@ -6,7 +6,7 @@ import {getAllProjectsWithTags} from "../api/projects.ts";
 import {getTagsForUser} from "../api/tags.ts";
 import {navToErrorPage} from "./ErrorPage.tsx";
 import {ImageCarouselPreview} from "../components/business/ImageCarousel.tsx";
-import {NavButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
+import {SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {H1, H3, Text} from "../components/ui/Text.tsx";
 
@@ -53,7 +53,7 @@ export function HomePage() {
                 <div>
                     <H1 content="My Projects" />
                     <div>
-                        <NavButton type="button" text="New project" onClick={() => nav("new")} />
+                        <SecondaryButton type="button" text="New project" onClick={() => nav("new")} />
                     </div>
                     <div>
                         <div className="flex flex-wrap">
@@ -68,10 +68,10 @@ export function HomePage() {
                     <div className="mt-4">
                         {projects.map((project: Project) => (
 //                             <LazyComponent key={project.projectName}>
-                                <div key={project.projectName} className="rounded-xl p-2 bg-surface mb-4 group cursor-pointer border border-surface-100" onClick={() => nav(project.projectName)}>
+                                <div key={project.projectName} className="rounded-xl p-2 bg-white mb-4 group cursor-pointer" onClick={() => nav(project.projectName)}>
                                     <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
                                     <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
-                                    <div className="rounded-lg bg-white group-hover:opacity-50 transition-opacity">
+                                    <div className="rounded-lg bg-surface group-hover:opacity-50 transition-opacity">
                                         <ImageCarouselPreview projectName={project.projectName} />
                                     </div>
                                 </div>

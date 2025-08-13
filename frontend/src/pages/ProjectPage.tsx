@@ -8,7 +8,7 @@ import {navToErrorPage} from "./ErrorPage.tsx";
 import {LoadingOverlay} from "../components/business/LoadingOverlay.tsx";
 import {ConfirmDeleteProjectModal} from "../components/business/ConfirmDeleteProjectModal.tsx";
 import {ImageCarousel} from "../components/business/ImageCarousel.tsx";
-import {DisplayOnlyTagButton, DeleteButton, NavButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
+import {DisplayOnlyTagButton, DeleteButton, SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {H1, H3, Text, TimestampText} from "../components/ui/Text.tsx";
 
@@ -51,7 +51,7 @@ export function ProjectPage() {
             <BackgroundBorder content={
                 <div>
                     {!isLoading && <H1 content={project.projectName} />}
-                    <NavButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
+                    <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
                     <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
                     <div>
                         {tags.map((tag: ProjectTag) => (

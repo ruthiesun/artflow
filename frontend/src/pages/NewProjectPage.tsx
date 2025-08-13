@@ -8,7 +8,7 @@ import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRa
 import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
 import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
 import {H1} from "../components/ui/Text.tsx";
-import {SubmitButton} from "../components/ui/Button.tsx";
+import {PrimaryButton} from "../components/ui/Button.tsx";
 
 
 export function NewProjectPage() {
@@ -47,7 +47,7 @@ export function NewProjectPage() {
                         <ProjectDescriptionInput description={description} setDescription={setDescription}/>
                         <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility}/>
                         <ProjectTagInput tags={tags} setTags={setTags}/>
-                        <SubmitButton type="submit" text="Save" disabled={name.trim() === "" | visibility.trim() === ""} />
+                        <PrimaryButton type="submit" text="Save" disabled={name.trim() === "" | visibility.trim() === ""} />
                     </form>
                 </div>
             } />
