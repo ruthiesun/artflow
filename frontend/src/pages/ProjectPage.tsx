@@ -64,7 +64,7 @@ export function ProjectPage() {
                         <Text content={project.description} />
                     </div>}
                     {!isLoading && <div className="flex justify-center items-center">
-                        <div className="max-w-full w-max p-4 sm:p-6 md:p-8 lg:p-10">
+                        <div className="w-full p-4 sm:p-6 md:p-8 lg:p-10">
                             <ImageCarousel projectName={project.projectName} />
                         </div>
                     </div>}

@@ -21,16 +21,6 @@ function ImageDisplaySmall({image, className}: ImageDisplayProps) {
     />)
 }
 
-function ImageDisplayLarge({image, className, onClick}: ImageDisplayProps) {
-    return (
-        <img
-            src={image.url}
-            alt={`image in position: ${image.position}`}
-            className={`${className} h-auto max-h-[70vh] w-min rounded-lg object-contain shadow-sm`}
-            onClick={onClick}
-        />)
-}
-
 type ImageDetailsProps = {
     image: ProjectImage;
     onClose: () => void
@@ -73,12 +63,15 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     return (
         <div className="flex-col flex justify-center items-center lg:items-start">
             {images.map((image, index) => (
-                <div key={image.position} className=" max-w-full bg-white-100 pb-10">
-                    <div className="flex flex-col items-center
-                    lg:flex-row lg:items-start">
-                        <ImageDisplayLarge image={image} className="cursor-pointer lg:max-w-1/2" onClick={() => prepareToShowImageDetails(image)} />
-                        <div className="flex flex-col items-center max-w-full
-                        lg:items-start lg:pl-5 lg:max-w-1/2">
+                <div key={image.position} className="w-full pb-10">
+                    <div className="flex flex-col items-center lg:flex-row lg:items-start">
+                        <img
+                            src={image.url}
+                            alt={`image in position: ${image.position}`}
+                            className={`cursor-pointer h-full max-h-[75vh] rounded-lg object-contain shadow-sm lg:max-w-1/2`}
+                            onClick={() => prepareToShowImageDetails(image)}
+                        />
+                        <div className="flex flex-col items-center max-w-full lg:items-start lg:pl-5">
                             {image.dateTime == null ? (
                                 <TimestampText content="Date: unknown" className="max-w-full" />
                             ) : (
