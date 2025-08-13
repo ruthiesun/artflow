@@ -6,7 +6,7 @@ import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {PasswordInput} from "../components/business/PasswordInput.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {BackgroundNoNav, BackgroundBorder} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 
 export function LoginPage() {
@@ -36,7 +36,7 @@ export function LoginPage() {
     };
 
     return (
-        <Background className="px-4" content={
+        <BackgroundNoNav className="px-4" content={
             <BackgroundBorder className="max-w-md" content={
                 <div>
                     <H1 content="Artflow" />

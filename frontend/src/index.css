@@ -11,7 +11,7 @@
     --color-secondary: var(--color-fuchsia-600); /*secondary actions/accent*/
     --color-secondary-400: var(--color-fuchsia-400);
     --color-background: var(--color-indigo-400); /*main background*/
-    --color-background-50: var(--color-indigo-50); /*main background*/
+    --color-background-50: var(--color-indigo-50);
     --color-surface: var(--color-stone-50); /*elevated panels/cards*/
     --color-surface-100: var(--color-stone-100);
     --color-foreground: var(--color-stone-800); /*primary text*/
