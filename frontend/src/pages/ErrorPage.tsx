@@ -18,7 +18,7 @@ export function ErrorPage() {
         <Background className="px-4" content={
             <BackgroundBorder className="max-w-lg" content={
                 <div>
-                    <H3 content="Something went wrong" className="text-text-color text-center"/>
+                    <H3 content="Something went wrong" className="text-center"/>
                     <Text className="mt-2" content={`Status: ${state?.status ?? 'Unknown'}`}/>
                     <Text content={`Message: ${state?.message ?? 'None'}`}/>
                     {state?.details && (

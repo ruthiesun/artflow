@@ -5,14 +5,13 @@ type ButtonProps = {
     onClick?: (() => (void | Promise<void>)) | undefined;
 };
 
-const buttonClass = "mr-1 text-text-font p-2 rounded-lg"
-const clickableButtonClass = "not-disabled:cursor-pointer transition disabled:bg-disabled-button"
+const buttonClass = "mr-1 text-text-font p-2 rounded-lg text-muted-100"
+const clickableButtonClass = "cursor-pointer transition disabled:bg-muted"
 
 export function SubmitButton({type, text, disabled, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold text-submit-button-text
-                bg-submit-button hover:bg-submit-button-hover`}
+                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-primary hover:bg-primary-400`}
                 onClick={onClick}
                 disabled={disabled}
         >
@@ -24,7 +23,7 @@ export function SubmitButton({type, text, disabled, onClick}: ButtonProps) {
 export function NavButton({type, text, disabled, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 bg-nav-button text-nav-button-text font-semibold hover:bg-nav-button-hover`}
+                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-secondary hover:bg-secondary-400`}
                 onClick={onClick}
                 disabled={disabled}
         >
@@ -36,7 +35,7 @@ export function NavButton({type, text, disabled, onClick}: ButtonProps) {
 export function DeleteButton({type, text, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 bg-delete-button text-delete-button-text font-semibold hover:bg-delete-button-hover`}
+                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-danger`}
                 onClick={onClick}
         >
             {text}
@@ -47,7 +46,7 @@ export function DeleteButton({type, text, onClick}: ButtonProps) {
 export function DisplayOnlyTagButton({type, text}: ButtonProps) {
     return (
         <button type={type}
-                className={`${buttonClass} bg-tag-selected text-tag-text-selected`}
+                className={`${buttonClass} bg-secondary-400`}
                 disabled={true}
         >
             {text}
@@ -58,7 +57,7 @@ export function DisplayOnlyTagButton({type, text}: ButtonProps) {
 export function SelectedTagButton({type, text, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} bg-tag-selected text-tag-text-selected hover:bg-tag-deselected`}
+                className={`${clickableButtonClass} ${buttonClass} bg-secondary-400 hover:bg-muted`}
                 onClick={onClick ? () => onClick() : undefined}
         >
             {text}
@@ -69,7 +68,7 @@ export function SelectedTagButton({type, text, onClick}: ButtonProps) {
 export function DeselectedTagButton({type, text, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} bg-tag-deselected text-tag-text-deselected hover:bg-tag-selected`}
+                className={`${clickableButtonClass} ${buttonClass} bg-muted hover:bg-secondary-400`}
                 onClick={onClick ? () => onClick() : undefined}
         >
             {text}

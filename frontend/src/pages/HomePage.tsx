@@ -68,8 +68,8 @@ export function HomePage() {
                     <div className="mt-4">
                         {projects.map((project: Project) => (
 //                             <LazyComponent key={project.projectName}>
-                                <div key={project.projectName} className="rounded-xl p-2 bg-project-preview-bg mb-4 group cursor-pointer border border-project-preview-border" onClick={() => nav(project.projectName)}>
-                                    <H3 className="text-project-name group-hover:opacity-50 transition-opacity" content={project.projectName} />
+                                <div key={project.projectName} className="rounded-xl p-2 bg-surface mb-4 group cursor-pointer border border-surface-100" onClick={() => nav(project.projectName)}>
+                                    <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
                                     <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
                                     <div className="rounded-lg bg-white group-hover:opacity-50 transition-opacity">
                                         <ImageCarouselPreview projectName={project.projectName} />

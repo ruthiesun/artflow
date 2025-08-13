@@ -3,37 +3,21 @@
 
 @theme {
     --font-display-font: "Playfair Display", sans-serif;
-    --color-display-color: var(--color-indigo-500);
     --font-header-font: "DM Sans", sans-serif;
-    --color-header-color: var(--color-indigo-400);
     --font-text-font: "Urbanist", sans-serif;
-    --color-text-color: var(--color-stone-800);
-    --color-text-light-color: var(--color-stone-400);
-    --color-bg-color: var(--color-indigo-400);
-    --color-backing-color: var(--color-stone-100);
-    --color-label: var(--color-indigo-800);
-    --color-input-text: var(--color-indigo-800);
-    --color-input-border: var(--color-indigo-800);
-    --color-input-border-focus: var(--color-indigo-800);
-    --color-tag-text-selected: var(--color-stone-100);
-    --color-tag-selected: var(--color-indigo-400);
-    --color-tag-text-deselected: var(--color-stone-100);
-    --color-tag-deselected: var(--color-stone-400);
-    --color-disabled-button: var(--color-stone-600);
-    --color-submit-button: var(--color-indigo-600);
-    --color-submit-button-hover: var(--color-indigo-400);
-    --color-submit-button-text: var(--color-stone-100);
-    --color-nav-button: var(--color-indigo-600);
-    --color-nav-button-hover: var(--color-indigo-400);
-    --color-nav-button-text: var(--color-stone-100);
-    --color-delete-button: var(--color-fuchsia-600);
-    --color-delete-button-hover: var(--color-fuchsia-400);
-    --color-delete-button-text: var(--color-stone-100);
-    --color-link: var(--color-indigo-800);
-    --color-link-hover: var(--color-indigo-400);
-    --color-shadow: var(--color-stone-300);
-    --color-project-name: var(--color-fuchsia-600);
-    --color-project-preview-bg: var(--color-stone-200);
-    --color-project-preview-border: var(--color-stone-300);
-    --color-error-color: var(--color-red-500);
+
+    --color-primary: var(--color-indigo-600); /*main brand/accent color (buttons, links)*/
+    --color-primary-400: var(--color-indigo-400);
+    --color-secondary: var(--color-fuchsia-600); /*secondary actions/accent*/
+    --color-secondary-400: var(--color-fuchsia-400);
+    --color-background: var(--color-indigo-400); /*main background*/
+    --color-background-50: var(--color-indigo-50); /*main background*/
+    --color-surface: var(--color-fuchsia-50); /*elevated panels/cards*/
+    --color-surface-100: var(--color-fuchsia-100);
+    --color-foreground: var(--color-stone-800); /*primary text*/
+    --color-muted: var(--color-stone-400); /*subtle text, placeholders*/
+    --color-muted-100: var(--color-stone-100);
+    --color-border: var(--color-stone-300); /*lines/dividers*/
+    --color-danger: var(--color-stone-950);
+    --color-warning: var(--color-red-500);
 }

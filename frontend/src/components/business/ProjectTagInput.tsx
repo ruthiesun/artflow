@@ -37,7 +37,7 @@ export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
                         <DisplayOnlyTagButton type="text" text={tag} />
                         <button
                             onClick={() => removeTag(tag)}
-                            className="text-delete-button hover:text-delete-button-hover"
+                            className="text-warning cursor-pointer"
                         >
                             ×
                         </button>

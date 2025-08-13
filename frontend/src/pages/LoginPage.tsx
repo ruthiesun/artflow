@@ -49,7 +49,7 @@ export function LoginPage() {
                         <SubmitButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
                     </form>
                     <div>
-                        <Link to="register" className="hover:text-link-hover text-link">
+                        <Link to="register" className="hover:text-primary-400 text-primary cursor-pointer">
                             Create an account
                         </Link>
                     </div>
