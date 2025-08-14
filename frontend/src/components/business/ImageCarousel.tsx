@@ -73,9 +73,9 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
                         />
                         <div className="flex flex-col items-center max-w-full lg:items-start lg:pl-5">
                             {image.dateTime == null ? (
-                                <TimestampText content="Date: unknown" className="max-w-full" />
+                                <TimestampText content="Date unknown" className="max-w-full" />
                             ) : (
-                                <TimestampText content={`Date: ${image.dateTime}`} className="max-w-full" />
+                                <TimestampText content={`${image.dateTime.split("T")[0]}`} className="max-w-full" />
                             )}
                             <Text content={image.caption} className="max-w-full" />
                         </div>

@@ -59,8 +59,8 @@ export function ProjectPage() {
                         ))}
                     </div>
                     {!isLoading && <div className="mt-5 mb-5">
-                        <TimestampText content={`Created: ${project.createdDateTime}`} />
-                        <TimestampText content={`Last updated: ${project.updatedDateTime}`} />
+                        <TimestampText content={`Created: ${project.createdDateTime.split("T")[0]}`} />
+                        <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]}`} />
                         <Text content={project.description} />
                     </div>}
                     {!isLoading && <div className="flex justify-center items-center">
