@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import type {ProjectImageElem, ProjectImagePrePersist} from "../../types/image";
 import {SmallModal} from "../ui/Modal.tsx"
 import {PrimaryButton} from "../ui/Button.tsx"
@@ -13,7 +13,7 @@ type EditImageModalProps = {
 
 export function EditImageModal({ editingImage, setImages, images, onClose }: EditImageModalProps) {
     const [url, setUrl] = useState<string>(editingImage.url);
-    const [date, setDate] = useState<Date>(editingImage.dateTime);
+    const [date, setDate] = useState<string>(editingImage.dateTime ? editingImage.dateTime.split("T")[0] : "");
     const [caption, setCaption] = useState<string>(editingImage.caption);
     const [error, setError] = useState<string | null>(null);
 
@@ -22,10 +22,12 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
             setError("URL must be nonempty")
             return
         }
+        
+        const newDateTime = date === "" ? null : new Date(date + "T00:00:00");
 
         const updatedImages = images.map((img) =>
             img.position === editingImage.position
-                ? { ...img, url: url, dateTime: date, caption: caption }
+                ? { ...img, url: url, dateTime: newDateTime, caption: caption }
                 : img
         );
         setImages(updatedImages);
@@ -39,7 +41,7 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
                     {error && <p>{error}</p>}
                     <Input label="Url" type="text" value={url} setValue={setUrl} />
                     <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
-                    <DateInput label="Date" type="text" value={date} setValue={setDate} />
+                    <DateInput label="Date" value={date} setValue={setDate} />
                     <PrimaryButton type='button' text="Update" disabled={url.trim() === ""} onClick={updateImage} />
                 </div>
             )
@@ -56,7 +58,7 @@ type AddImageModalProps = {
 
 export function AddImageModal({projectName, setImages, images, onClose}: AddImageModalProps) {
     const [url, setUrl] = useState<string>("");
-    const [date, setDate] = useState<Date>(new Date());
+    const [date, setDate] = useState<string>("");
     const [caption, setCaption] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +67,10 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
             setError("URL must be nonempty")
             return
         }
-        const newImage: ProjectImagePrePersist = {position: images.length, caption: caption, dateTime: date, url: url, projectName: projectName}
+
+        const dateTime = date === "" ? null : new Date(date + "T00:00:00");
+
+        const newImage: ProjectImagePrePersist = {position: images.length, caption: caption, dateTime: dateTime, url: url, projectName: projectName}
         setImages([...images, newImage]);
         onClose()
     })
@@ -76,7 +81,7 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
                 {error && <p>{error}</p>}
                 <Input label="Url" type="text" value={url} setValue={setUrl} />
                 <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
-                <DateInput label="Date" type="text" value={date} setValue={setDate} />
+                <DateInput label="Date" value={date} setValue={setDate} />
                 <PrimaryButton type='button' text="Create" disabled={url.trim() === ""} onClick={updateImages} />
             </div>
         )} onClose={onClose}/>

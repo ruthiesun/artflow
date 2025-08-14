@@ -14,7 +14,7 @@ export async function createImageForProject(projectName: string, url: string, ca
         dateTime: dateTime
     }
 
-    return api.post<ProjectImage[]>(`/projects/${projectName}/images`, body)
+    return api.post<ProjectImage>(`/projects/${projectName}/images`, body)
         .then(res => res.data as ProjectImage);
 }
 
@@ -27,7 +27,7 @@ export async function updateImageForProject(projectName: string, id: number, pos
         dateTime: dateTime
     }
 
-    return api.put<ProjectImage[]>(`/projects/${projectName}/images`, body)
+    return api.put<ProjectImage>(`/projects/${projectName}/images`, body)
         .then(res => res.data as ProjectImage);
 }
 

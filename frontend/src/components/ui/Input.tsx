@@ -7,7 +7,7 @@ type InputProps = {
     value: string;
     setValue: ((newValue) => void)
     placeholder?: string;
-    inKeyDown?: () => void;
+    onKeyDown?: () => void;
 };
 
 export function Input({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
@@ -23,23 +23,6 @@ export function Input({label, type, value, setValue, placeholder, onKeyDown}: In
                 className={textInputClass}
             />
         </div>
-    )
-}
-
-type RadioInputProps = {
-    label: string;
-    name: string;
-    value: string;
-    onChange: (() => void);
-    checked: boolean;
-};
-export function RadioInput({label, name, value, onChange, checked}: InputProps) {
-    return (
-            <label className={labelClass}>
-                <input type="radio" name={name} value={value} checked={checked} onChange={onChange}
-                className="text-foreground mr-1" />
-                {label}
-            </label>
     )
 }
 
@@ -60,16 +43,37 @@ export function TextAreaInput({label, type, value, setValue, placeholder, onKeyD
     )
 }
 
-export function DateInput({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
+type RadioInputProps = {
+    label: string;
+    name: string;
+    value: string;
+    onChange: (() => void);
+    checked: boolean;
+};
+export function RadioInput({label, name, value, onChange, checked}: RadioInputProps) {
+    return (
+            <label className={labelClass}>
+                <input type="radio" name={name} value={value} checked={checked} onChange={onChange}
+                className="text-foreground mr-1" />
+                {label}
+            </label>
+    )
+}
+
+type DateInputProps = {
+    label: string;
+    value: string;
+    setValue: ((newValue) => void)
+}
+
+export function DateInput({label, value, setValue}: DateInputProps) {
     return (
         <div className="mb-4">
             <label className={labelClass}>{label}</label>
             <input
-                type={type}
+                type="date"
                 value={value}
                 onChange={e => setValue(e.target.value)}
-                placeholder={placeholder}
-                onKeyDown={onKeyDown}
                 className={textInputClass}
             />
         </div>
