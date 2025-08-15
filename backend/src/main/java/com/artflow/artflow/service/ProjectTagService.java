@@ -47,6 +47,7 @@ public class ProjectTagService {
 		ProjectTag projectTag = new ProjectTag(new ProjectTagId(project.getId(), tag.getId()));
 		projectTag.setTag(tag);
 		projectTag.setProject(project);
+		project.updateDateTime();
 		return toDto(projectTagRepo.save(projectTag));
 	}
 	
@@ -70,7 +71,10 @@ public class ProjectTagService {
 	@Transactional
 	public void deleteTag(String projectName, String tagName, String email) {
 		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email);
-		projectTag.ifPresent(projectTagRepo::delete);
+		if (projectTag.isPresent()) {
+			projectTagRepo.delete(projectTag.get());
+			projectTag.get().getProject().updateDateTime();
+		}
 	}
 	
 	@Transactional

@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -83,14 +84,19 @@ public class ProjectControllerTest {
 	public void canCreateProject() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		
-		mockMvc.perform(post(UriUtil.getProjectsUri())
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
-				.andExpect(status().isCreated());
+				.andExpect(status().isCreated())
+			.andReturn();
 		
 		Optional<UserProject> foundProject = projectRepository.findByOwner_EmailAndProjectName(user.getEmail(), projectCreateDto.getProjectName());
 		assertTrue(foundProject.isPresent());
+		
+		LocalDateTime createdDateTime = LocalDateTime.parse(objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("createdDateTime").asText());
+		LocalDateTime updatedDateTime1 = LocalDateTime.parse(objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertEquals(createdDateTime, updatedDateTime1);
 	}
 	
 	@Test
@@ -316,6 +322,7 @@ public class ProjectControllerTest {
 		assertSame(visibility2, foundProject.get().getVisibility());
 		assertEquals(name2, foundProject.get().getProjectName());
 		assertEquals(desc2, foundProject.get().getDescription());
+		assertTrue(foundProject.get().getUpdatedDateTime().isAfter(projectDto.getUpdatedDateTime()));
 	}
 	
 	@Test

@@ -72,7 +72,6 @@ public class UserProject {
 	
 	@PreUpdate
 	public void preUpdate() {
-		log.info("updating project datetime");
 		updateDateTime();
 	}
 	
@@ -82,7 +81,7 @@ public class UserProject {
 		updatedDateTime = currentTime;
 	}
 	
-	private void updateDateTime() {
+	public void updateDateTime() {
 		updatedDateTime = LocalDateTime.now();
 	}
 	

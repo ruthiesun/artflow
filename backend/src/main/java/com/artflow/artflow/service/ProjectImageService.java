@@ -48,6 +48,7 @@ public class ProjectImageService {
 		);
 		project.getImages().add(image);
 		projectImageRepo.save(image);
+		project.updateDateTime();
 		return toDto(image);
 	}
 	
@@ -97,6 +98,8 @@ public class ProjectImageService {
 			projectRepo.flush(); // need this for the db to know that the new pos is now free. above: did not need flush because the lazy load implicitly flushes (this is my hypothesis)
 			image.setPosition(newPos);
 		}
+		
+		image.getProject().updateDateTime();
 		return toDto(image);
 	}
 	
@@ -111,6 +114,7 @@ public class ProjectImageService {
 			project.getImages().remove(pos);
 			projectRepo.flush(); // need the removal to propagate to images and make the removed position available again
 			updateProjectImagePositionsAscending(project.getImages(), pos, project.getImages().size());
+			image.get().getProject().updateDateTime();
 		}
 	}
 	

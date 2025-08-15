@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -255,6 +256,55 @@ public class ProjectTagControllerTest {
 		mockMvc.perform(delete(UriUtil.getProjectTagUri("asdf", tag1.getName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void canUpdateProjectTimestampWithTag() throws Exception {
+		// create project
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+			.andExpect(status().isCreated())
+			.andReturn();
+		
+		String projectName = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("projectName").asText();
+		LocalDateTime updatedDateTime1 = LocalDateTime.parse(objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		
+		// create tag
+		ProjectTagCreateDto projectTagCreateDto = new ProjectTagCreateDto(projectName, "an excellent tag");
+		MvcResult tagCreateResult = mockMvc.perform(post(UriUtil.getProjectTagsUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isCreated())
+			.andReturn();
+		
+		String tagName = objectMapper.readTree(tagCreateResult.getResponse().getContentAsString()).get("tagName").asText();
+		
+		// check update timestamp is different
+		MvcResult projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LocalDateTime updatedDateTime2 = LocalDateTime.parse(objectMapper.readTree(projectGetResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertTrue(updatedDateTime2.isAfter(updatedDateTime1));
+		
+		// delete tag
+		mockMvc.perform(delete(UriUtil.getProjectTagUri(projectName, tagName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isNoContent());
+		
+		// check update timestamp is different
+		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LocalDateTime updatedDateTime3 = LocalDateTime.parse(objectMapper.readTree(projectGetResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertTrue(updatedDateTime3.isAfter(updatedDateTime2));
 	}
 	
 	@Test

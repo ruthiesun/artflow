@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -352,6 +353,83 @@ public class ProjectImageControllerTest {
 		mockMvc.perform(delete(UriUtil.getImageUri(project.getProjectName(), 123L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void canUpdateProjectTimestampWithImage() throws Exception {
+		// create project
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+			.andExpect(status().isCreated())
+			.andReturn();
+		
+		String projectName = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("projectName").asText();
+		LocalDateTime updatedDateTime1 = LocalDateTime.parse(objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		
+		// create image for project
+		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
+		MvcResult imageCreateResult = mockMvc.perform(post(UriUtil.getImagesUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
+			.andExpect(status().isCreated())
+			.andReturn();
+		
+		Long imageId = objectMapper.readTree(imageCreateResult.getResponse().getContentAsString()).get("id").asLong();
+		Integer position = objectMapper.readTree(imageCreateResult.getResponse().getContentAsString()).get("position").asInt();
+		String caption = "a new caption";
+		LocalDateTime dateTime = LocalDateTime.parse(objectMapper.readTree(imageCreateResult.getResponse().getContentAsString()).get("dateTime").asText());
+		String url = objectMapper.readTree(imageCreateResult.getResponse().getContentAsString()).get("url").asText();
+		
+		// check update timestamp is different
+		MvcResult projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LocalDateTime updatedDateTime2 = LocalDateTime.parse(objectMapper.readTree(projectGetResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertTrue(updatedDateTime2.isAfter(updatedDateTime1));
+		
+		// update image
+		ProjectImageUpdateDto projectImageUpdateDto = new ProjectImageUpdateDto(
+			imageId,
+			position,
+			caption,
+			dateTime,
+			url
+		);
+		
+		mockMvc.perform(put(UriUtil.getImagesUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
+			.andExpect(status().isOk());
+		
+		// check update timestamp is different
+		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LocalDateTime updatedDateTime3 = LocalDateTime.parse(objectMapper.readTree(projectGetResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertTrue(updatedDateTime3.isAfter(updatedDateTime2));
+		
+		// delete image
+		mockMvc.perform(delete(UriUtil.getImageUri(projectName, imageId))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isNoContent());
+		
+		// check update timestamp is different
+		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LocalDateTime updatedDateTime4 = LocalDateTime.parse(objectMapper.readTree(projectGetResult.getResponse().getContentAsString()).get("updatedDateTime").asText());
+		assertTrue(updatedDateTime4.isAfter(updatedDateTime3));
 	}
 	
 	@Test

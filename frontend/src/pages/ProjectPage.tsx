@@ -46,6 +46,14 @@ export function ProjectPage() {
 
     }, [projectName]);
 
+    function getPrettyTime(timeString: string): string {
+        return (new Date(timeString)).toLocaleTimeString(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,   // enables AM/PM
+            });
+    }
+
     return (
         <Background className="px-10 py-5" content={
             <BackgroundBorder content={
@@ -59,8 +67,8 @@ export function ProjectPage() {
                         ))}
                     </div>
                     {!isLoading && <div className="mt-5 mb-5">
-                        <TimestampText content={`Created: ${project.createdDateTime.split("T")[0]}`} />
-                        <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]}`} />
+                        <TimestampText content={`Created: ${project.createdDateTime.split("T")[0]} ${getPrettyTime(project.createdDateTime)}`} />
+                        <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]} ${getPrettyTime(project.updatedDateTime)}`} />
                         <Text content={project.description} />
                     </div>}
                     {!isLoading && <div className="flex justify-center items-center">
