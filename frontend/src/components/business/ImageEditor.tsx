@@ -138,7 +138,7 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
 type ImageButtonProps = {
     iconSrc: string;
     alt: string;
-    className: string;
+    className?: string;
     onClick?: (e) => void;
     }
 

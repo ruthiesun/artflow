@@ -1,13 +1,16 @@
+import {useState} from "react";
 import {SecondaryButton} from "../ui/Button.tsx";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../.././AuthContext.tsx"
+import {useAuth} from "../.././AuthContext.tsx";
+import {H1, Text} from "./Text.tsx";
 
-type Props = {
+type BgProps = {
     className: string;
     content: ReactNode;
 };
 
-export function Background({className, content}: Props) {
+export function Background({className, content}: BgProps) {
+    const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
     const {isAuthenticated, removeAuth} = useAuth();
     const nav = useNavigate();
 
@@ -18,22 +21,55 @@ export function Background({className, content}: Props) {
         nav("/login");
     });
 
+
     const authButtonText = isAuthenticated ? "Logout" : "Login";
 
     return (
         <div className={`min-h-screen flex-col bg-background`}>
-            <div className="flex justify-end pt-2 bg-surface-100">
-                <SecondaryButton type="button" text={`${authButtonText}`} onClick={handleAuthButton} />
-            </div>
+            <nav className="flex items-center justify-between p-4 shadow-md bg-surface">
+                {/* Left side */}
+                <H1 content="Artflow" />
+
+                {/* Right side */}
+                <div className="block sm:hidden">
+                    <img src="/src/assets/icons/hamburger.svg" alt="menu" className="w-8 h-8 cursor-pointer" onClick={() => setIsDropDownOpen(!isDropDownOpen)} />
+                </div>
+                <div className="hidden sm:block flex space-x-6">
+
+                    <SecondaryButton type="button" text="Home" onClick={() => nav("/projects")} />
+                    <SecondaryButton type="button" text={`${authButtonText}`} onClick={handleAuthButton} />
+                </div>
+            </nav>
+
             <div className={`flex grow items-center justify-center ${className}`}>
-                {content}
+                {isDropDownOpen && (
+                    <div className="flex flex-col bg-background-50 w-full h-full items-center">
+                        <NavDropDownRow content={<Text content="Home" />} onClick={() => nav("/projects")}/>
+                        <NavDropDownRow content={<Text content={`${authButtonText}`} />} onClick={handleAuthButton} />
+                    </div>
+                )}
+                {!isDropDownOpen && content}
             </div>
         </div>
 
     )
 }
 
-export function BackgroundNoNav({className, content}: Props) {
+type NavDropDownRowProps = {
+    onClick: () => void;
+    content: ReactNode;
+};
+
+
+    function NavDropDownRow({content, onClick}: NavDropDownRowProps)  {
+        return (
+            <div className="hover:opacity-50 cursor-pointer p-2" onClick={onClick}>
+                {content}
+            </div>
+        );
+    }
+
+export function BackgroundNoNav({className, content}: BgProps) {
     return (
         <div className={`min-h-screen bg-background flex items-center justify-center ${className}`}>
             {content}
@@ -41,7 +77,7 @@ export function BackgroundNoNav({className, content}: Props) {
     )
 }
 
-export function BackgroundBorder({className, content}: Props) {
+export function BackgroundBorder({className, content}: BgProps) {
     return (
         <div className={`w-full rounded-2xl shadow-lg p-8 bg-background-50 ${className}`}>
             {content}
