@@ -13,6 +13,7 @@ export function Background({className, children}: BgProps) {
     const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
     const {isAuthenticated, removeAuth} = useAuth();
     const nav = useNavigate();
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     const handleAuthButton = (() => {
         if (isAuthenticated) {
@@ -35,20 +36,22 @@ export function Background({className, children}: BgProps) {
                     <img src="/src/assets/icons/hamburger.svg" alt="menu" className="w-8 h-8 cursor-pointer" onClick={() => setIsDropDownOpen(!isDropDownOpen)} />
                 </div>
                 <div className="hidden sm:block flex space-x-6">
-
                     <SecondaryButton type="button" text="Home" onClick={() => nav("/projects")} />
                     <SecondaryButton type="button" text={`${authButtonText}`} onClick={handleAuthButton} />
                 </div>
             </nav>
 
-            <div className={`flex grow items-center justify-center pt-1`}>
-                {isDropDownOpen && (
-                    <div className="flex flex-col bg-background-50 w-full h-full items-center">
-                        <NavDropDownRow content={<Text content="Home" />} onClick={() => nav("/projects")}/>
-                        <NavDropDownRow content={<Text content={`${authButtonText}`} />} onClick={handleAuthButton} />
+            <div className="relative flex items-center justify-center pt-1">
+                {isDropDownOpen && isMobile && (
+                    <div className="absolute z-10 sm:hidden flex flex-col bg-background-50 w-full h-full items-center">
+                        <NavDropDownRow children={<Text content="Home" />} onClick={() => {
+                            setIsDropDownOpen(!isDropDownOpen);
+                            nav("/projects");
+                        }}/>
+                        <NavDropDownRow children={<Text content={`${authButtonText}`} />} onClick={handleAuthButton} />
                     </div>
                 )}
-                {!isDropDownOpen && children}
+                {children}
             </div>
         </div>
 

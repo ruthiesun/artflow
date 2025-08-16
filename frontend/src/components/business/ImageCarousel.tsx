@@ -61,35 +61,6 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
         setShowImageDetailsModal(true);
     }
 
-    // return (
-    //     <div className="flex-col flex justify-center items-center lg:items-start">
-    //         {images.map((image, index) => (
-    //             <div key={image.position} className="w-full pb-1">
-    //                 <div className="flex flex-col items-center lg:flex-row lg:items-start py-1 bg-surface">
-    //                     <EdgePadding>
-    //                         <img
-    //                             src={image.url}
-    //                             alt={`image in position: ${image.position}`}
-    //                             className={`cursor-pointer h-full max-h-[75vh] rounded-lg object-contain shadow-sm lg:max-w-1/2`}
-    //                             onClick={() => prepareToShowImageDetails(image)}
-    //                         />
-    //                         <div className="flex flex-col items-center max-w-full lg:items-start lg:pl-5">
-    //                             {image.dateTime == null ? (
-    //                                 <TimestampText content="Date unknown" className="max-w-full" />
-    //                             ) : (
-    //                                 <TimestampText content={`${image.dateTime.split("T")[0]}`} className="max-w-full" />
-    //                             )}
-    //                             <Text content={image.caption} className="max-w-full" />
-    //                         </div>
-    //                     </EdgePadding>
-    //                 </div>
-    //             </div>
-    //         ))}
-    //         {selectedImage && showImageDetailsModal && <ImageDetails image={selectedImage} onClose={() => setShowImageDetailsModal(false)} />}
-    //     </div>
-    // )
-
-
     return (
         <div className="flex-col flex justify-center items-center lg:items-start">
             {images.map((image, index) => (
