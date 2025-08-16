@@ -4,7 +4,7 @@ import {register} from "../api/auth.ts";
 import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 
@@ -38,9 +38,9 @@ export function RegisterPage() {
     };
 
     return (
-        <Background className="px-4" content={
-            <BackgroundBorder className="max-w-md" content={
-                <div>
+        <BackgroundNoNav>
+            <BackgroundBorderSm>
+                <EdgePadding>
                     <H1 content="Artflow" />
                     <form onSubmit={handleSubmit}>
                         <EmailInput email={email} setEmail={setEmail} />
@@ -51,8 +51,8 @@ export function RegisterPage() {
 
                         <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
                     </form>
-                </div>
-            } />
-        } />
+                </EdgePadding>
+            </BackgroundBorderSm>
+        </BackgroundNoNav>
     );
 }

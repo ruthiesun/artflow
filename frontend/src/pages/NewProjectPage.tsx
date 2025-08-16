@@ -6,7 +6,7 @@ import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
 import {ProjectDescriptionInput} from "../components/business/ProjectDescriptionInput.tsx";
 import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
 import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
 import {H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 
@@ -38,9 +38,9 @@ export function NewProjectPage() {
     }
 
     return (
-        <Background className="px-10 py-5" content={
-            <BackgroundBorder content={
-                <div>
+        <Background>
+            <BackgroundBorder>
+                <EdgePadding>
                     <H1 content="New Project" />
                     <form onSubmit={handleSubmit}>
                         <ProjectNameInput name={name} setName={setName}/>
@@ -49,8 +49,8 @@ export function NewProjectPage() {
                         <ProjectTagInput tags={tags} setTags={setTags}/>
                         <PrimaryButton type="submit" text="Save" disabled={name.trim() === "" | visibility.trim() === ""} />
                     </form>
-                </div>
-            } />
-        } />
+                </EdgePadding>
+            </BackgroundBorder>
+        </Background>
     )
 }

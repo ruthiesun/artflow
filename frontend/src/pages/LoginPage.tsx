@@ -6,7 +6,7 @@ import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {PasswordInput} from "../components/business/PasswordInput.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
-import {BackgroundNoNav, BackgroundBorder} from "../components/ui/Background.tsx";
+import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 
 export function LoginPage() {
@@ -36,9 +36,9 @@ export function LoginPage() {
     };
 
     return (
-        <BackgroundNoNav className="px-4" content={
-            <BackgroundBorder className="max-w-md" content={
-                <div>
+        <BackgroundNoNav>
+            <BackgroundBorderSm>
+                <EdgePadding>
                     <H1 content="Artflow" />
                     <form onSubmit={handleSubmit}>
                         <EmailInput email={email} setEmail={setEmail} />
@@ -49,12 +49,12 @@ export function LoginPage() {
                         <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
                     </form>
                     <div>
-                        <Link to="register" className="text-primary">
+                        <Link to="/register" className="text-primary">
                             Create an account
                         </Link>
                     </div>
-                </div>
-            } />
-        } />
+                </EdgePadding>
+            </BackgroundBorderSm>
+        </BackgroundNoNav>
     );
 }

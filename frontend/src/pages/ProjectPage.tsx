@@ -9,7 +9,7 @@ import {LoadingOverlay} from "../components/business/LoadingOverlay.tsx";
 import {ConfirmDeleteProjectModal} from "../components/business/ConfirmDeleteProjectModal.tsx";
 import {ImageCarousel} from "../components/business/ImageCarousel.tsx";
 import {DisplayOnlyTagButton, DeleteButton, SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
 import {H1, H3, Text, TimestampText} from "../components/ui/Text.tsx";
 
 export function ProjectPage() {
@@ -55,9 +55,9 @@ export function ProjectPage() {
     }
 
     return (
-        <Background className="px-10 py-5" content={
-            <BackgroundBorder content={
-                <div>
+        <Background>
+            <BackgroundBorder>
+                <EdgePadding>
                     {!isLoading && <H1 content={project.projectName} />}
                     <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
                     <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
@@ -71,8 +71,9 @@ export function ProjectPage() {
                         <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]} ${getPrettyTime(project.updatedDateTime)}`} />
                         <Text content={project.description} />
                     </div>}
+                </EdgePadding>
                     {!isLoading && <div className="flex justify-center items-center">
-                        <div className="w-full p-4 sm:p-6 md:p-8 lg:p-10">
+                        <div className="w-full">
                             <ImageCarousel projectName={project.projectName} />
                         </div>
                     </div>}
@@ -80,8 +81,8 @@ export function ProjectPage() {
                         <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>
                     )}
                     {isLoading && <LoadingOverlay/>}
-                </div>
-            } />
-        } />
+                
+            </BackgroundBorder>
+        </Background>
     );
 }

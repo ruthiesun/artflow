@@ -13,7 +13,7 @@ import {ProjectDescriptionInput} from "../components/business/ProjectDescription
 import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
 import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
 import {ImageEditor} from "../components/business/ImageEditor.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
 import {H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 
@@ -130,9 +130,9 @@ export function EditProjectPage() {
     const isLoading = isLoadingProject || isLoadingTags || isLoadingImages;
 
     return (
-        <Background className="px-10 py-5" content={
-            <BackgroundBorder content={
-                <div>
+        <Background>
+            <BackgroundBorder>
+                <EdgePadding>
                     <H1 content="Edit Project" />
                     <form onSubmit={handleSubmit}>
                         {!isLoadingProject && <ProjectNameInput name={name} setName={setName} />}
@@ -143,8 +143,8 @@ export function EditProjectPage() {
                         <PrimaryButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" | visibility.trim() === "")} />
                     </form>
                     {isLoading && <LoadingOverlay/>}
-                </div>
-            } />
-        } />
+                </EdgePadding>
+            </BackgroundBorder>
+        </Background>
     );
 }

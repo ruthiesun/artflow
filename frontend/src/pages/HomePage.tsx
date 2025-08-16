@@ -7,7 +7,7 @@ import {getTagsForUser} from "../api/tags.ts";
 import {navToErrorPage} from "./ErrorPage.tsx";
 import {ImageCarouselPreview} from "../components/business/ImageCarousel.tsx";
 import {SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
 import {H1, H3, Text} from "../components/ui/Text.tsx";
 
 export function HomePage() {
@@ -48,9 +48,9 @@ export function HomePage() {
 
 
     return (
-        <Background className="px-10 py-5" content={
-            <BackgroundBorder content={
-                <div>
+        <Background>
+            <BackgroundBorder>
+                <EdgePadding>
                     <H1 content="My Projects" />
                     <div>
                         <SecondaryButton type="button" text="New project" onClick={() => nav("new")} />
@@ -78,8 +78,8 @@ export function HomePage() {
 //                             </LazyComponent>
                         ))}
                     </div>
-                </div>
-            } />
-        } />
+                </EdgePadding>
+            </BackgroundBorder>
+        </Background>
     );
 }

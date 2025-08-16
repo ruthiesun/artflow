@@ -1,7 +1,7 @@
 import {useLocation, useNavigate} from 'react-router-dom';
 import {AxiosError} from "axios";
 import {H1, H3, Text} from "../components/ui/Text.tsx";
-import {Background, BackgroundBorder} from "../components/ui/Background.tsx";
+import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
 
 type ErrorState = {
     status?: number;
@@ -15,9 +15,9 @@ export function ErrorPage() {
     const state = location.state as ErrorState;
 
     return (
-        <Background className="px-4" content={
-            <BackgroundBorder className="max-w-lg" content={
-                <div>
+        <Background>
+            <BackgroundBorder>
+                <EdgePadding>
                     <H3 content="Something went wrong" className="text-center"/>
                     <Text className="mt-2" content={`Status: ${state?.status ?? 'Unknown'}`}/>
                     <Text content={`Message: ${state?.message ?? 'None'}`}/>
@@ -26,9 +26,9 @@ export function ErrorPage() {
           {JSON.stringify(state.details, null, 2)}
                     </pre>
                     )}
-                </div>
-            }/>
-        }/>
+                </EdgePadding>
+            </BackgroundBorder>
+        </Background>
     )
 }
 
