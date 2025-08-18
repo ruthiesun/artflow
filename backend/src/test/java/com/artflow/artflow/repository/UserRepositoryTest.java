@@ -32,11 +32,12 @@ public class UserRepositoryTest {
 	@Test
 	public void canCreateUser() {
 		String email = "testEmail";
+		String username = "testUsername";
 		String password = "testPassword";
 		
 		assertEquals(0, userRepository.count());
 		
-		User user = new User(email, password);
+		User user = new User(email, username,  password);
 		userRepository.save(user);
 		
 		assertEquals(1, userRepository.count());
@@ -50,14 +51,16 @@ public class UserRepositoryTest {
 	@Test
 	public void canCreateUsers() {
 		String email1 = "testEmail1";
+		String username1 = "testUsername1";
 		String password1 = "testPassword1";
 		String email2 = "testEmail2";
+		String username2 = "testUsername2";
 		String password2 = "testPassword2";
 		
 		assertEquals(0, userRepository.count());
 		
-		User user1 = new User(email1, password1);
-		User user2 = new User(email2, password2);
+		User user1 = new User(email1, username1, password1);
+		User user2 = new User(email2, username2, password2);
 		userRepository.save(user1);
 		userRepository.save(user2);
 		
@@ -69,11 +72,13 @@ public class UserRepositoryTest {
 	@Test
 	public void cannotCreateUsersWithSameEmail() {
 		String email = "testEmail";
+		String username1 = "testUsername1";
+		String username2 = "testUsername2";
 		String password1 = "testPassword1";
 		String password2 = "testPassword2";
 		
-		User user1 = new User(email, password1);
-		User user2 = new User(email, password2);
+		User user1 = new User(email, username1, password1);
+		User user2 = new User(email, username2, password2);
 		userRepository.save(user1);
 		
 		assertThrows(RuntimeException.class, () -> {
@@ -85,9 +90,10 @@ public class UserRepositoryTest {
 	public void canUpdateEmail() {
 		String email1 = "testEmail1";
 		String email2 = "testEmail2";
+		String username = "testUsername1";
 		String password = "testPassword";
 		
-		User user = new User(email1, password);
+		User user = new User(email1, username, password);
 		userRepository.save(user);
 		User foundUser = userRepository.getReferenceById(user.getId());
 		assertEquals(email1, foundUser.getEmail());
@@ -103,9 +109,10 @@ public class UserRepositoryTest {
 	@Test
 	public void cannotNullifyEmail() {
 		String email = "testEmail";
+		String username = "testUsername";
 		String password = "testPassword";
 		
-		User user = new User(email, password);
+		User user = new User(email, username, password);
 		userRepository.save(user);
 		User foundUser = userRepository.getReferenceById(user.getId());
 		assertEquals(email, foundUser.getEmail());
@@ -119,12 +126,14 @@ public class UserRepositoryTest {
 	@Test
 	public void cannotUpdateUsersWithSameEmail() {
 		String email1 = "testEmail1";
+		String username1 = "testUsername1";
 		String password1 = "testPassword1";
 		String email2 = "testEmail2";
+		String username2 = "testUsername2";
 		String password2 = "testPassword2";
 		
-		User user1 = new User(email1, password1);
-		User user2 = new User(email2, password2);
+		User user1 = new User(email1, username1, password1);
+		User user2 = new User(email2, username2, password2);
 		userRepository.save(user1);
 		userRepository.save(user2);
 		
@@ -137,10 +146,11 @@ public class UserRepositoryTest {
 	@Test
 	public void canUpdatePassword() {
 		String email = "testEmail";
+		String username = "testUsername";
 		String password1 = "testPassword1";
 		String password2 = "testPassword2";
 		
-		User user = new User(email, password1);
+		User user = new User(email, username, password1);
 		userRepository.save(user);
 		User foundUser = userRepository.getReferenceById(user.getId());
 		assertEquals(password1, foundUser.getPassword());
@@ -156,9 +166,10 @@ public class UserRepositoryTest {
 	@Test
 	public void cannotNullifyPassword() {
 		String email = "testEmail";
+		String username = "testUsername";
 		String password = "testPassword";
 		
-		User user = new User(email, password);
+		User user = new User(email, username, password);
 		userRepository.save(user);
 		User foundUser = userRepository.getReferenceById(user.getId());
 		assertEquals(password, foundUser.getPassword());
@@ -172,9 +183,10 @@ public class UserRepositoryTest {
 	@Test
 	public void canDeleteUser() {
 		String email = "testEmail";
+		String username = "testUsername";
 		String password = "testPassword";
 		
-		User user = new User(email, password);
+		User user = new User(email, username, password);
 		userRepository.save(user);
 		assertEquals(1, userRepository.count());
 		
@@ -185,17 +197,19 @@ public class UserRepositoryTest {
 	@Test
 	public void deletionPropagatesToProjects() {
 		String email1 = "testEmail1";
+		String username1 = "testUsername1";
 		String password1 = "testPassword1";
 		String email2 = "testEmail2";
+		String username2 = "testUsername2";
 		String password2 = "testPassword2";
 		String projectName1 = "test project a";
 		String projectName2 = "test project b";
 		String projectName3 = "test project c";
 		
 		// create new users
-		User user1 = new User(email1, password1);
+		User user1 = new User(email1, username1, password1);
 		userRepository.save(user1);
-		User user2 = new User(email2, password2);
+		User user2 = new User(email2, username2, password2);
 		userRepository.save(user2);
 		assertEquals(2, userRepository.count());
 		assertEquals(0, userProjectRepository.count());

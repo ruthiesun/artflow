@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(UriUtil.BASE)
+@RequestMapping(UriUtil.BASE + UriUtil.USERNAME)
 public class ProjectTagController {
 	private final ProjectTagService projectTagService;
 	
@@ -28,37 +28,40 @@ public class ProjectTagController {
 		this.projectTagService = projectTagService;
 	}
 	
-	@PostMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS)
-	public ResponseEntity<ProjectTagDto> create(@RequestBody ProjectTagCreateDto projectTagCreateDto, @AuthenticationPrincipal AuthUser user) {
-		ProjectTagDto tagDto = projectTagService.create(projectTagCreateDto, user.email());
+	@PostMapping(UriUtil.PROJECT +  UriUtil.TAGS)
+	public ResponseEntity<ProjectTagDto> create(@PathVariable String username, @RequestBody ProjectTagCreateDto projectTagCreateDto, @AuthenticationPrincipal AuthUser user) {
+		ProjectTagDto tagDto = projectTagService.create(username, projectTagCreateDto, user.email());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectTagUri(
+						UriUtil.toSlug(username),
 						UriUtil.toSlug(projectTagCreateDto.getProjectName()),
 						UriUtil.toSlug(tagDto.getTagName()))))
 				.body(tagDto);
 	}
 	
-	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
-	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
+	@GetMapping(UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
+	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String username, @PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectTagService.getTagForProject(
+				username,
 				UriUtil.fromSlug(projectName),
 				UriUtil.fromSlug(tagName),
 				user.email()));
 	}
 	
 	@GetMapping(UriUtil.TAGS)
-	public ResponseEntity<List<TagDto>> getTags(@AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectTagService.getTags(user.email()));
+	public ResponseEntity<List<TagDto>> getTags(@PathVariable String username, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectTagService.getTags(username, user.email()));
 	}
 	
-	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS)
-	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectTagService.getTagsForProject(UriUtil.fromSlug(projectName), user.email()));
+	@GetMapping(UriUtil.PROJECT +  UriUtil.TAGS)
+	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectTagService.getTagsForProject(username, UriUtil.fromSlug(projectName), user.email()));
 	}
 	
-	@DeleteMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
-	public ResponseEntity<Void> delete(@PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
+	@DeleteMapping(UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
+	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		projectTagService.deleteTag(
+				username,
 				UriUtil.fromSlug(projectName),
 				UriUtil.fromSlug(tagName),
 				user.email());

@@ -11,7 +11,7 @@ public class UriUtil {
 	public static final String AUTH = "/auth";
 	public static final String SIGNUP = "/register";
 	public static final String LOGIN = "/login";
-	public static final String PROJECTS = "/projects";
+	public static final String USERNAME = "/{username}";
 	
 	public static final String PROJECT = "/{projectName}";
 	public static final String PUBLIC_PROJECTS = "/public";
@@ -36,11 +36,7 @@ public class UriUtil {
 		return BASE + AUTH + SIGNUP;
 	}
 	
-	public static String getProjectsUri() {
-		return BASE + PROJECTS;
-	}
-	
-	public static String getProjectsUriWithQueryParams(List<String> tags, Visibility visibility) {
+	public static String getProjectsUriWithQueryParams(String username, List<String> tags, Visibility visibility) {
 		StringBuilder query = new StringBuilder();
 		if (tags != null && !tags.isEmpty()) {
 			query.append("?tags=");
@@ -58,30 +54,34 @@ public class UriUtil {
 			}
 			query.append("visibility=").append(visibility);
 		}
-		return BASE + PROJECTS + query;
+		return BASE + "/" + username + query;
 	}
 	
-	public static String getProjectUri(String name) {
-		return getProjectsUri() + "/" + name;
+	public static String getProjectsUri(String username) {
+		return BASE + "/" + username;
 	}
 	
-	public static String getImagesUri(String projectName) {
-		return getProjectUri(projectName) + IMAGES;
+	public static String getProjectUri(String username, String name) {
+		return getProjectsUri(username) + "/" + name;
 	}
 	
-	public static String getImageUri(String projectName, Long imageId) {
-		return getImagesUri(projectName) + "/" + imageId;
+	public static String getImagesUri(String username, String projectName) {
+		return getProjectUri(username, projectName) + IMAGES;
 	}
 	
-	public static String getTagsUri() {
-		return BASE + TAGS;
+	public static String getImageUri(String username, String projectName, Long imageId) {
+		return getImagesUri(username, projectName) + "/" + imageId;
 	}
 	
-	public static String getProjectTagsUri(String projectName) {
-		return getProjectUri(projectName) + TAGS;
+	public static String getTagsUri(String username) {
+		return BASE + "/" + username + "/" + TAGS;
 	}
 	
-	public static String getProjectTagUri(String projectName, String tagName) {
-		return getProjectTagsUri(projectName) + "/" + tagName;
+	public static String getProjectTagsUri(String username, String projectName) {
+		return getProjectUri(username, projectName) + TAGS;
+	}
+	
+	public static String getProjectTagUri(String username, String projectName, String tagName) {
+		return getProjectTagsUri(username, projectName) + "/" + tagName;
 	}
 }

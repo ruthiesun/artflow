@@ -3,10 +3,12 @@ package com.artflow.artflow.service;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
+import com.artflow.artflow.exception.ForbiddenActionException;
 import com.artflow.artflow.exception.ProjectImageNotFoundException;
 import com.artflow.artflow.exception.ProjectNotFoundException;
 import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectImageRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import jakarta.transaction.Transactional;
@@ -24,19 +26,23 @@ public class ProjectImageService {
 	private static final Logger log = LoggerFactory.getLogger(ProjectImageService.class);
 	private final UserProjectRepository projectRepo;
 	private final ProjectImageRepository projectImageRepo;
+	private final VisibilityUtilService visibilityUtilService;
 	
-	public ProjectImageService(UserProjectRepository projectRepo, ProjectImageRepository projectImageRepo) {
+	public ProjectImageService(UserProjectRepository projectRepo, ProjectImageRepository projectImageRepo, VisibilityUtilService visibilityUtilService) {
 		this.projectRepo = projectRepo;
 		this.projectImageRepo = projectImageRepo;
+		this.visibilityUtilService = visibilityUtilService;
 	}
 	
 	@Transactional
-	public ProjectImageDto create(String projectName, ProjectImageCreateDto projectImageCreateDto, String email) {
-		UserProject project = projectRepo.findByOwner_EmailAndProjectName(email, projectName)
-				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
-		long currentNumImages = projectImageRepo.countByProject_ProjectNameAndProject_Owner_Email(
+	public ProjectImageDto create(String username, String projectName, ProjectImageCreateDto projectImageCreateDto, String email) {
+		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+		
+		UserProject project = projectRepo.findByOwner_UsernameAndProjectName(username, projectName)
+				.orElseThrow(() -> new ProjectNotFoundException(projectName, username));
+		long currentNumImages = projectImageRepo.countByProject_ProjectNameAndProject_Owner_Username(
 				projectName,
-				email
+				username
 		);
 		log.info("creating new image with position=" + currentNumImages);
 		ProjectImage image = new ProjectImage(
@@ -52,16 +58,16 @@ public class ProjectImageService {
 		return toDto(image);
 	}
 	
-	public List<ProjectImageDto> getImagesForProject(String projectName, String email) {
-		projectRepo.findByOwner_EmailAndProjectName(email, projectName)
-				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
-		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(projectName, email);
+	public List<ProjectImageDto> getImagesForProject(String username, String projectName, String email) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+		
+		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(projectName, username);
 		return toDto(images);
 	}
 	
-	public ProjectImageDto getImageForProject(String projectName, Long imageId, String email) {
-		projectRepo.findByOwner_EmailAndProjectName(email, projectName)
-				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
+	public ProjectImageDto getImageForProject(String username, String projectName, Long imageId, String email) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+		
 		ProjectImage image = projectImageRepo
 				.findById(imageId)
 				.orElseThrow(() -> new ProjectImageNotFoundException(imageId));
@@ -69,7 +75,9 @@ public class ProjectImageService {
 	}
 	
 	@Transactional
-	public ProjectImageDto updateProjectImage(ProjectImageUpdateDto projectImageUpdateDto) {
+	public ProjectImageDto updateProjectImage(String username, ProjectImageUpdateDto projectImageUpdateDto, String email) {
+		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+		
 		ProjectImage image = projectImageRepo
 				.findById(projectImageUpdateDto.getId())
 				.orElseThrow(() -> new ProjectImageNotFoundException(projectImageUpdateDto.getId()));
@@ -104,7 +112,9 @@ public class ProjectImageService {
 	}
 	
 	@Transactional
-	public void deleteProjectImage(Long imageId) {
+	public void deleteProjectImage(String username, Long imageId, String email) {
+		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+		
 		Optional<ProjectImage> image = projectImageRepo.findById(imageId);
 		if (image.isPresent()) {
 			int pos = image.get().getPosition();

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ProjectTagRepositoryTest {
 	private static final Logger log = LoggerFactory.getLogger(ProjectTagRepositoryTest.class);
 	private final String email = "testEmail";
+	private final String username = "testUsername";
 	private final String password = "testPassword";
 	private final String projectName = "test project";
 	private final String tagName1 = "tag 1";
@@ -120,7 +121,7 @@ public class ProjectTagRepositoryTest {
 	
 	@BeforeEach
 	public void setup() {
-		user = new User(email, password);
+		user = new User(email, username, password);
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
 		log.info("created test user");

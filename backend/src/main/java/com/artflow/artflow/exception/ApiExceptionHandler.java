@@ -17,7 +17,7 @@ public class ApiExceptionHandler {
 				.body(Map.of("error", ex.getMessage()));
 	}
 	
-	@ExceptionHandler(InvalidCredentialsException.class)
+	@ExceptionHandler(UnauthorizedException.class)
 	public ResponseEntity<?> handleUnauthorized(UnauthorizedException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 				.body(Map.of("error", ex.getMessage()));

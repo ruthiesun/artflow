@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(UriUtil.BASE + UriUtil.PROJECTS)
+@RequestMapping(UriUtil.BASE + UriUtil.USERNAME)
 public class ProjectController {
 	
 	private final ProjectService projectService;
@@ -33,32 +33,34 @@ public class ProjectController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ProjectDto> create(@RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
-		ProjectDto projectDto = projectService.create(projectCreateDto, user.email());
+	public ResponseEntity<ProjectDto> create(@PathVariable String username, @RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
+		ProjectDto projectDto = projectService.create(username, projectCreateDto, user.email());
 		return ResponseEntity
-				.created(URI.create(UriUtil.getProjectUri(UriUtil.toSlug(projectDto.getProjectName()))))
+				.created(URI.create(UriUtil.getProjectUri(
+					UriUtil.toSlug(username),
+					UriUtil.toSlug(projectDto.getProjectName()))))
 				.body(projectDto);
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<ProjectDto>> getMyProjects(@AuthenticationPrincipal AuthUser user,
-			@RequestParam Optional<String> tags, @RequestParam Optional<String> visibility) {
-		return ResponseEntity.ok(projectService.getUserProjects(user.email(), tags, visibility));
+	public ResponseEntity<List<ProjectDto>> getProjects(@PathVariable String username, @AuthenticationPrincipal AuthUser user,
+														@RequestParam Optional<String> tags, @RequestParam Optional<String> visibility) {
+		return ResponseEntity.ok(projectService.getUserProjects(username, user.email(), tags, visibility));
 	}
 	
 	@GetMapping(UriUtil.PROJECT)
-	public ResponseEntity<ProjectDto> getProject(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectService.getProject(projectName, user.email()));
+	public ResponseEntity<ProjectDto> getProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectService.getProject(username, projectName, user.email()));
 	}
 	
 	@PutMapping()
-	public ResponseEntity<ProjectDto> update(@RequestBody ProjectUpdateDto projectUpdateDto, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectService.updateProject(projectUpdateDto, user.email()));
+	public ResponseEntity<ProjectDto> update(@PathVariable String username, @RequestBody ProjectUpdateDto projectUpdateDto, @AuthenticationPrincipal AuthUser user) {
+		return ResponseEntity.ok(projectService.updateProject(username, projectUpdateDto, user.email()));
 	}
 	
 	@DeleteMapping(UriUtil.PROJECT)
-	public ResponseEntity<Void> delete(@PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		projectService.deleteProject(UriUtil.fromSlug(projectName), user.email());
+	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		projectService.deleteProject(username, UriUtil.fromSlug(projectName), user.email());
 		return ResponseEntity.noContent().build();
 	}
 }

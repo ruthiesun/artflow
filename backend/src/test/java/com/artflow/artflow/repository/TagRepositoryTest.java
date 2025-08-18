@@ -147,7 +147,7 @@ public class TagRepositoryTest {
 		String tagName1 = "test tag 1";
 		String tagName2 = "test tag 2";
 
-		User user = new User("email", "password");
+		User user = new User("email", "username", "password");
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
 

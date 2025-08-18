@@ -10,6 +10,7 @@ import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.ProjectTagId;
 import com.artflow.artflow.model.Tag;
 import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectTagRepository;
 import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
@@ -25,23 +26,27 @@ public class ProjectTagService {
 	private final TagRepository tagRepo;
 	private final ProjectTagRepository projectTagRepo;
 	private final UserProjectRepository projectRepo;
+	private final VisibilityUtilService visibilityUtilService;
 	
-	public ProjectTagService(TagRepository tagRepo, ProjectTagRepository projectTagRepo, UserProjectRepository projectRepo) {
+	public ProjectTagService(TagRepository tagRepo, ProjectTagRepository projectTagRepo, UserProjectRepository projectRepo, VisibilityUtilService visibilityUtilService) {
 		this.tagRepo = tagRepo;
 		this.projectTagRepo = projectTagRepo;
 		this.projectRepo = projectRepo;
+		this.visibilityUtilService = visibilityUtilService;
 	}
 	
 	@Transactional
-	public ProjectTagDto create(ProjectTagCreateDto projectTagCreateDto, String userEmail) {
-		if (projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(
+	public ProjectTagDto create(String username, ProjectTagCreateDto projectTagCreateDto, String userEmail) {
+		visibilityUtilService.checkUsernameAgainstEmail(userEmail, username);
+		
+		if (projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Username(
 				projectTagCreateDto.getTagName(),
 				projectTagCreateDto.getProjectName(),
-				userEmail)
+				username)
 				.isPresent()) {
 			throw new ProjectTagNameInUseException(projectTagCreateDto.getTagName(), projectTagCreateDto.getProjectName());
 		}
-		UserProject project = projectRepo.findByOwner_EmailAndProjectName(userEmail, projectTagCreateDto.getProjectName())
+		UserProject project = projectRepo.findByOwner_UsernameAndProjectName(username, projectTagCreateDto.getProjectName())
 				.orElseThrow(() -> new ProjectNotFoundException(projectTagCreateDto.getProjectName(), userEmail));
 		Tag tag = getOrCreateTag(projectTagCreateDto.getTagName());
 		ProjectTag projectTag = new ProjectTag(new ProjectTagId(project.getId(), tag.getId()));
@@ -51,26 +56,35 @@ public class ProjectTagService {
 		return toDto(projectTagRepo.save(projectTag));
 	}
 	
-	public ProjectTagDto getTagForProject(String projectName, String tagName, String email) {
-		projectRepo.findByOwner_EmailAndProjectName(email, projectName)
-				.orElseThrow(() -> new ProjectNotFoundException(projectName, email));
-		ProjectTag projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email)
+	public ProjectTagDto getTagForProject(String username, String projectName, String tagName, String email) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+		
+		ProjectTag projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Username(tagName, projectName, username)
 				.orElseThrow(() -> new ProjectTagNotFoundException(tagName, projectName));
 		return toDto(projectTag);
 	}
 	
-	public List<TagDto> getTags(String userEmail) {
-		return toTagDto(projectTagRepo.findDistinctTagNameByProject_Owner_Email(userEmail));
+	public List<TagDto> getTags(String username, String email) {
+		if (visibilityUtilService.doesUsernameMatchEmail(email, username)) {
+			return toTagDto(projectTagRepo.findDistinctTagNameByProject_Owner_Username(username));
+		}
+		else {
+			return toTagDto(projectTagRepo.findDistinctTagNameByProject_Owner_UsernameAndProject_Visibility(username, Visibility.PUBLIC));
+		}
 	}
 	
-	public List<ProjectTagDto> getTagsForProject(String projectName, String email) {
-		List<ProjectTag> projectTags = projectTagRepo.findByProject_ProjectNameAndProject_Owner_Email(projectName, email);
+	public List<ProjectTagDto> getTagsForProject(String username, String projectName, String email) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+		
+		List<ProjectTag> projectTags = projectTagRepo.findByProject_ProjectNameAndProject_Owner_Username(projectName, username);
 		return toDto(projectTags);
 	}
 	
 	@Transactional
-	public void deleteTag(String projectName, String tagName, String email) {
-		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Email(tagName, projectName, email);
+	public void deleteTag(String username, String projectName, String tagName, String email) {
+		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+		
+		Optional<ProjectTag> projectTag = projectTagRepo.findByTagNameAndProject_ProjectNameAndProject_Owner_Username(tagName, projectName, username);
 		if (projectTag.isPresent()) {
 			projectTagRepo.delete(projectTag.get());
 			projectTag.get().getProject().updateDateTime();

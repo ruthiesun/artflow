@@ -23,6 +23,10 @@ public class User {
 	private Long id;
 	
 	@NotNull
+	@Column(name = "username", unique = true, nullable = false)
+	private String username;
+	
+	@NotNull
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 	
@@ -36,8 +40,9 @@ public class User {
 	
 	public User() {}
 	
-	public User(String email, String password) {
+	public User(String email, String username, String password) {
 		this.email = email;
+		this.username = username;
 		this.password = password;
 	}
 	
@@ -47,6 +52,14 @@ public class User {
 	
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 	public String getEmail() {

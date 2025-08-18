@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UserProjectRepositoryTest {
 	private static final Logger LOG = LoggerFactory.getLogger(UserProjectRepositoryTest.class);
 	private final String EMAIL = "testEmail";
+	private final String USERNAME = "testUser";
 	private final String PASSWORD = "testPassword";
 	
 	@Autowired
@@ -325,7 +326,7 @@ public class UserProjectRepositoryTest {
 	
 	@BeforeEach
 	public void setup() {
-		user = new User(EMAIL, PASSWORD);
+		user = new User(EMAIL, USERNAME, PASSWORD);
 		userRepository.save(user);
 		user = userRepository.getReferenceById(user.getId());
 		LOG.info("created test user");

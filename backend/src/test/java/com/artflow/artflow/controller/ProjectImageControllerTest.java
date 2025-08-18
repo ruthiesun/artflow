@@ -81,7 +81,7 @@ public class ProjectImageControllerTest {
 	public void canCreateProjectImage() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
 		
-		MvcResult res = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
+		MvcResult res = mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -90,12 +90,12 @@ public class ProjectImageControllerTest {
 		
 		int position = Integer.parseInt(objectMapper.readTree(res.getResponse().getContentAsString()).get("position").asText());
 		assertEquals(0, position);
-		Optional<ProjectImage> image = projectImageRepository.findByProject_ProjectNameAndProject_Owner_EmailAndPosition(
-				project.getProjectName(), project.getOwner().getEmail(), position);
+		Optional<ProjectImage> image = projectImageRepository.findByProject_ProjectNameAndProject_Owner_UsernameAndPosition(
+				project.getProjectName(), project.getOwner().getUsername(), position);
 		assertTrue(image.isPresent());
 		
-		long numImages = projectImageRepository.countByProject_ProjectNameAndProject_Owner_Email(
-				project.getProjectName(), project.getOwner().getEmail());
+		long numImages = projectImageRepository.countByProject_ProjectNameAndProject_Owner_Username(
+				project.getProjectName(), project.getOwner().getUsername());
 		assertEquals(1, numImages);
 		
 		assertEquals(1, project.getImages().size());
@@ -104,7 +104,7 @@ public class ProjectImageControllerTest {
 	@Test
 	public void canCreateProjectImages() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto1 = new ProjectImageCreateDto("a caption 2", LocalDateTime.now(), "url1");
-		MvcResult res1 = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
+		MvcResult res1 = mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto1)))
@@ -112,7 +112,7 @@ public class ProjectImageControllerTest {
 				.andReturn();
 		
 		ProjectImageCreateDto projectImageCreateDto2 = new ProjectImageCreateDto("a caption 1", LocalDateTime.now(), "url2");
-		MvcResult res2 = mockMvc.perform(post(UriUtil.getImagesUri(project.getProjectName()))
+		MvcResult res2 = mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto2)))
@@ -124,8 +124,8 @@ public class ProjectImageControllerTest {
 		int position2 = Integer.parseInt(objectMapper.readTree(res2.getResponse().getContentAsString()).get("position").asText());
 		assertEquals(1, position2);
 		
-		long numImages = projectImageRepository.countByProject_ProjectNameAndProject_Owner_Email(
-				project.getProjectName(), project.getOwner().getEmail());
+		long numImages = projectImageRepository.countByProject_ProjectNameAndProject_Owner_Username(
+				project.getProjectName(), project.getOwner().getUsername());
 		assertEquals(2, numImages);
 		
 		assertEquals(2, project.getImages().size());
@@ -135,11 +135,35 @@ public class ProjectImageControllerTest {
 	public void cannotCreateProjectImageForProjectThatDoesNotExist() throws Exception {
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
 		
-		mockMvc.perform(post(UriUtil.getImagesUri("yah"))
+		mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), "yah"))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
 				.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void cannotCreateProjectImageForOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		UserProject publicProject = new UserProject(anotherUser, "public project");
+		publicProject.setVisibility(Visibility.PUBLIC);
+		UserProject privateProject = new UserProject(anotherUser, "private project");
+		privateProject.setVisibility(Visibility.PRIVATE);
+		projectRepository.save(publicProject);
+		projectRepository.save(privateProject);
+		
+		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
+		
+		mockMvc.perform(post(UriUtil.getImagesUri(anotherUser.getUsername(), publicProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
+			.andExpect(status().isNotFound());
+		mockMvc.perform(post(UriUtil.getImagesUri(anotherUser.getUsername(), privateProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
+			.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -151,7 +175,7 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image1);
 		projectImageRepository.save(image2);
 		
-		MvcResult res = mockMvc.perform(get(UriUtil.getImageUri(project.getProjectName(), image1.getId()))
+		MvcResult res = mockMvc.perform(get(UriUtil.getImageUri(user.getUsername(), project.getProjectName(), image1.getId()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -164,14 +188,14 @@ public class ProjectImageControllerTest {
 	
 	@Test
 	public void cannotGetProjectImageForProjectThatDoesNotExist() throws Exception {
-		mockMvc.perform(get(UriUtil.getImageUri("yah", 0L))
+		mockMvc.perform(get(UriUtil.getImageUri(user.getUsername(), "yah", 0L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
 	
 	@Test
 	public void cannotGetProjectImageThatDoesNotExist() throws Exception {
-		mockMvc.perform(get(UriUtil.getImageUri(project.getProjectName(), 0L))
+		mockMvc.perform(get(UriUtil.getImageUri(user.getUsername(), project.getProjectName(), 0L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
@@ -191,7 +215,7 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image2);
 		projectImageRepository.save(image3);
 		
-		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(project.getProjectName()))
+		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -201,6 +225,35 @@ public class ProjectImageControllerTest {
 				new HashSet<>(List.of(new JsonUtil.Field("url", image2.getUrl())))
 		));
 		JsonUtil.checkMockResponses(objectMapper, expected, res);
+	}
+	
+	@Test
+	public void cannotGetProjectImageInPrivateProjectForOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		UserProject publicProject = new UserProject(anotherUser, "public project");
+		publicProject.setVisibility(Visibility.PUBLIC);
+		UserProject privateProject = new UserProject(anotherUser, "private project");
+		privateProject.setVisibility(Visibility.PRIVATE);
+		projectRepository.save(publicProject);
+		projectRepository.save(privateProject);
+		ProjectImage imagePublic = new ProjectImage(publicProject, 0, "url1");
+		ProjectImage imagePrivate = new ProjectImage(privateProject, 0, "url2");
+		projectImageRepository.save(imagePublic);
+		projectImageRepository.save(imagePrivate);
+		
+		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
+			new HashSet<>(List.of(new JsonUtil.Field("url", imagePublic.getUrl())))
+		));
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(anotherUser.getUsername(), publicProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		JsonUtil.checkMockResponses(objectMapper, expected, res);
+		
+		mockMvc.perform(get(UriUtil.getImagesUri(anotherUser.getUsername(), privateProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -219,7 +272,7 @@ public class ProjectImageControllerTest {
 				image1.getDateTime(),
 				"url3"
 		);
-		MvcResult res = mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
+		MvcResult res = mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -251,14 +304,14 @@ public class ProjectImageControllerTest {
 				image1.getDateTime(),
 				image1.getUrl()
 		);
-		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
+		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
 				.andExpect(status().isOk());
 		
-		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(
-				project.getProjectName(), project.getOwner().getEmail());
+		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(
+				project.getProjectName(), project.getOwner().getUsername());
 		assertEquals(0, images.get(0).getPosition());
 		assertEquals(1, images.get(1).getPosition());
 		assertEquals(2, images.get(2).getPosition());
@@ -286,14 +339,14 @@ public class ProjectImageControllerTest {
 				image3.getDateTime(),
 				image3.getUrl()
 		);
-		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
+		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
 				.andExpect(status().isOk());
 		
-		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(
-				project.getProjectName(), project.getOwner().getEmail());
+		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(
+				project.getProjectName(), project.getOwner().getUsername());
 		assertEquals(0, images.get(0).getPosition());
 		assertEquals(1, images.get(1).getPosition());
 		assertEquals(2, images.get(2).getPosition());
@@ -316,7 +369,7 @@ public class ProjectImageControllerTest {
 				image1.getUrl()
 		);
 		
-		mockMvc.perform(put(UriUtil.getImagesUri(project.getProjectName()))
+		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -335,12 +388,12 @@ public class ProjectImageControllerTest {
 		projectImageRepository.save(image2);
 		projectImageRepository.save(image3);
 		
-		mockMvc.perform(delete(UriUtil.getImageUri(project.getProjectName(), image2.getId()))
+		mockMvc.perform(delete(UriUtil.getImageUri(user.getUsername(), project.getProjectName(), image2.getId()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
-		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_EmailOrderByPosition(
-				project.getProjectName(), project.getOwner().getEmail());
+		List<ProjectImage> images = projectImageRepository.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(
+				project.getProjectName(), project.getOwner().getUsername());
 		assertEquals(0, images.get(0).getPosition());
 		assertEquals(image1.getUrl(), images.get(0).getUrl());
 		assertEquals(1, images.get(1).getPosition());
@@ -350,16 +403,36 @@ public class ProjectImageControllerTest {
 	
 	@Test
 	public void canDeleteProjectImageThatDoesNotExist() throws Exception {
-		mockMvc.perform(delete(UriUtil.getImageUri(project.getProjectName(), 123L))
+		mockMvc.perform(delete(UriUtil.getImageUri(user.getUsername(), project.getProjectName(), 123L))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void cannotDeleteProjectImageForOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		UserProject publicProject = new UserProject(anotherUser, "public project");
+		publicProject.setVisibility(Visibility.PUBLIC);
+		UserProject privateProject = new UserProject(anotherUser, "private project");
+		privateProject.setVisibility(Visibility.PRIVATE);
+		projectRepository.save(publicProject);
+		projectRepository.save(privateProject);
+		ProjectImage imagePublic = projectImageRepository.save(new ProjectImage(publicProject, 0, "url1"));
+		ProjectImage imagePrivate = projectImageRepository.save(new ProjectImage(privateProject, 0, "url2"));
+		
+		mockMvc.perform(delete(UriUtil.getImageUri(anotherUser.getUsername(), publicProject.getProjectName(), imagePublic.getId()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isNotFound());
+		mockMvc.perform(delete(UriUtil.getImageUri(anotherUser.getUsername(), privateProject.getProjectName(), imagePrivate.getId()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isNotFound());
 	}
 	
 	@Test
 	public void canUpdateProjectTimestampWithImage() throws Exception {
 		// create project
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
@@ -371,7 +444,7 @@ public class ProjectImageControllerTest {
 		
 		// create image for project
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
-		MvcResult imageCreateResult = mockMvc.perform(post(UriUtil.getImagesUri(projectName))
+		MvcResult imageCreateResult = mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -385,7 +458,7 @@ public class ProjectImageControllerTest {
 		String url = objectMapper.readTree(imageCreateResult.getResponse().getContentAsString()).get("url").asText();
 		
 		// check update timestamp is different
-		MvcResult projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+		MvcResult projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 			.andExpect(status().isOk())
 			.andReturn();
@@ -402,14 +475,14 @@ public class ProjectImageControllerTest {
 			url
 		);
 		
-		mockMvc.perform(put(UriUtil.getImagesUri(projectName))
+		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
 			.andExpect(status().isOk());
 		
 		// check update timestamp is different
-		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 			.andExpect(status().isOk())
 			.andReturn();
@@ -418,12 +491,12 @@ public class ProjectImageControllerTest {
 		assertTrue(updatedDateTime3.isAfter(updatedDateTime2));
 		
 		// delete image
-		mockMvc.perform(delete(UriUtil.getImageUri(projectName, imageId))
+		mockMvc.perform(delete(UriUtil.getImageUri(user.getUsername(), projectName, imageId))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 			.andExpect(status().isNoContent());
 		
 		// check update timestamp is different
-		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(projectName))
+		projectGetResult = mockMvc.perform(get(UriUtil.getProjectUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 			.andExpect(status().isOk())
 			.andReturn();
@@ -435,7 +508,7 @@ public class ProjectImageControllerTest {
 	@Test
 	public void canCreateProjectAndManageImages() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri())
+		MvcResult projectCreateResult = mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
@@ -445,7 +518,7 @@ public class ProjectImageControllerTest {
 		String projectName = objectMapper.readTree(projectCreateResult.getResponse().getContentAsString()).get("projectName").asText();
 		
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto("a caption", LocalDateTime.now(), "url");
-		MvcResult createResult = mockMvc.perform(post(UriUtil.getImagesUri(projectName))
+		MvcResult createResult = mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
@@ -467,7 +540,7 @@ public class ProjectImageControllerTest {
 				dateTime,
 				url
 		);
-		MvcResult updateResult = mockMvc.perform(put(UriUtil.getImagesUri(projectName))
+		MvcResult updateResult = mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
@@ -480,23 +553,23 @@ public class ProjectImageControllerTest {
 		assertEquals(projectName, projectNameFromUpdate);
 		assertEquals(caption, captionFromUpdate);
 		
-		mockMvc.perform(get(UriUtil.getImageUri(projectName, imageId))
+		mockMvc.perform(get(UriUtil.getImageUri(user.getUsername(), projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk());
 		
-		mockMvc.perform(delete(UriUtil.getImageUri(projectName, imageId))
+		mockMvc.perform(delete(UriUtil.getImageUri(user.getUsername(), projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
-		mockMvc.perform(get(UriUtil.getImageUri(projectName, imageId))
+		mockMvc.perform(get(UriUtil.getImageUri(user.getUsername(), projectName, imageId))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
 	
 	@BeforeEach
 	public void setup() {
-		user = new User("testemail", "testpassword");
-		token = authService.register(new SignupDto(user.getEmail(), user.getPassword())).getToken();
+		user = new User("testemail", "testusername","testpassword");
+		token = authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword())).getToken();
 		user = userRepository.findByEmail(user.getEmail()).get();
 		project = projectRepository.save(new UserProject(user, "test project"));
 	}

@@ -3,15 +3,22 @@ package com.artflow.artflow.service;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.exception.ForbiddenActionException;
+import com.artflow.artflow.exception.ProjectNotFoundException;
 import com.artflow.artflow.model.User;
+import com.artflow.artflow.model.UserProject;
+import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.security.exception.EmailInUseException;
 import com.artflow.artflow.security.exception.InvalidCredentialsException;
+import com.artflow.artflow.security.exception.UsernameInUseException;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,7 +37,10 @@ public class AuthService {
 		if (userRepository.existsByEmail(signupDto.getEmail())) {
 			throw new EmailInUseException(signupDto.getEmail());
 		}
-		User user = new User(signupDto.getEmail(), passwordEncoder.encode(signupDto.getPassword()));
+		if (userRepository.existsByUsername(signupDto.getUsername())) {
+			throw new UsernameInUseException(signupDto.getUsername());
+		}
+		User user = new User(signupDto.getEmail(), signupDto.getUsername(), passwordEncoder.encode(signupDto.getPassword()));
 		userRepository.save(user);
 		String token = jwtService.createJwtToken(new AuthUser(user.getEmail()));
 		return new TokenDto(token);
