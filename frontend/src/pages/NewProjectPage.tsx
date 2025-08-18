@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {createProject} from "../api/projects.ts";
 import {navToErrorPage} from "./ErrorPage.tsx";
 import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
@@ -12,6 +12,7 @@ import {PrimaryButton} from "../components/ui/Button.tsx";
 
 
 export function NewProjectPage() {
+    const {username} = useParams<{ username: string }>()
     const [name, setName] = useState<string>("")
     const [description, setDescription] = useState<string>("")
     const [visibility, setVisibility] =  useState<"public" | "private">("private");
@@ -23,11 +24,15 @@ export function NewProjectPage() {
         e.preventDefault();
         setError(null);
 
+        if (!username) {
+            return;
+        }
+
         if (!name || !visibility) {
             setError("Please fill in all fields.");
         }
 
-        createProject(name, description, visibility, tags)
+        createProject(username, name, description, visibility, tags)
             .then((createdProject) => {
                 nav("/projects/" + createdProject.projectName)
             })

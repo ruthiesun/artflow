@@ -18,6 +18,7 @@ import {H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 
 export function EditProjectPage() {
+    const {username} = useParams<{ username: string }>()
     const {projectName} = useParams<{ projectName: string }>()
     const [project, setProject] = useState<Project>(null)
     const [name, setName] = useState<string>("")
@@ -35,10 +36,16 @@ export function EditProjectPage() {
     useEffect(() => {
         if (!projectName) {
             setError("Null project name");
-            navToErrorPage(nav, err);
+            navToErrorPage(nav, error);
+            return;
+        }
+        if (!username) {
+            setError("Null username");
+            navToErrorPage(nav, error);
+            return;
         }
 
-        getProject(projectName)
+        getProject(username, projectName)
             .then((retrievedProject) => {
                 setProject(retrievedProject)
                 setName(retrievedProject.projectName)
@@ -50,7 +57,7 @@ export function EditProjectPage() {
                 navToErrorPage(nav, err);
             })
 
-        getTagsForProject(projectName)
+        getTagsForProject(username, projectName)
             .then((retrievedTags) => {
                 let tagStrings: string[] = []
                 for (const tag of retrievedTags) {
@@ -63,7 +70,7 @@ export function EditProjectPage() {
                 navToErrorPage(nav, err);
             })
 
-        getImagesForProject(projectName)
+        getImagesForProject(username, projectName)
             .then((retrievedImages) => {
                 setImages(retrievedImages)
                 setIsLoadingImages(false);
@@ -72,7 +79,7 @@ export function EditProjectPage() {
                 navToErrorPage(nav, err);
             })
 
-    }, [projectName]);
+    }, [username, projectName]);
 
     const addDeletedImage = ((image: ProjectImage) => {
         setDeletedImages([...deletedImages, image])
@@ -86,16 +93,21 @@ export function EditProjectPage() {
             setError("Please fill in all fields.")
             return;
         }
+        if (!username) {
+            setError("Null username");
+            navToErrorPage(nav, error);
+            return;
+        }
 
         try {
-            await updateProject(project.id, name, description, visibility, tags)
+            await updateProject(username, project.id, name, description, visibility, tags)
 
             // delete images
             for (const img of deletedImages) {
-                const res = await deleteImageForProject(name, img.id)
+                const res = await deleteImageForProject(username, name, img.id)
                 if (res.status !== HttpStatusCode.NoContent) {
                     setError(`${res.statusText}: Failed to delete image with id=${img.id}`)
-                    navToErrorPage(nav, err);
+                    navToErrorPage(nav, error);
                 }
             }
 
@@ -108,7 +120,7 @@ export function EditProjectPage() {
                 if ("id" in image) {
                     positionToImageMap.set(i, image);
                 } else {
-                    const newImage: ProjectImage = await createImageForProject(name, image.url, image.caption, image.dateTime)
+                    const newImage: ProjectImage = await createImageForProject(username, name, image.url, image.caption, image.dateTime)
                     positionToImageMap.set(i, newImage)
                 }
             }
@@ -116,7 +128,7 @@ export function EditProjectPage() {
             // update all images using the map
             for (let i = 0; i < images.length; i++) {
                 const image: ProjectImage = positionToImageMap.get(i)
-                await updateImageForProject(name, image.id, i, image.url, image.caption, image.dateTime)
+                await updateImageForProject(username, name, image.id, i, image.url, image.caption, image.dateTime)
             }
 
             nav("/projects/" + name)
@@ -140,7 +152,7 @@ export function EditProjectPage() {
                         {!isLoadingProject && <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />}
                         {!isLoadingTags && <ProjectTagInput tags={tags} setTags={setTags} />}
                         {!isLoadingImages && <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>}
-                        <PrimaryButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" | visibility.trim() === "")} />
+                        <PrimaryButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" || visibility.trim() === "")} />
                     </form>
                     {isLoading && <LoadingOverlay/>}
                 </EdgePadding>

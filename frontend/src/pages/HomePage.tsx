@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react"
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {useAuth} from "../AuthContext.tsx"
 import type {Project} from "../types/project"
 import type {Tag} from "../types/tag";
 import {getAllProjectsWithTags} from "../api/projects.ts";
@@ -11,23 +12,36 @@ import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Backgr
 import {H1, H3, Text} from "../components/ui/Text.tsx";
 
 export function HomePage() {
+    const {username} = useParams<{ username: string }>()
+    const {getUsername} = useAuth();
     const [projects, setProjects] = useState<Project[]>([])
     const [deselectedTags, setDeselectedTags] = useState<Tag[]>([])
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
-        getTagsForUser()
+        if (!username) {
+            setError("Null username");
+            return;
+        }
+
+        getTagsForUser(username)
             .then((allTags) => {
                 setDeselectedTags(allTags)
             })
             .catch(err => {
                 navToErrorPage(nav, err);
             })
-        }, []);
+    }, [username]);
 
     useEffect(() => {
-        getAllProjectsWithTags(selectedTags)
+        if (!username) {
+            setError("Null username");
+            return;
+        }
+
+        getAllProjectsWithTags(username, selectedTags)
             .then((allProjects) => {
                 setProjects(allProjects)
             })
@@ -46,13 +60,14 @@ export function HomePage() {
         setSelectedTags(prev => prev.filter(tag => tag.tagName !== deselectedTag.tagName));
     };
 
+    const modButtonClassName = username === getUsername() ? "" : "hidden";
 
     return (
         <Background>
             <BackgroundBorder>
                 <EdgePadding>
                     <H1 content="My Projects" />
-                    <div>
+                    <div className={modButtonClassName}>
                         <SecondaryButton type="button" text="New project" onClick={() => nav("new")} />
                     </div>
                     <div>
@@ -72,7 +87,7 @@ export function HomePage() {
                                     <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
                                     <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
                                     <div className="rounded-lg bg-surface group-hover:opacity-50 transition-opacity">
-                                        <ImageCarouselPreview projectName={project.projectName} />
+                                        <ImageCarouselPreview projectName={project.projectName} username={username}/>
                                     </div>
                                 </div>
 //                             </LazyComponent>

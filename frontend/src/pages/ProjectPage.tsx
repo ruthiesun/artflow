@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import {useAuth} from "../AuthContext.tsx"
 import type {Project} from "../types/project";
 import type {ProjectTag} from "../types/tag";
 import {getProject} from "../api/projects.ts";
@@ -13,7 +14,9 @@ import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Backgr
 import {H1, H3, Text, TimestampText} from "../components/ui/Text.tsx";
 
 export function ProjectPage() {
+    const {username} = useParams<{ username: string }>();
     const {projectName} = useParams<{ projectName: string }>();
+    const {getUsername} = useAuth();
     const [project, setProject] = useState<Project>(null);
     const [tags, setTags] = useState<ProjectTag[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -22,12 +25,12 @@ export function ProjectPage() {
     const nav = useNavigate();
 
     useEffect(() => {
-        if (!projectName) {
-            setError("Null project name");
+        if (!projectName || !username) {
+            setError("Null param");
             return;
         }
 
-        getProject(projectName)
+        getProject(username, projectName)
             .then((retrievedProject) => {
                 setProject(retrievedProject);
                 setIsLoading(false);
@@ -36,7 +39,7 @@ export function ProjectPage() {
                 navToErrorPage(nav, err);
             });
 
-        getTagsForProject(projectName)
+        getTagsForProject(username, projectName)
             .then((projectTags) => {
                 setTags(projectTags);
             })
@@ -44,7 +47,7 @@ export function ProjectPage() {
                 navToErrorPage(nav, err);
             });
 
-    }, [projectName]);
+    }, [username, projectName]);
 
     function getPrettyTime(timeString: string): string {
         return (new Date(timeString)).toLocaleTimeString(undefined, {
@@ -54,13 +57,17 @@ export function ProjectPage() {
             });
     }
 
+    const modButtonClassName = username === getUsername() ? "" : "hidden";
+
     return (
         <Background>
             <BackgroundBorder>
                 <EdgePadding>
                     {!isLoading && <H1 content={project.projectName} />}
-                    <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
-                    <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
+                    <div className={modButtonClassName}>
+                        <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
+                        <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
+                    </div>
                     <div>
                         {tags.map((tag: ProjectTag) => (
                             <DisplayOnlyTagButton key={tag.tagName} type="button" text={tag.tagName} />
@@ -74,11 +81,11 @@ export function ProjectPage() {
                 </EdgePadding>
                     {!isLoading && <div className="flex justify-center items-center">
                         <div className="w-full">
-                            <ImageCarousel projectName={project.projectName} />
+                            <ImageCarousel projectName={project.projectName} username={username}/>
                         </div>
                     </div>}
                     {showModal && (
-                        <ConfirmDeleteProjectModal projectName={project.projectName} onClose={() => setShowModal(false)}/>
+                        <ConfirmDeleteProjectModal projectName={project.projectName} username={username} onClose={() => setShowModal(false)}/>
                     )}
                     {isLoading && <LoadingOverlay/>}
                 

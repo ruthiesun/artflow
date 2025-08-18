@@ -22,8 +22,8 @@ export function LoginPage() {
 
         login(email, password)
             .then((res) => {
-                setAuth(res.data.token);
-                nav("/projects");
+                setAuth(res.data.token, res.data.username);
+                nav("/" + res.data.username + "/projects");
             })
             .catch(err => {
                 if (err.response?.status === 401) {

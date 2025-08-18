@@ -7,9 +7,11 @@ import {ConfirmPasswordInput, PasswordInput} from "../components/business/Passwo
 import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
+import { Input } from "../components/ui/Input.tsx";
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ export function RegisterPage() {
         e.preventDefault();
         setError(null);
 
-        if (!email || !password || !confirmedPassword) {
+        if (!email || !username || !password || !confirmedPassword) {
             setError("Please fill in all fields.");
             return;
         }
@@ -30,10 +32,10 @@ export function RegisterPage() {
             return;
         }
 
-        register(email, password)
+        register(email, username, password)
             .then((res) => {
-                setAuth(res.data.token);
-                nav("/projects");
+                setAuth(res.data.token, username);
+                nav("/" + username + "/projects");
             }).catch(err => setError(err.message))
     };
 
@@ -44,6 +46,7 @@ export function RegisterPage() {
                     <H1 content="Artflow" />
                     <form onSubmit={handleSubmit}>
                         <EmailInput email={email} setEmail={setEmail} />
+                        <Input label="Username" type="text" value={username} setValue={setUsername} />
                         <PasswordInput password={password} setPassword={setPassword} />
                         <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
 

@@ -10,7 +10,8 @@ interface TokenPayload {
 type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
-  setAuth: (token: string) => void;
+  getUsername: () => string | null;
+  setAuth: (token: string, username: string) => void;
   removeAuth: () => void;
 };
 
@@ -22,8 +23,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+    const username = localStorage.getItem("username");
 
-    if (!token || !isTokenValid(token)) {
+    if (!token || !isTokenValid(token) || !username) {
       removeAuth();
     } else {
       setIsAuthenticated(true);
@@ -32,19 +34,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
+  const getUsername = () => {
+    return localStorage.getItem("username");
+  }
 
-  const setAuth = (token: string) => {
+  const setAuth = (token: string, username: string) => {
     localStorage.setItem("authToken", token);
+    localStorage.setItem("username", username);
     setIsAuthenticated(true);
   };
 
   const removeAuth = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("username");
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, setAuth, removeAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, getUsername, setAuth, removeAuth }}>
       {children}
     </AuthContext.Provider>
   );

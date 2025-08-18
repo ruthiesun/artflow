@@ -36,10 +36,11 @@ function ImageDetails({image, onClose}: ImageDetailsProps) {
 }
 
 type ImageCarouselProps = {
+    username: string;
     projectName: string;
 };
 
-export function ImageCarousel({ projectName }: ImageCarouselProps) {
+export function ImageCarousel({ projectName, username}: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
     const [selectedImage, setSelectedImage] = useState<ProjectImage>(null)
     const [showImageDetailsModal, setShowImageDetailsModal] = useState(false);
@@ -47,7 +48,7 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     const nav = useNavigate()
 
     useEffect(() => {
-        getImagesForProject(projectName)
+        getImagesForProject(username, projectName)
             .then((projectImages) =>
                 setImages(projectImages)
             )
@@ -90,13 +91,13 @@ export function ImageCarousel({ projectName }: ImageCarouselProps) {
     )
 }
 
-export function ImageCarouselPreview({ projectName, }: ImageCarouselProps) {
+export function ImageCarouselPreview({ projectName, username}: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
-        getImagesForProject(projectName)
+        getImagesForProject(username, projectName)
             .then((projectImages) =>
                 setImages(projectImages)
             )
