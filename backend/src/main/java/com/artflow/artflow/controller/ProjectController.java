@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(UriUtil.BASE + UriUtil.USERNAME)
+@RequestMapping(UriUtil.BASE + UriUtil.USERNAME + UriUtil.PROJECTS)
 public class ProjectController {
 	
 	private final ProjectService projectService;

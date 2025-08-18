@@ -43,7 +43,7 @@ public class AuthService {
 		User user = new User(signupDto.getEmail(), signupDto.getUsername(), passwordEncoder.encode(signupDto.getPassword()));
 		userRepository.save(user);
 		String token = jwtService.createJwtToken(new AuthUser(user.getEmail()));
-		return new TokenDto(token);
+		return new TokenDto(token, user.getUsername());
 	}
 	
 	public TokenDto login(LoginDto request) {
@@ -52,7 +52,7 @@ public class AuthService {
 			throw new InvalidCredentialsException();
 		}
 		String token = jwtService.createJwtToken(new AuthUser(user.getEmail()));
-		return new TokenDto(token);
+		return new TokenDto(token, user.getUsername());
 	}
 }
 

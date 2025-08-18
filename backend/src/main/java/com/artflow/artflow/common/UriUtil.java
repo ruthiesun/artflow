@@ -13,6 +13,7 @@ public class UriUtil {
 	public static final String LOGIN = "/login";
 	public static final String USERNAME = "/{username}";
 	
+	public static final String PROJECTS = "/projects";
 	public static final String PROJECT = "/{projectName}";
 	public static final String PUBLIC_PROJECTS = "/public";
 	public static final String IMAGES = "/images";
@@ -54,11 +55,11 @@ public class UriUtil {
 			}
 			query.append("visibility=").append(visibility);
 		}
-		return BASE + "/" + username + query;
+		return getProjectsUri(username) + query;
 	}
 	
 	public static String getProjectsUri(String username) {
-		return BASE + "/" + username;
+		return BASE + "/" + username + PROJECTS;
 	}
 	
 	public static String getProjectUri(String username, String name) {

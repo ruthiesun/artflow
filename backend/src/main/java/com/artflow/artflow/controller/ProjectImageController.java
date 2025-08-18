@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(UriUtil.BASE + UriUtil.USERNAME + UriUtil.PROJECT + UriUtil.IMAGES)
+@RequestMapping(UriUtil.BASE + UriUtil.USERNAME + UriUtil.PROJECTS + UriUtil.PROJECT + UriUtil.IMAGES)
 public class ProjectImageController {
 	private final ProjectImageService projectImageService;
 	
