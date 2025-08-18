@@ -23,8 +23,8 @@ export function ErrorPage() {
                     <Text content={`Message: ${state?.message ?? 'None'}`}/>
                     {state?.details && (
                         <pre className="mt-4 p-2 rounded text-sm overflow-auto">
-          {JSON.stringify(state.details, null, 2)}
-                    </pre>
+                            {JSON.stringify(state.details, null, 2)}
+                        </pre>
                     )}
                 </EdgePadding>
             </BackgroundBorder>
