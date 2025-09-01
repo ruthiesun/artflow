@@ -36,7 +36,9 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
                 <div>
                 <Text content="Confirm the name of the project to delete." />
                 <form onSubmit={handleSubmit}>
-                    <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
+                    <div className="mb-2">
+                        <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
+                    </div>
                     <PrimaryButton disabled={typedName !== projectName} type="submit" text="Delete" />
                 </form>
                 </div>

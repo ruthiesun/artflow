@@ -45,14 +45,24 @@ export function RegisterPage() {
                 <EdgePadding>
                     <H1 content="Artflow" />
                     <form onSubmit={handleSubmit}>
-                        <EmailInput email={email} setEmail={setEmail} />
-                        <Input label="Username" type="text" value={username} setValue={setUsername} />
-                        <PasswordInput password={password} setPassword={setPassword} />
-                        <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
-
+                        <div className="mb-2">
+                            <EmailInput email={email} setEmail={setEmail} />
+                        </div>
+                        <div className="mb-2">
+                            <Input label="Username" type="text" value={username} setValue={setUsername} />
+                        </div>
+                        <div className="mb-2">
+                            <PasswordInput password={password} setPassword={setPassword} />
+                        </div>
+                        <div className="mb-2">
+                            <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
+                        </div>
+                        
                         {error && <ErrorText className="mb-4" content={error} />}
 
-                        <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
+                        <div className="mb-2">
+                            <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
+                        </div>
                     </form>
                 </EdgePadding>
             </BackgroundBorderSm>

@@ -131,7 +131,7 @@ export function EditProjectPage() {
                 await updateImageForProject(username, name, image.id, i, image.url, image.caption, image.dateTime)
             }
 
-            nav("/" + username + "/projects/" + name)
+            nav("/" + username + "/projects/" + name, { replace: true })
         }
         catch (err) {
             // todo handle unavailable names without nav

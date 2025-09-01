@@ -34,7 +34,7 @@ export function NewProjectPage() {
 
         createProject(username, name, description, visibility, tags)
             .then((createdProject) => {
-                nav("/" + username + "/projects/" + createdProject.projectName)
+                nav("/" + username + "/projects/" + createdProject.projectName, { replace: true })
             })
             .catch(err => {
                 // todo handle unavailable names without nav

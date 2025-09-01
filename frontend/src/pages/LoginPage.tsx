@@ -41,12 +41,18 @@ export function LoginPage() {
                 <EdgePadding>
                     <H1 content="Artflow" />
                     <form onSubmit={handleSubmit}>
-                        <EmailInput email={email} setEmail={setEmail} />
-                        <PasswordInput password={password} setPassword={setPassword} />
-
+                        <div className="mb-2">
+                            <EmailInput email={email} setEmail={setEmail} />
+                        </div>
+                        <div className="mb-2">
+                            <PasswordInput password={password} setPassword={setPassword} />
+                        </div>
+                    
                         {error && <ErrorText className="mb-4" content={error} />}
 
-                        <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
+                        <div className="mb-2">
+                            <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Log In" />
+                        </div>
                     </form>
                     <div>
                         <Link to="/register" className="text-primary">
