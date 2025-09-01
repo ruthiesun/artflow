@@ -131,7 +131,7 @@ export function EditProjectPage() {
                 await updateImageForProject(username, name, image.id, i, image.url, image.caption, image.dateTime)
             }
 
-            nav("/projects/" + name)
+            nav("/" + username + "/projects/" + name)
         }
         catch (err) {
             // todo handle unavailable names without nav
@@ -147,11 +147,21 @@ export function EditProjectPage() {
                 <EdgePadding>
                     <H1 content="Edit Project" />
                     <form onSubmit={handleSubmit}>
-                        {!isLoadingProject && <ProjectNameInput name={name} setName={setName} />}
-                        {!isLoadingProject && <ProjectDescriptionInput description={description} setDescription={setDescription} />}
-                        {!isLoadingProject && <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />}
-                        {!isLoadingTags && <ProjectTagInput tags={tags} setTags={setTags} />}
-                        {!isLoadingImages && <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>}
+                        {!isLoadingProject && <div className="mb-2">
+                            <ProjectNameInput name={name} setName={setName} />
+                        </div>}
+                        {!isLoadingProject && <div className="mb-2">
+                            <ProjectDescriptionInput description={description} setDescription={setDescription} />
+                        </div>}
+                        {!isLoadingProject && <div className="mb-2">
+                            <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility} />
+                        </div>}
+                        {!isLoadingTags && <div className="mb-2">
+                            <ProjectTagInput tags={tags} setTags={setTags} />
+                        </div>}
+                        {!isLoadingImages && <div className="mb-2">
+                            <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>
+                        </div>}
                         <PrimaryButton type="submit" text="Save changes" disabled={isLoading && (name.trim() === "" || visibility.trim() === "")} />
                     </form>
                     {isLoading && <LoadingOverlay/>}

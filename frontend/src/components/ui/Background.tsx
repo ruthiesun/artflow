@@ -35,7 +35,7 @@ export function Background({className, children}: BgProps) {
                 <div className="block sm:hidden">
                     <img src="/src/assets/icons/hamburger.svg" alt="menu" className="w-8 h-8 cursor-pointer" onClick={() => setIsDropDownOpen(!isDropDownOpen)} />
                 </div>
-                <div className="hidden sm:block flex space-x-6">
+                <div className="hidden sm:block flex space-x-2">
                     <SecondaryButton type="button" text="Home" onClick={() => nav("/")} />
                     <SecondaryButton type="button" text={`${authButtonText}`} onClick={handleAuthButton} />
                 </div>

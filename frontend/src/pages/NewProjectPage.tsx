@@ -34,7 +34,7 @@ export function NewProjectPage() {
 
         createProject(username, name, description, visibility, tags)
             .then((createdProject) => {
-                nav("/projects/" + createdProject.projectName)
+                nav("/" + username + "/projects/" + createdProject.projectName)
             })
             .catch(err => {
                 // todo handle unavailable names without nav
@@ -48,10 +48,19 @@ export function NewProjectPage() {
                 <EdgePadding>
                     <H1 content="New Project" />
                     <form onSubmit={handleSubmit}>
-                        <ProjectNameInput name={name} setName={setName}/>
-                        <ProjectDescriptionInput description={description} setDescription={setDescription}/>
-                        <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility}/>
-                        <ProjectTagInput tags={tags} setTags={setTags}/>
+                        <div className="mb-2">
+                            <ProjectNameInput name={name} setName={setName}/>
+                        </div>
+                        <div className="mb-2">
+                            <ProjectDescriptionInput description={description} setDescription={setDescription}/>
+                        </div>
+                        <div className="mb-2">
+                            <ProjectVisibilityRadio visibility={visibility} setVisibility={setVisibility}/>
+                        </div>
+                        <div className="mb-2">
+                            <ProjectTagInput tags={tags} setTags={setTags}/>
+                        </div>
+                        
                         <PrimaryButton type="submit" text="Save" disabled={name.trim() === "" | visibility.trim() === ""} />
                     </form>
                 </EdgePadding>

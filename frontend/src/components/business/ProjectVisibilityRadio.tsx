@@ -7,7 +7,7 @@ type ProjectVisibilityRadioProps = {
 
 export function ProjectVisibilityRadio({ visibility, setVisibility }: ProjectVisibilityRadioProps) {
     return (
-        <div className="mb-4">
+        <div>
             <label className={labelClass}>Visibility</label>
             <RadioInput label="Public" name="visibility" value={visibility} checked={visibility == "public"} onChange={() => setVisibility("public")} />
             <RadioInput label="Private" name="visibility" value={visibility} checked={visibility == "private"} onChange={() => setVisibility("private")} />

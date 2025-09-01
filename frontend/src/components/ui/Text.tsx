@@ -5,7 +5,7 @@ type Props = {
 
 export function H1({className, content}: Props) {
     return (
-        <h1 className={`${className} font-display-font text-2xl font-bold mb-6 text-center text-primary break-normal wrap-anywhere`}>
+        <h1 className={`${className} font-display-font text-2xl font-bold text-center text-primary break-normal wrap-anywhere`}>
             {content}
         </h1>
     )

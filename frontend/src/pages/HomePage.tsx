@@ -66,17 +66,20 @@ export function HomePage() {
         <Background>
             <BackgroundBorder>
                 <EdgePadding>
-                    <H1 content="My Projects" />
-                    <div className={modButtonClassName}>
+                    <div className={`mb-2 ${modButtonClassName}`}>
                         <SecondaryButton type="button" text="New project" onClick={() => nav("new")} />
                     </div>
                     <div>
                         <div className="flex flex-wrap">
                             {selectedTags.map((tag: Tag) => (
-                                <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
+                                <div className="mr-2">
+                                    <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
+                                </div>
                             ))}
                             {deselectedTags.map((tag: Tag) => (
-                                <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
+                                <div className="mr-2">
+                                    <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
+                                </div>
                             ))}
                         </div>
                     </div>

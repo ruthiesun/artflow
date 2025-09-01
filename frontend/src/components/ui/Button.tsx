@@ -5,9 +5,9 @@ type ButtonProps = {
     onClick?: (() => (void | Promise<void>)) | undefined;
 };
 
-const buttonClass = "mr-1 text-text-font p-2 rounded-lg text-muted-100"
+const buttonClass = "text-text-font p-2 rounded-lg text-muted-100"
 const clickableButtonClass = "cursor-pointer transition disabled:bg-muted disabled:cursor-default"
-const normalButtonClass = "mb-2 font-semibold "
+const normalButtonClass = "font-semibold "
 
 export function PrimaryButton({type, text, disabled, onClick}: ButtonProps) {
     return (
@@ -36,7 +36,7 @@ export function SecondaryButton({type, text, disabled, onClick}: ButtonProps) {
 export function DeleteButton({type, text, onClick}: ButtonProps) {
     return (
         <button type={type}
-                className={`${clickableButtonClass} ${buttonClass} mb-2 font-semibold bg-danger`}
+                className={`${clickableButtonClass} ${buttonClass} font-semibold bg-danger`}
                 onClick={onClick}
         >
             {text}

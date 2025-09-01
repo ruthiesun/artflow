@@ -27,11 +27,10 @@ export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
     };
 
     return (
-        <div className="mb-4">
-            <Input label="Tags" type="text" value={currTag} setValue={setCurrTag}
-            placeholder="Type a tag and press Enter" onKeyDown={addTag}/>
+        <div>
+            <Input label="Tags" type="text" value={currTag} setValue={setCurrTag} placeholder="Type a tag and press Enter" onKeyDown={addTag}/>
 
-            <div>
+            <div className="mt-2">
                 {tags.map(tag => (
                     <div key={tag} className="mb-1">
                         <DisplayOnlyTagButton type="text" text={tag} />

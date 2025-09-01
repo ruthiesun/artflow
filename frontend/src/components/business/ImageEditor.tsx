@@ -44,9 +44,9 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
     })
 
     return (
-        <div className="mb-4">
+        <div>
             <label className={labelClass}>Images</label>
-            <div className="rounded-lg bg-white mt-2 mb-2 w-full flex justify-center items-center sm:justify-start">
+            <div className="rounded-lg bg-white w-full flex justify-center items-center sm:justify-start">
                 <DndContext
                     collisionDetection={closestCenter}
                     sensors={sensors}
@@ -68,7 +68,10 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                     </SortableContext>
                 </DndContext>
             </div>
-            <SecondaryButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
+            <div className="mt-2">
+                <SecondaryButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
+            </div>
+            
             {showAddImageModal &&
                 <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))} />
             }

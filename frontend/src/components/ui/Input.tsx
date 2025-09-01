@@ -1,5 +1,5 @@
 export const labelClass = "font-label block text-sm font-medium text-secondary";
-const textInputClass = "font-input text-foreground mt-1 w-full px-4 py-2 border border-secondary rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-secondary placeholder:text-muted placeholder:italic";
+const textInputClass = "font-input text-foreground w-full px-4 py-2 border border-secondary rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-secondary placeholder:text-muted placeholder:italic";
 
 type InputProps = {
     label: string;
@@ -12,7 +12,7 @@ type InputProps = {
 
 export function Input({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
     return (
-        <div className="mb-4">
+        <div>
             <label className={labelClass}>{label}</label>
             <input
                 type={type}
@@ -28,7 +28,7 @@ export function Input({label, type, value, setValue, placeholder, onKeyDown}: In
 
 export function TextAreaInput({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
     return (
-        <div className="mb-4">
+        <div>
             <label className={labelClass}>{label}</label>
             <textarea
                 type={type}
@@ -68,7 +68,7 @@ type DateInputProps = {
 
 export function DateInput({label, value, setValue}: DateInputProps) {
     return (
-        <div className="mb-4">
+        <div>
             <label className={labelClass}>{label}</label>
             <input
                 type="date"

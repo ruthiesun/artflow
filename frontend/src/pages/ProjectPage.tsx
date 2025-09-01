@@ -64,16 +64,22 @@ export function ProjectPage() {
             <BackgroundBorder>
                 <EdgePadding>
                     {!isLoading && <H1 content={project.projectName} />}
-                    <div className={modButtonClassName}>
-                        <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
-                        <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
+                    <div className={`mt-4 mb-2 flex flex-row ${modButtonClassName}`}>
+                        <div className="mr-2">
+                            <SecondaryButton type="button" text="Edit" disabled={isLoading} onClick={() => nav("edit")} />
+                        </div>
+                        <div className="mr-2">
+                            <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
+                        </div>
                     </div>
-                    <div>
+                    <div className="flex flex-row">
                         {tags.map((tag: ProjectTag) => (
-                            <DisplayOnlyTagButton key={tag.tagName} type="button" text={tag.tagName} />
+                            <div className="mr-2">
+                                <DisplayOnlyTagButton key={tag.tagName} type="button" text={tag.tagName} />
+                            </div>
                         ))}
                     </div>
-                    {!isLoading && <div className="mt-5 mb-5">
+                    {!isLoading && <div className="mt-4 mb-4">
                         <TimestampText content={`Created: ${project.createdDateTime.split("T")[0]} ${getPrettyTime(project.createdDateTime)}`} />
                         <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]} ${getPrettyTime(project.updatedDateTime)}`} />
                         <Text content={project.description} />
