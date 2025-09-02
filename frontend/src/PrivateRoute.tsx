@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {useAuth} from "./AuthContext.tsx"
 
-
+// can only access when logged in to the corresponding user
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
     const { isAuthenticated, isLoading, getUsername } = useAuth();
     const {username} = useParams<{ username: string }>();

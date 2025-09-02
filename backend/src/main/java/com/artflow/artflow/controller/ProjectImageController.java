@@ -42,12 +42,14 @@ public class ProjectImageController {
 	
 	@GetMapping
 	public ResponseEntity<List<ProjectImageDto>> getImagesForProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectImageService.getImagesForProject(username, UriUtil.fromSlug(projectName), user.email()));
+		String email = user == null ? null : user.email();
+		return ResponseEntity.ok(projectImageService.getImagesForProject(username, UriUtil.fromSlug(projectName), email));
 	}
 	
 	@GetMapping(UriUtil.IMAGE)
 	public ResponseEntity<ProjectImageDto> getImageForProject(@PathVariable String username, @PathVariable String projectName, @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectImageService.getImageForProject(username, UriUtil.fromSlug(projectName), imageId, user.email()));
+		String email = user == null ? null : user.email();
+		return ResponseEntity.ok(projectImageService.getImageForProject(username, UriUtil.fromSlug(projectName), imageId, email));
 	}
 	@PutMapping
 	public ResponseEntity<ProjectImageDto> update(@PathVariable String username, @RequestBody ProjectImageUpdateDto projectImageUpdateDto, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {

@@ -20,7 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-		"jwt.signing-secret=test-secret"
+	"jwt.auth-secret=test-secret-auth",
+	"jwt.verify-secret=test-secret-verify"
 })
 public class TestControllerTest {
 	@Autowired

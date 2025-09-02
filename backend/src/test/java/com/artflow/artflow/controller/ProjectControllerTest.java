@@ -3,6 +3,7 @@ package com.artflow.artflow.controller;
 import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
+import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
@@ -51,7 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-		"jwt.signing-secret=test-secret"
+	"jwt.auth-secret=test-secret-auth",
+	"jwt.verify-secret=test-secret-verify"
 })
 public class ProjectControllerTest {
 	@Autowired
@@ -79,6 +81,9 @@ public class ProjectControllerTest {
 	private ProjectService projectService;
 	private User user;
 	private String token;
+	private String email = "testemail";
+	private String username = "testusername";
+	private String password = "testpassword";
 
 	@Test
 	public void canCreateProject() throws Exception {
@@ -205,6 +210,43 @@ public class ProjectControllerTest {
 		
 		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
 				new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
+	}
+	
+	@Test
+	public void canGetAllPublicProjectsWithOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		
+		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
+		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
+		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri(anotherUser.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+			new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
+	}
+	
+	@Test
+	public void canGetAllPublicProjectsWithoutLogin() throws Exception {
+		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
+		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
+		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri(user.getUsername())))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
+			new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
 		));
 		JsonUtil.checkMockResponses(objectMapper, expectedProjects, res);
 	}
@@ -470,28 +512,28 @@ public class ProjectControllerTest {
 	}
 	
 	@Test
-	public void canSignUpAndManageProjects() throws Exception {
-		// sign up and get token
-		SignupDto signupDto = new SignupDto("anothertestemail", "ausername", "testpassword");
-		MvcResult signupResult = mockMvc.perform(post(UriUtil.getSignupUri())
+	public void canLoginAndManageProjects() throws Exception {
+		// login and get token
+		LoginDto loginDto = new LoginDto(email, password);
+		MvcResult loginResult = mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsBytes(signupDto)))
+						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isOk())
 				.andReturn();
 		
-		String token = objectMapper.readTree(signupResult.getResponse().getContentAsString()).get("token").asText();
+		String token = objectMapper.readTree(loginResult.getResponse().getContentAsString()).get("token").asText();
 		
 		// create a project with some tags
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		projectCreateDto.setTagStrings(List.of("a tag!", "another tag"));
-		MvcResult createResult = mockMvc.perform(post(UriUtil.getProjectsUri(signupDto.getUsername()))
+		MvcResult createResult = mockMvc.perform(post(UriUtil.getProjectsUri(username))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectCreateDto)))
 				.andExpect(status().isCreated())
 				.andReturn();
 		
-		MvcResult projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(signupDto.getUsername(), projectCreateDto.getProjectName()))
+		MvcResult projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(username, projectCreateDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -513,14 +555,14 @@ public class ProjectControllerTest {
 		projectUpdateDto.getTagStrings().add(projectCreateDto.getTagStrings().get(0));
 		projectUpdateDto.getTagStrings().add("yet another");
 		projectUpdateDto.getTagStrings().add("and another");
-		MvcResult updateResult = mockMvc.perform(put(UriUtil.getProjectsUri(signupDto.getUsername()))
+		MvcResult updateResult = mockMvc.perform(put(UriUtil.getProjectsUri(username))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
 				.andExpect(status().isOk())
 				.andReturn();
 
-		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(signupDto.getUsername(), projectUpdateDto.getProjectName()))
+		projectTagsResult = mockMvc.perform(get(UriUtil.getProjectTagsUri(username, projectUpdateDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -535,17 +577,17 @@ public class ProjectControllerTest {
 		projectName = objectMapper.readTree(updateResult.getResponse().getContentAsString()).get("projectName").asText();
 		
 		// check that the project still exists
-		mockMvc.perform(get(UriUtil.getProjectUri(signupDto.getUsername(), projectName))
+		mockMvc.perform(get(UriUtil.getProjectUri(username, projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk());
 		
 		// delete the project
-		mockMvc.perform(delete(UriUtil.getProjectUri(signupDto.getUsername(), projectName))
+		mockMvc.perform(delete(UriUtil.getProjectUri(username, projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
 		// check that the associated tags are deleted when the refcount reaches 0
-		MvcResult tagsResult = mockMvc.perform(get(UriUtil.getTagsUri(signupDto.getUsername()))
+		MvcResult tagsResult = mockMvc.perform(get(UriUtil.getTagsUri(username))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -553,15 +595,17 @@ public class ProjectControllerTest {
 		JsonUtil.checkMockResponses(objectMapper, new HashSet<>(), tagsResult);
 		
 		// and check that the project itself has been deleted
-		mockMvc.perform(get(UriUtil.getProjectUri(signupDto.getUsername(), projectName))
+		mockMvc.perform(get(UriUtil.getProjectUri(username, projectName))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNotFound());
 	}
 	
 	@BeforeEach
 	public void setup() {
-		user = new User("testemail", "testusername","testpassword");
-		token = authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword())).getToken();
+		authService.register(new SignupDto(email, username, password));
+		user = userRepository.findByEmail(email).get();
+		user.setIsVerified(true);
+		token = authService.login(new LoginDto(email, password)).getToken();
 	}
 }
 

@@ -11,6 +11,7 @@ public class UriUtil {
 	public static final String AUTH = "/auth";
 	public static final String SIGNUP = "/register";
 	public static final String LOGIN = "/login";
+	public static final String VERIFY = "/verify";
 	public static final String USERNAME = "/{username}";
 	
 	public static final String PROJECTS = "/projects";
@@ -35,6 +36,10 @@ public class UriUtil {
 	
 	public static String getSignupUri() {
 		return BASE + AUTH + SIGNUP;
+	}
+	
+	public static String getVerifyUri() {
+		return BASE + AUTH + VERIFY;
 	}
 	
 	public static String getProjectsUriWithQueryParams(String username, List<String> tags, Visibility visibility) {
@@ -84,5 +89,37 @@ public class UriUtil {
 	
 	public static String getProjectTagUri(String username, String projectName, String tagName) {
 		return getProjectTagsUri(username, projectName) + "/" + tagName;
+	}
+	
+	public static String getAuthWildcardUri() {
+		return BASE + AUTH + "/**";
+	}
+	
+	public static String getProjectsWildcardUri() {
+		return BASE + "/*" + PROJECTS;
+	}
+	
+	public static String getProjectWildcardUri() {
+		return BASE + "/*" + PROJECTS + "/*";
+	}
+	
+	public static String getProjectImagesWildcardUri() {
+		return BASE + "/*" + PROJECTS + "/*" + IMAGES;
+	}
+	
+	public static String getProjectImageWildcardUri() {
+		return BASE + "/*" + PROJECTS + "/*" + IMAGES + "/*";
+	}
+	
+	public static String getProjectTagsWildcardUri() {
+		return BASE + "/*" + PROJECTS + "/*" + TAGS;
+	}
+	
+	public static String getProjectTagWildcardUri() {
+		return BASE + "/*" + PROJECTS + "/*" + TAGS + "/*";
+	}
+	
+	public static String getTagsWildcardUri() {
+		return BASE + "/*" + TAGS;
 	}
 }

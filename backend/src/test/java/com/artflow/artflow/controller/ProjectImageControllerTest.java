@@ -3,6 +3,7 @@ package com.artflow.artflow.controller;
 import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
+import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
@@ -49,7 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-		"jwt.signing-secret=test-secret"
+	"jwt.auth-secret=test-secret-auth",
+	"jwt.verify-secret=test-secret-verify"
 })
 public class ProjectImageControllerTest {
 	@Autowired
@@ -76,6 +78,9 @@ public class ProjectImageControllerTest {
 	private User user;
 	private UserProject project;
 	private String token;
+	private String email = "testemail";
+	private String username = "testusername";
+	private String password = "testpassword";
 	
 	@Test
 	public void canCreateProjectImage() throws Exception {
@@ -223,6 +228,58 @@ public class ProjectImageControllerTest {
 		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
 				new HashSet<>(List.of(new JsonUtil.Field("url", image1.getUrl()))),
 				new HashSet<>(List.of(new JsonUtil.Field("url", image2.getUrl())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expected, res);
+	}
+	
+	@Test
+	public void canGetProjectImagesForPublicProjectWithOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		UserProject otherProject = new UserProject(anotherUser, "other project");
+		otherProject.setVisibility(Visibility.PUBLIC);
+		projectRepository.save(otherProject);
+		
+		ProjectImage image1 = new ProjectImage(otherProject, 0, "url1");
+		ProjectImage image2 = new ProjectImage(otherProject, 1, "url2");
+		otherProject.getImages().add(image1);
+		otherProject.getImages().add(image2);
+		projectImageRepository.save(image1);
+		projectImageRepository.save(image2);
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(anotherUser.getUsername(), otherProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
+			new HashSet<>(List.of(new JsonUtil.Field("url", image1.getUrl()))),
+			new HashSet<>(List.of(new JsonUtil.Field("url", image2.getUrl())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expected, res);
+	}
+	
+	@Test
+	public void canGetProjectImagesForPublicProjectWithoutLogin() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		
+		UserProject otherProject = new UserProject(anotherUser, "other project");
+		otherProject.setVisibility(Visibility.PUBLIC);
+		projectRepository.save(otherProject);
+		
+		ProjectImage image1 = new ProjectImage(otherProject, 0, "url1");
+		ProjectImage image2 = new ProjectImage(otherProject, 1, "url2");
+		otherProject.getImages().add(image1);
+		otherProject.getImages().add(image2);
+		projectImageRepository.save(image1);
+		projectImageRepository.save(image2);
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getImagesUri(anotherUser.getUsername(), otherProject.getProjectName())))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
+			new HashSet<>(List.of(new JsonUtil.Field("url", image1.getUrl()))),
+			new HashSet<>(List.of(new JsonUtil.Field("url", image2.getUrl())))
 		));
 		JsonUtil.checkMockResponses(objectMapper, expected, res);
 	}
@@ -568,9 +625,10 @@ public class ProjectImageControllerTest {
 	
 	@BeforeEach
 	public void setup() {
-		user = new User("testemail", "testusername","testpassword");
-		token = authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword())).getToken();
-		user = userRepository.findByEmail(user.getEmail()).get();
+		authService.register(new SignupDto(email, username, password));
+		user = userRepository.findByEmail(email).get();
+		user.setIsVerified(true);
+		token = authService.login(new LoginDto(email, password)).getToken();
 		project = projectRepository.save(new UserProject(user, "test project"));
 	}
 }

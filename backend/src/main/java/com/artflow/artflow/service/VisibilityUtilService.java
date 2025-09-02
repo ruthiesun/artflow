@@ -28,6 +28,10 @@ public class VisibilityUtilService {
     }
     
     public boolean doesUsernameMatchEmail(String email, String username) {
+        if (email == null) {
+            return false;
+        }
+        
         User user = userRepo.findByEmailWithProjects(email).get();
         return user.getUsername().equals(username);
     }

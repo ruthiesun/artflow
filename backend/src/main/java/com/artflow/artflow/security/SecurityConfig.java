@@ -39,7 +39,14 @@ public class SecurityConfig {
 				.addFilterBefore(jwtFilter, AuthorizationFilter.class)
 				.authorizeHttpRequests((requests) -> requests
 						.requestMatchers(HttpMethod.POST, UriUtil.getLoginUri(), UriUtil.getSignupUri()).permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/hello").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/hello", UriUtil.getVerifyUri(),
+							UriUtil.getProjectWildcardUri(),
+							UriUtil.getProjectsWildcardUri(),
+							UriUtil.getProjectImagesWildcardUri(),
+							UriUtil.getProjectImageWildcardUri(),
+							UriUtil.getProjectTagsWildcardUri(),
+							UriUtil.getProjectTagWildcardUri(),
+							UriUtil.getTagsWildcardUri()).permitAll()
 						.anyRequest().authenticated())
 				.cors(Customizer.withDefaults())
 				.csrf(AbstractHttpConfigurer::disable)

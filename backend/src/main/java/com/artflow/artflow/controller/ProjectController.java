@@ -45,12 +45,14 @@ public class ProjectController {
 	@GetMapping
 	public ResponseEntity<List<ProjectDto>> getProjects(@PathVariable String username, @AuthenticationPrincipal AuthUser user,
 														@RequestParam Optional<String> tags, @RequestParam Optional<String> visibility) {
-		return ResponseEntity.ok(projectService.getUserProjects(username, user.email(), tags, visibility));
+		String email = user == null ? null : user.email();
+		return ResponseEntity.ok(projectService.getUserProjects(username, email, tags, visibility));
 	}
 	
 	@GetMapping(UriUtil.PROJECT)
 	public ResponseEntity<ProjectDto> getProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		return ResponseEntity.ok(projectService.getProject(username, projectName, user.email()));
+		String email = user == null ? null : user.email();
+		return ResponseEntity.ok(projectService.getProject(username, projectName, email));
 	}
 	
 	@PutMapping()

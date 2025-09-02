@@ -2,6 +2,8 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {HomePage} from "./pages/HomePage.tsx";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
+import {RegisterSuccessPage} from "./pages/RegisterSuccessPage.tsx";
+import {VerifySuccessPage} from "./pages/VerifySuccessPage.tsx";
 import {ProjectPage} from "./pages/ProjectPage.tsx";
 import {NewProjectPage} from "./pages/NewProjectPage.tsx";
 import {EditProjectPage} from "./pages/EditProjectPage.tsx";
@@ -17,6 +19,8 @@ const App = () => {
             <Routes>
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+                <Route path="/register-success" element={<PublicRoute><RegisterSuccessPage /></PublicRoute>} />
+                <Route path="/verify" element={<PublicRoute><VerifySuccessPage /></PublicRoute>} />
                 <Route path="/:username/projects" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
                 <Route path="/:username/projects/new" element={<PrivateRoute><NewProjectPage /></PrivateRoute>} />
                 <Route path="/:username/projects/:projectName" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} />

@@ -33,9 +33,8 @@ export function RegisterPage() {
         }
 
         register(email, username, password)
-            .then((res) => {
-                setAuth(res.data.token, username);
-                nav("/" + username + "/projects");
+            .then(() => {
+                nav("/register-success");
             }).catch(err => setError(err.message))
     };
 

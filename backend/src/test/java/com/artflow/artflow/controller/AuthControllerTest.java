@@ -1,10 +1,13 @@
 package com.artflow.artflow.controller;
 
+import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.repository.UserRepository;
+import com.artflow.artflow.security.service.JwtService;
+import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -15,11 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-		"jwt.signing-secret=test-secret"
+	"jwt.auth-secret=test-secret-auth",
+	"jwt.verify-secret=test-secret-verify"
 })
 public class AuthControllerTest {
 	
@@ -43,6 +49,9 @@ public class AuthControllerTest {
 
 	@Autowired
 	private AuthService authService;
+	
+	@Autowired
+	private JwtService jwtService;
 	
 	@Test
 	public void canSignUp() throws Exception {
@@ -92,14 +101,34 @@ public class AuthControllerTest {
 	
 	@Test
 	public void canLogin() throws Exception {
-		User user = new User("testemail", "testusername", "testpassword");
-		authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword()));
-		LoginDto loginDto = new LoginDto(user.getEmail(), user.getPassword());
+		String email = "testemail";
+		String username = "testusername";
+		String password = "testpassword";
+		
+		authService.register(new SignupDto(email, username, password));
+		User user = userRepository.findByEmail(email).get();
+		user.setIsVerified(true);
+		LoginDto loginDto = new LoginDto(email, password);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void cannotLoginWhenUnverified() throws Exception {
+		String email = "testemail";
+		String username = "testusername";
+		String password = "testpassword";
+		
+		authService.register(new SignupDto(email, username, password));
+		LoginDto loginDto = new LoginDto(email, password);
+		
+		mockMvc.perform(post(UriUtil.getLoginUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(loginDto)))
+			.andExpect(status().isForbidden());
 	}
 	
 	@Test
@@ -128,11 +157,41 @@ public class AuthControllerTest {
 		
 		User user = new User(email, username, password1);
 		authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword()));
+		user = userRepository.findByEmail(user.getEmail()).get();
+		user.setIsVerified(true);
 		LoginDto loginDto = new LoginDto(email, password2);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
 						.content(objectMapper.writeValueAsBytes(loginDto)))
 				.andExpect(status().isUnauthorized());
+	}
+	
+	@Test
+	public void canSignUpAndLogin() throws Exception {
+		String email = "ruthieismakinganapp@gmail.com";
+		String username = "testusername";
+		String password = "testpassword";
+		
+		SignupDto signupDto = new SignupDto(email, username, password);
+		
+		mockMvc.perform(post(UriUtil.getSignupUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(signupDto)))
+			.andExpect(status().isOk());
+		
+		String verifyToken = jwtService.createVerifyJwtToken(new AuthUser(email));
+		
+		mockMvc.perform(get(UriUtil.getVerifyUri())
+				.param("token", verifyToken))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		LoginDto loginDto = new LoginDto(email, password);
+		
+		mockMvc.perform(post(UriUtil.getLoginUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(loginDto)))
+			.andExpect(status().isOk());
 	}
 }

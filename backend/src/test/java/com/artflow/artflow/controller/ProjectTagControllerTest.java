@@ -3,6 +3,7 @@ package com.artflow.artflow.controller;
 import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
+import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectTagCreateDto;
@@ -51,7 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-		"jwt.signing-secret=test-secret"
+	"jwt.auth-secret=test-secret-auth",
+	"jwt.verify-secret=test-secret-verify"
 })
 public class ProjectTagControllerTest {
 	
@@ -81,6 +83,9 @@ public class ProjectTagControllerTest {
 	private Tag tag1;
 	private Tag tag2;
 	private String token;
+	private String email = "testemail";
+	private String username = "testusername";
+	private String password = "testpassword";
 	
 	@Test
 	public void canCreateProjectTagExistingTag() throws Exception {
@@ -254,6 +259,69 @@ public class ProjectTagControllerTest {
 				new HashSet<>(List.of(
 						new JsonUtil.Field("tagName", tag2.getName()),
 						new JsonUtil.Field("projectName", project.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expected, res);
+	}
+	
+	@Test
+	public void canGetProjectTagsForPublicProjectWithOtherUser() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		UserProject otherProject = new UserProject(anotherUser, "other project");
+		otherProject.setVisibility(Visibility.PUBLIC);
+		projectRepository.save(otherProject);
+		
+		ProjectTag projectTag1 = new ProjectTag(new ProjectTagId(otherProject.getId(), tag1.getId()));
+		projectTag1.setProject(otherProject);
+		projectTag1.setTag(tag1);
+		ProjectTag projectTag2 = new ProjectTag(new ProjectTagId(otherProject.getId(), tag2.getId()));
+		projectTag2.setProject(otherProject);
+		projectTag2.setTag(tag2);
+		projectTagRepository.save(projectTag1);
+		projectTagRepository.save(projectTag2);
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectTagsUri(anotherUser.getUsername(), otherProject.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
+			new HashSet<>(List.of(
+				new JsonUtil.Field("tagName", tag1.getName()),
+				new JsonUtil.Field("projectName", otherProject.getProjectName()))),
+			new HashSet<>(List.of(
+				new JsonUtil.Field("tagName", tag2.getName()),
+				new JsonUtil.Field("projectName", otherProject.getProjectName())))
+		));
+		JsonUtil.checkMockResponses(objectMapper, expected, res);
+	}
+	
+	@Test
+	public void canGetProjectTagsForPublicProjectWithoutLogin() throws Exception {
+		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		UserProject otherProject = new UserProject(anotherUser, "other project");
+		otherProject.setVisibility(Visibility.PUBLIC);
+		projectRepository.save(otherProject);
+		
+		ProjectTag projectTag1 = new ProjectTag(new ProjectTagId(otherProject.getId(), tag1.getId()));
+		projectTag1.setProject(otherProject);
+		projectTag1.setTag(tag1);
+		ProjectTag projectTag2 = new ProjectTag(new ProjectTagId(otherProject.getId(), tag2.getId()));
+		projectTag2.setProject(otherProject);
+		projectTag2.setTag(tag2);
+		projectTagRepository.save(projectTag1);
+		projectTagRepository.save(projectTag2);
+		
+		MvcResult res = mockMvc.perform(get(UriUtil.getProjectTagsUri(anotherUser.getUsername(), otherProject.getProjectName())))
+			.andExpect(status().isOk())
+			.andReturn();
+		
+		Set<Set<JsonUtil.Field>> expected = new HashSet<>(List.of(
+			new HashSet<>(List.of(
+				new JsonUtil.Field("tagName", tag1.getName()),
+				new JsonUtil.Field("projectName", otherProject.getProjectName()))),
+			new HashSet<>(List.of(
+				new JsonUtil.Field("tagName", tag2.getName()),
+				new JsonUtil.Field("projectName", otherProject.getProjectName())))
 		));
 		JsonUtil.checkMockResponses(objectMapper, expected, res);
 	}
@@ -454,9 +522,10 @@ public class ProjectTagControllerTest {
 	
 	@BeforeEach
 	public void setup() {
-		user = new User("testemail", "testusername","testpassword");
-		token = authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword())).getToken();
-		user = userRepository.findByEmail(user.getEmail()).get();
+		authService.register(new SignupDto(email, username, password));
+		user = userRepository.findByEmail(email).get();
+		user.setIsVerified(true);
+		token = authService.login(new LoginDto(email, password)).getToken();
 		project = projectRepository.save(new UserProject(user, "test project"));
 		tag1 = tagRepository.save(new Tag("test tag 1"));
 		tag2 = tagRepository.save(new Tag("test tag 2"));

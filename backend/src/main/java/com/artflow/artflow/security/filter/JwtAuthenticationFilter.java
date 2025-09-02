@@ -1,8 +1,11 @@
 package com.artflow.artflow.security.filter;
 
 import com.artflow.artflow.common.AuthConstants;
+import com.artflow.artflow.model.User;
+import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.security.authentication.UserAuthentication;
 import com.artflow.artflow.security.exception.UnsupportedAuthException;
+import com.artflow.artflow.security.exception.UnverifiedException;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
 import jakarta.servlet.FilterChain;
@@ -19,8 +22,11 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
-	public JwtAuthenticationFilter(JwtService jwtService) {
+	private final UserRepository userRepository;
+	
+	public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
 		this.jwtService = jwtService;
+		this.userRepository = userRepository;
 	}
 	
 	@Override
@@ -36,7 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		
 		String jwtToken = stripBearerPrefix(authenticationHeader);
-		AuthUser authUser = jwtService.resolveJwtToken(jwtToken);
+		AuthUser authUser = jwtService.resolveLoginJwtToken(jwtToken);
+		User user = userRepository.findByEmailWithProjects(authUser.email()).get();
+		if (!user.getIsVerified()) {
+			throw new UnverifiedException();
+		}
 		
 		UserAuthentication authentication = new UserAuthentication(authUser);
 		

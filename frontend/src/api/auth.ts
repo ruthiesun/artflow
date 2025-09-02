@@ -7,3 +7,7 @@ export async function login(email: string, password: string) {
 export async function register(email: string, username: string, password: string) {
     return axios.post("http://localhost:8080/api/auth/register", {email: email, username: username, password: password});
 }
+
+export async function verify(token: string) {
+    return axios.get(`http://localhost:8080/api/auth/verify?token=${token}`);
+}

@@ -34,6 +34,10 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
+	@NotNull
+	@Column(name = "verified", nullable = false)
+	private Boolean isVerified;
+	
 	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("createdDateTime ASC")
 	private List<UserProject> projects = new ArrayList<>();
@@ -44,6 +48,14 @@ public class User {
 		this.email = email;
 		this.username = username;
 		this.password = password;
+		this.isVerified = false;
+	}
+	
+	public User(String email, String username, String password, Boolean isVerified) {
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.isVerified = isVerified;
 	}
 	
 	public Long getId() {
@@ -76,6 +88,14 @@ public class User {
 	
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public Boolean getIsVerified() {
+		return isVerified;
+	}
+	
+	public void setIsVerified(Boolean isVerified) {
+		this.isVerified = isVerified;
 	}
 	
 	public List<UserProject> getProjects() {
