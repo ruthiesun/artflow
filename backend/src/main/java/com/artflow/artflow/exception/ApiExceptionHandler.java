@@ -5,6 +5,7 @@ import com.artflow.artflow.security.exception.UnauthorizedException;
 import com.artflow.artflow.security.exception.UnverifiedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +40,12 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(UnverifiedException.class)
 	public ResponseEntity<?> handleForbidden(UnverifiedException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+			.body(Map.of("error", ex.getMessage()));
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<?> handleInvalidArg(MethodArgumentNotValidException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(Map.of("error", ex.getMessage()));
 	}
 }

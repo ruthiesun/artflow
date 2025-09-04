@@ -5,6 +5,7 @@ import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
 import com.artflow.artflow.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class AuthController {
 	}
 
 	@PostMapping(UriUtil.SIGNUP)
-	public ResponseEntity<String> register(@RequestBody SignupDto request) {
+	public ResponseEntity<String> register(@Valid @RequestBody SignupDto request) {
 		authService.register(request);
 		return ResponseEntity.ok("An email with a verification link has been sent to " + request.getEmail() + ".");
 	}

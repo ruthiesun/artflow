@@ -83,9 +83,14 @@ public class ProjectTagControllerTest {
 	private Tag tag1;
 	private Tag tag2;
 	private String token;
-	private String email = "testemail";
-	private String username = "testusername";
-	private String password = "testpassword";
+	
+	private String email = "ruthieismakinganapp@gmail.com";
+	private String username = "test-username_";
+	private String password = "testPassword1!";
+	
+	private String altEmail = "duthieismakinganapp@gmail.com";
+	private String altUsername = "test-username_-";
+	private String altPassword = "testPassword2!";
 	
 	@Test
 	public void canCreateProjectTagExistingTag() throws Exception {
@@ -147,7 +152,7 @@ public class ProjectTagControllerTest {
 	
 	@Test
 	public void cannotCreateProjectTagForOtherUser() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword));
 		UserProject publicProject = new UserProject(anotherUser, "public project");
 		publicProject.setVisibility(Visibility.PUBLIC);
 		UserProject privateProject = new UserProject(anotherUser, "private project");
@@ -265,7 +270,7 @@ public class ProjectTagControllerTest {
 	
 	@Test
 	public void canGetProjectTagsForPublicProjectWithOtherUser() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword, true));
 		UserProject otherProject = new UserProject(anotherUser, "other project");
 		otherProject.setVisibility(Visibility.PUBLIC);
 		projectRepository.save(otherProject);
@@ -297,7 +302,7 @@ public class ProjectTagControllerTest {
 	
 	@Test
 	public void canGetProjectTagsForPublicProjectWithoutLogin() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword, true));
 		UserProject otherProject = new UserProject(anotherUser, "other project");
 		otherProject.setVisibility(Visibility.PUBLIC);
 		projectRepository.save(otherProject);
@@ -328,7 +333,7 @@ public class ProjectTagControllerTest {
 	
 	@Test
 	public void cannotGetProjectTagInPrivateProjectForOtherUser() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword));
 		UserProject publicProject = new UserProject(anotherUser, "public project");
 		publicProject.setVisibility(Visibility.PUBLIC);
 		UserProject privateProject = new UserProject(anotherUser, "private project");
@@ -406,7 +411,7 @@ public class ProjectTagControllerTest {
 	
 	@Test
 	public void cannotDeleteProjectTagForOtherUser() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass"));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword));
 		UserProject publicProject = new UserProject(anotherUser, "public project");
 		publicProject.setVisibility(Visibility.PUBLIC);
 		UserProject privateProject = new UserProject(anotherUser, "private project");

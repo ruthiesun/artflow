@@ -9,6 +9,12 @@ import {ErrorText, H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 import { Input } from "../components/ui/Input.tsx";
 
+// Username regex
+const usernameRegex = /^(?=.*[a-z])[a-z0-9_-]+$/;
+
+// Password regex
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 export function RegisterPage() {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
@@ -32,6 +38,21 @@ export function RegisterPage() {
             return;
         }
 
+        if (!usernameRegex.test(username)) {
+            setError("Username must be URL-friendly (lowercase letters, numbers, - and _ allowed)");
+            return;
+        }
+
+        if (!(username.length >= 3) || !(username.length <= 20)) {
+            setError("Username must be between 3 and 20 characters (inclusive)");
+            return;
+        }
+
+        if (!passwordRegex.test(password)) {
+            setError("Password must be 8+ chars and include uppercase, lowercase, number, special char");
+            return;
+        }
+            
         register(email, username, password)
             .then(() => {
                 nav("/register-success");

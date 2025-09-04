@@ -81,9 +81,14 @@ public class ProjectControllerTest {
 	private ProjectService projectService;
 	private User user;
 	private String token;
-	private String email = "testemail";
-	private String username = "testusername";
-	private String password = "testpassword";
+
+	private String email = "ruthieismakinganapp@gmail.com";
+	private String username = "test-username_";
+	private String password = "testPassword1!";
+	
+	private String altEmail = "duthieismakinganapp@gmail.com";
+	private String altUsername = "test-username_-";
+	private String altPassword = "testPassword2!";
 
 	@Test
 	public void canCreateProject() throws Exception {
@@ -156,7 +161,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotCreateProjectForOtherUser() throws Exception {
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
@@ -216,7 +221,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void canGetAllPublicProjectsWithOtherUser() throws Exception {
-		User anotherUser = userRepository.save(new User("asdfemail", "ausername", "asdfpass", true));
+		User anotherUser = userRepository.save(new User(altEmail, altUsername, altPassword, true));
 		
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
@@ -256,7 +261,7 @@ public class ProjectControllerTest {
 		String tag1 = "some tag 1";
 		String tag2 = "some tag 2";
 		String tag3 = "some tag 3";
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
@@ -294,7 +299,7 @@ public class ProjectControllerTest {
 		String tag1 = "some tag 1";
 		String tag2 = "some tag 2";
 		String tag3 = "some tag 3";
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
@@ -331,7 +336,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotGetPrivateProjectsForOtherUser() throws Exception {
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
@@ -386,7 +391,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotGetPrivateProjectForOtherUser() throws Exception {
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
@@ -450,7 +455,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotUpdateProjectForOtherUser() throws Exception {
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
@@ -495,7 +500,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotDeleteProjectForOtherUser() throws Exception {
-		User anotherUser = new User("asdfemail", "ausername", "asdfpass");
+		User anotherUser = new User(altEmail, altUsername, altPassword);
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);

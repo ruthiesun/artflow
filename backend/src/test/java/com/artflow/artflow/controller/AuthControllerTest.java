@@ -53,9 +53,13 @@ public class AuthControllerTest {
 	@Autowired
 	private JwtService jwtService;
 	
+	String validEmail = "ruthieismakinganapp@gmail.com";
+	String validUsername = "test-username_";
+	String validPassword = "testPassword1!";
+	
 	@Test
 	public void canSignUp() throws Exception {
-		SignupDto signupDto = new SignupDto("testemail", "testusername", "testpassword");
+		SignupDto signupDto = new SignupDto(validEmail, validUsername, validPassword);
 		
 		mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
@@ -68,13 +72,8 @@ public class AuthControllerTest {
 	
 	@Test
 	public void cannotSignUpWithExistingEmail() throws Exception {
-		String email = "testemail";
-		String username = "testusername";
-		String password1 = "testpassword1";
-		String password2 = "testpassword2";
-		
-		userRepository.save(new User(email, username, password1));
-		SignupDto signupDto = new SignupDto(email, username, password2);
+		userRepository.save(new User(validEmail, validUsername, validPassword));
+		SignupDto signupDto = new SignupDto(validEmail, validUsername + "a", validPassword + "a");
 		
 		mockMvc.perform(post(UriUtil.getSignupUri())
 						.contentType(APPLICATION_JSON)
@@ -84,14 +83,8 @@ public class AuthControllerTest {
 	
 	@Test
 	public void cannotSignUpWithExistingUsername() throws Exception {
-		String email1 = "testemail1";
-		String email2 = "testemail2";
-		String username = "testusername";
-		String password1 = "testpassword1";
-		String password2 = "testpassword2";
-		
-		userRepository.save(new User(email1, username, password1));
-		SignupDto signupDto = new SignupDto(email2, username, password2);
+		userRepository.save(new User(validEmail, validUsername, validPassword));
+		SignupDto signupDto = new SignupDto("a" + validEmail, validUsername, validPassword + "a");
 		
 		mockMvc.perform(post(UriUtil.getSignupUri())
 				.contentType(APPLICATION_JSON)
@@ -100,15 +93,47 @@ public class AuthControllerTest {
 	}
 	
 	@Test
-	public void canLogin() throws Exception {
-		String email = "testemail";
-		String username = "testusername";
-		String password = "testpassword";
+	public void cannotSignUpWithInvalidEmail() throws Exception {
+		String invalidEmail = "bademail";
 		
-		authService.register(new SignupDto(email, username, password));
-		User user = userRepository.findByEmail(email).get();
+		SignupDto signupDto = new SignupDto(invalidEmail, validUsername, validPassword);
+		
+		mockMvc.perform(post(UriUtil.getSignupUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(signupDto)))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotSignUpWithInvalidUsername() throws Exception {
+		String invalidUsername = "bad username";
+		
+		SignupDto signupDto = new SignupDto(validEmail, invalidUsername, validPassword);
+		
+		mockMvc.perform(post(UriUtil.getSignupUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(signupDto)))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotSignUpWithInvalidPassword() throws Exception {
+		String invalidPassword = "Password1";
+		
+		SignupDto signupDto = new SignupDto(validEmail, validUsername, invalidPassword);
+		
+		mockMvc.perform(post(UriUtil.getSignupUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(signupDto)))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void canLogin() throws Exception {
+		authService.register(new SignupDto(validEmail, validUsername, validPassword));
+		User user = userRepository.findByEmail(validEmail).get();
 		user.setIsVerified(true);
-		LoginDto loginDto = new LoginDto(email, password);
+		LoginDto loginDto = new LoginDto(validEmail, validPassword);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
@@ -118,12 +143,8 @@ public class AuthControllerTest {
 	
 	@Test
 	public void cannotLoginWhenUnverified() throws Exception {
-		String email = "testemail";
-		String username = "testusername";
-		String password = "testpassword";
-		
-		authService.register(new SignupDto(email, username, password));
-		LoginDto loginDto = new LoginDto(email, password);
+		authService.register(new SignupDto(validEmail, validUsername, validPassword));
+		LoginDto loginDto = new LoginDto(validEmail, validPassword);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 				.contentType(APPLICATION_JSON)
@@ -133,14 +154,8 @@ public class AuthControllerTest {
 	
 	@Test
 	public void cannotLoginWithNonexistantEmail() throws Exception {
-		String email1 = "testemail1";
-		String email2 = "testemail2";
-		String username = "testusername";
-		String password = "testpassword";
-		
-		User user = new User(email1, username, password);
-		authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword()));
-		LoginDto loginDto = new LoginDto(email2, password);
+		authService.register(new SignupDto(validEmail, validUsername, validPassword));
+		LoginDto loginDto = new LoginDto(validEmail + "a", validPassword);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
@@ -150,16 +165,10 @@ public class AuthControllerTest {
 	
 	@Test
 	public void cannotLoginWithWrongPassword() throws Exception {
-		String email = "testemail";
-		String username = "testusername";
-		String password1 = "testpassword1";
-		String password2 = "testpassword2";
-		
-		User user = new User(email, username, password1);
-		authService.register(new SignupDto(user.getEmail(), user.getUsername(), user.getPassword()));
-		user = userRepository.findByEmail(user.getEmail()).get();
+		authService.register(new SignupDto(validEmail, validUsername, validPassword));
+		User user = userRepository.findByEmail(validEmail).get();
 		user.setIsVerified(true);
-		LoginDto loginDto = new LoginDto(email, password2);
+		LoginDto loginDto = new LoginDto(validEmail, validPassword + "a");
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 						.contentType(APPLICATION_JSON)
@@ -169,25 +178,21 @@ public class AuthControllerTest {
 	
 	@Test
 	public void canSignUpAndLogin() throws Exception {
-		String email = "ruthieismakinganapp@gmail.com";
-		String username = "testusername";
-		String password = "testpassword";
-		
-		SignupDto signupDto = new SignupDto(email, username, password);
+		SignupDto signupDto = new SignupDto(validEmail, validUsername, validPassword);
 		
 		mockMvc.perform(post(UriUtil.getSignupUri())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(signupDto)))
 			.andExpect(status().isOk());
 		
-		String verifyToken = jwtService.createVerifyJwtToken(new AuthUser(email));
+		String verifyToken = jwtService.createVerifyJwtToken(new AuthUser(validEmail));
 		
 		mockMvc.perform(get(UriUtil.getVerifyUri())
 				.param("token", verifyToken))
 			.andExpect(status().isOk())
 			.andReturn();
 		
-		LoginDto loginDto = new LoginDto(email, password);
+		LoginDto loginDto = new LoginDto(validEmail, validPassword);
 		
 		mockMvc.perform(post(UriUtil.getLoginUri())
 				.contentType(APPLICATION_JSON)
