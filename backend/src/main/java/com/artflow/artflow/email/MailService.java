@@ -23,10 +23,10 @@ public class MailService {
     }
     
     public void sendSimpleMessage(String to, String subject, String text) {
-//        if (!mailEnabled) {
-//            log.info("Mail disabled in dev");
-//            return;
-//        }
+        if (!mailEnabled) {
+            log.info("Mail disabled in dev");
+            return;
+        }
         
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("ruthieismakinganapp@gmail.com");
