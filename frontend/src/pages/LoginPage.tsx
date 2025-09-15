@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {login} from "../api/auth.ts";
+import {login} from "../api/auth/auth.ts";
 import {navToErrorPage} from "./ErrorPage.tsx";
 import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
@@ -21,9 +21,9 @@ export function LoginPage() {
         setError(null);
 
         login(email, password)
-            .then((res) => {
-                setAuth(res.data.token, res.data.username);
-                nav("/" + res.data.username + "/projects");
+            .then(({username, idToken}) => {
+                setAuth(idToken, username);
+                nav("/" + username + "/projects");
             })
             .catch(err => {
                 if (err.response?.status === 401) {

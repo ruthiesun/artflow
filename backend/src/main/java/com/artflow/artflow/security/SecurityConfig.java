@@ -1,12 +1,11 @@
 /**
- * All authentication code was modified from https://medium.com/@ihor.polataiko/spring-security-guide-part-3-authentication-with-jwt-token-42c23a1c375d
+ * All custom JWT authentication code was modified from https://medium.com/@ihor.polataiko/spring-security-guide-part-3-authentication-with-jwt-token-42c23a1c375d
  */
 
 package com.artflow.artflow.security;
 
 import com.artflow.artflow.common.UriUtil;
-import com.artflow.artflow.security.filter.FirebaseAuthenticationFilter;
-import com.artflow.artflow.security.filter.JwtAuthenticationFilter;
+import com.artflow.artflow.security.filter.BearerAuthenticationFilter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -22,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -36,12 +34,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	private final JwtAuthenticationFilter jwtFilter;
-	private final FirebaseAuthenticationFilter firebaseFilter;
+	private final BearerAuthenticationFilter filter;
 	
-	public SecurityConfig(JwtAuthenticationFilter jwtFilter, FirebaseAuthenticationFilter firebaseFilter) {
-		this.jwtFilter = jwtFilter;
-		this.firebaseFilter = firebaseFilter;
+	public SecurityConfig(BearerAuthenticationFilter filter) {
+		this.filter = filter;
 	}
 	
 	@Value("${google.app.credentials.path}")
@@ -63,11 +59,11 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.addFilterBefore(jwtFilter, AuthorizationFilter.class)
-				.addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests((requests) -> requests
 						.requestMatchers(HttpMethod.POST, UriUtil.getLoginUri(), UriUtil.getSignupUri()).permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/hello", UriUtil.getVerifyUri(),
+						.requestMatchers(HttpMethod.GET,
+							UriUtil.getVerifyUri(),
 							UriUtil.getProjectWildcardUri(),
 							UriUtil.getProjectsWildcardUri(),
 							UriUtil.getProjectImagesWildcardUri(),

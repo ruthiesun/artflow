@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {register} from "../api/auth.ts";
+import {register} from "../api/auth/auth.ts";
 import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";

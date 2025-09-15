@@ -1,23 +1,21 @@
 package com.artflow.artflow.security.filter;
 
 import com.artflow.artflow.common.AuthConstants;
-import com.artflow.artflow.security.exception.UnsupportedAuthException;
 import com.artflow.artflow.security.exception.UnverifiedException;
 import com.artflow.artflow.security.service.FirebaseService;
+import com.artflow.artflow.security.user.AuthUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
-@Component
-public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
+@Configuration
+public class FirebaseAuthenticationFilter extends BearerAuthenticationFilter {
     private final FirebaseService firebaseService;
     
     public FirebaseAuthenticationFilter(FirebaseService firebaseService) {
@@ -41,26 +39,16 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
         try {
             String id = firebaseService.resolveIdToken(jwtToken);
             
-            // Wrap into Spring Security Authentication
             UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(id, null, Collections.emptyList());
-            
+                new UsernamePasswordAuthenticationToken(new AuthUser(Long.parseLong(id)), null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
             filterChain.doFilter(request, response);
-            
         } catch (Exception e) {
             throw new UnverifiedException();
         }
     }
     
-    String stripBearerPrefix(String token) {
-        
-        if (!token.startsWith(AuthConstants.BEARER_TOKEN_PREAMBLE)) {
-            throw new UnsupportedAuthException("Unsupported authentication scheme");
-        }
-        
-        return token.substring(7);
-    }
+   
 }
 
