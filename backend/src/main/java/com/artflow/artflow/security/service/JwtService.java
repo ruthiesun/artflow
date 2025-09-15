@@ -2,7 +2,6 @@ package com.artflow.artflow.security.service;
 
 import com.artflow.artflow.security.exception.InvalidTokenException;
 import com.artflow.artflow.security.user.AuthUser;
-import com.artflow.artflow.service.ProjectImageService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -51,8 +50,8 @@ public class JwtService {
 		try {
 			JWTVerifier verifier = JWT.require(algorithm).build();
 			DecodedJWT decodedJWT = verifier.verify(token);
-			String email = decodedJWT.getSubject();
-			return new AuthUser(email);
+			Long id = Long.valueOf(decodedJWT.getSubject());
+			return new AuthUser(id);
 		} catch (JWTVerificationException exception) {
 			throw new InvalidTokenException();
 		}
@@ -65,7 +64,7 @@ public class JwtService {
 		Date exp = new Date(expMillis);
 		
 		return JWT.create()
-			.withSubject(authUser.email())
+			.withSubject(authUser.id().toString())
 			.withIssuedAt(now)
 			.withExpiresAt(exp)
 			.sign(algorithm);

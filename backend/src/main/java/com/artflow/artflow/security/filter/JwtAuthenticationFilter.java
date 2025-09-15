@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		String jwtToken = stripBearerPrefix(authenticationHeader);
 		AuthUser authUser = jwtService.resolveLoginJwtToken(jwtToken);
-		User user = userRepository.findByEmailWithProjects(authUser.email()).get();
+		User user = userRepository.findByIdWithProjects(authUser.id()).get();
 		if (!user.getIsVerified()) {
 			throw new UnverifiedException();
 		}

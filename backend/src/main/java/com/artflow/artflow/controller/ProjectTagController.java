@@ -30,7 +30,7 @@ public class ProjectTagController {
 	
 	@PostMapping(UriUtil.PROJECTS + UriUtil.PROJECT + UriUtil.TAGS)
 	public ResponseEntity<ProjectTagDto> create(@PathVariable String username, @RequestBody ProjectTagCreateDto projectTagCreateDto, @AuthenticationPrincipal AuthUser user) {
-		ProjectTagDto tagDto = projectTagService.create(username, projectTagCreateDto, user.email());
+		ProjectTagDto tagDto = projectTagService.create(username, projectTagCreateDto, user.id());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectTagUri(
 						UriUtil.toSlug(username),
@@ -41,24 +41,24 @@ public class ProjectTagController {
 	
 	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
 	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String username, @PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
-		String email = user == null ? null : user.email();
+		Long id = user == null ? null : user.id();
 		return ResponseEntity.ok(projectTagService.getTagForProject(
 				username,
 				UriUtil.fromSlug(projectName),
 				UriUtil.fromSlug(tagName),
-				email));
+				id));
 	}
 	
 	@GetMapping(UriUtil.TAGS)
 	public ResponseEntity<List<TagDto>> getTags(@PathVariable String username, @AuthenticationPrincipal AuthUser user) {
-		String email = user == null ? null : user.email();
-		return ResponseEntity.ok(projectTagService.getTags(username, email));
+		Long id = user == null ? null : user.id();
+		return ResponseEntity.ok(projectTagService.getTags(username, id));
 	}
 	
 	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS)
 	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
-		String email = user == null ? null : user.email();
-		return ResponseEntity.ok(projectTagService.getTagsForProject(username, UriUtil.fromSlug(projectName), email));
+		Long id = user == null ? null : user.id();
+		return ResponseEntity.ok(projectTagService.getTagsForProject(username, UriUtil.fromSlug(projectName), id));
 	}
 	
 	@DeleteMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
@@ -67,7 +67,7 @@ public class ProjectTagController {
 				username,
 				UriUtil.fromSlug(projectName),
 				UriUtil.fromSlug(tagName),
-				user.email());
+				user.id());
 		return ResponseEntity.noContent().build();
 	}
 

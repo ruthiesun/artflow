@@ -3,12 +3,10 @@ package com.artflow.artflow.service;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
-import com.artflow.artflow.exception.ForbiddenActionException;
 import com.artflow.artflow.exception.ProjectImageNotFoundException;
 import com.artflow.artflow.exception.ProjectNotFoundException;
 import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.UserProject;
-import com.artflow.artflow.model.Visibility;
 import com.artflow.artflow.repository.ProjectImageRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import jakarta.transaction.Transactional;
@@ -35,8 +33,8 @@ public class ProjectImageService {
 	}
 	
 	@Transactional
-	public ProjectImageDto create(String username, String projectName, ProjectImageCreateDto projectImageCreateDto, String email) {
-		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+	public ProjectImageDto create(String username, String projectName, ProjectImageCreateDto projectImageCreateDto, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
 		UserProject project = projectRepo.findByOwner_UsernameAndProjectName(username, projectName)
 				.orElseThrow(() -> new ProjectNotFoundException(projectName, username));
@@ -58,15 +56,15 @@ public class ProjectImageService {
 		return toDto(image);
 	}
 	
-	public List<ProjectImageDto> getImagesForProject(String username, String projectName, String email) {
-		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+	public List<ProjectImageDto> getImagesForProject(String username, String projectName, Long userId) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(userId, username, projectName);
 		
 		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(projectName, username);
 		return toDto(images);
 	}
 	
-	public ProjectImageDto getImageForProject(String username, String projectName, Long imageId, String email) {
-		visibilityUtilService.checkUsernameAgainstProjectVisibility(email, username, projectName);
+	public ProjectImageDto getImageForProject(String username, String projectName, Long imageId, Long userId) {
+		visibilityUtilService.checkUsernameAgainstProjectVisibility(userId, username, projectName);
 		
 		ProjectImage image = projectImageRepo
 				.findById(imageId)
@@ -75,8 +73,8 @@ public class ProjectImageService {
 	}
 	
 	@Transactional
-	public ProjectImageDto updateProjectImage(String username, ProjectImageUpdateDto projectImageUpdateDto, String email) {
-		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+	public ProjectImageDto updateProjectImage(String username, ProjectImageUpdateDto projectImageUpdateDto, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
 		ProjectImage image = projectImageRepo
 				.findById(projectImageUpdateDto.getId())
@@ -112,8 +110,8 @@ public class ProjectImageService {
 	}
 	
 	@Transactional
-	public void deleteProjectImage(String username, Long imageId, String email) {
-		visibilityUtilService.checkUsernameAgainstEmail(email, username);
+	public void deleteProjectImage(String username, Long imageId, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
 		Optional<ProjectImage> image = projectImageRepo.findById(imageId);
 		if (image.isPresent()) {

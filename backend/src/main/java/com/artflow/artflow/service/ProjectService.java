@@ -50,9 +50,9 @@ public class ProjectService {
 	}
 	
 	@Transactional
-	public ProjectDto create(String username, ProjectCreateDto projectInitDto, String userEmail) {
-		visibilityUtilService.checkUsernameAgainstEmail(userEmail, username);
-		User user = userRepo.findByEmailWithProjects(userEmail).get();
+	public ProjectDto create(String username, ProjectCreateDto projectInitDto, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
+		User user = userRepo.findByIdWithProjects(userId).get();
 		
 		if (projectRepo.findByOwner_UsernameAndProjectName(username, projectInitDto.getProjectName()).isPresent()) {
 			throw new ProjectNameInUseException(projectInitDto.getProjectName());
@@ -67,8 +67,8 @@ public class ProjectService {
 		return toDto(project);
 	}
 	
-	public List<ProjectDto> getUserProjects(String username, String userEmail, Optional<String> tagQuery, Optional<String> visQuery) {
-		boolean publicOnly = !visibilityUtilService.doesUsernameMatchEmail(userEmail, username);
+	public List<ProjectDto> getUserProjects(String username, Long userId, Optional<String> tagQuery, Optional<String> visQuery) {
+		boolean publicOnly = !visibilityUtilService.doesUsernameBelongToId(userId, username);
 		
 		Set<String> tags = null;
 		if (tagQuery.isPresent()) {
@@ -103,16 +103,16 @@ public class ProjectService {
 		}
 	}
 	
-	public ProjectDto getProject(String username, String projectName, String userEmail) {
-		return toDto(visibilityUtilService.getProjectCheckUsernameAgainstProjectVisibility(userEmail, username, projectName));
+	public ProjectDto getProject(String username, String projectName, Long userId) {
+		return toDto(visibilityUtilService.getProjectCheckUsernameAgainstProjectVisibility(userId, username, projectName));
 	}
 	
 	@Transactional
-	public ProjectDto updateProject(String username, ProjectUpdateDto projectUpdateDto, String userEmail) {
-		visibilityUtilService.checkUsernameAgainstEmail(userEmail, username);
+	public ProjectDto updateProject(String username, ProjectUpdateDto projectUpdateDto, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
 		UserProject project = projectRepo.findByIdWithTags(projectUpdateDto.getId())
-				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), userEmail));
+				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), username));
 		Optional<UserProject> projectWithRequestedName = projectRepo.findByOwner_UsernameAndProjectName(username, projectUpdateDto.getProjectName());
 		if (projectWithRequestedName.isPresent() && !Objects.equals(projectWithRequestedName.get().getId(), project.getId())) {
 			throw new ProjectNameInUseException(projectUpdateDto.getProjectName());
@@ -125,8 +125,8 @@ public class ProjectService {
 	}
 	
 	@Transactional
-	public void deleteProject(String username, String projectName, String userEmail) {
-		visibilityUtilService.checkUsernameAgainstEmail(userEmail, username);
+	public void deleteProject(String username, String projectName, Long userId) {
+		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
 		Optional<UserProject> foundProject = projectRepo.findByOwner_UsernameAndProjectNameWithTags(username, projectName);
 		if (foundProject.isEmpty()) {

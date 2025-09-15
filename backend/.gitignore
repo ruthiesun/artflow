@@ -58,6 +58,7 @@ Icon?
 .env.production
 /src/main/resources/application.properties
 /src/main/resources/my.application.properties
+/src/main/resources/serviceAccountKey.json
 
 # Logs
 *.log

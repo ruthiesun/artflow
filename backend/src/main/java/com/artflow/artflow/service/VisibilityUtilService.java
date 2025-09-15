@@ -21,23 +21,23 @@ public class VisibilityUtilService {
         this.userRepo = userRepo;
     }
     
-    public void checkUsernameAgainstEmail(String email, String username) {
-        if (!doesUsernameMatchEmail(email, username)) {
+    public void checkUsernameAgainstId(Long id, String username) {
+        if (!doesUsernameBelongToId(id, username)) {
             throw new ForbiddenActionException();
         }
     }
     
-    public boolean doesUsernameMatchEmail(String email, String username) {
-        if (email == null) {
+    public boolean doesUsernameBelongToId(Long id, String username) {
+        if (id == null) {
             return false;
         }
         
-        User user = userRepo.findByEmailWithProjects(email).get();
+        User user = userRepo.findById(id).get();
         return user.getUsername().equals(username);
     }
     
-    public UserProject getProjectCheckUsernameAgainstProjectVisibility(String email, String username, String projectName) {
-        boolean publicOnly = !doesUsernameMatchEmail(email, username);
+    public UserProject getProjectCheckUsernameAgainstProjectVisibility(Long id, String username, String projectName) {
+        boolean publicOnly = !doesUsernameBelongToId(id, username);
         
         Optional<UserProject> project = projectRepo.findByOwner_UsernameAndProjectName(username, projectName);
         if (publicOnly && (!project.isPresent() || project.get().getVisibility() != Visibility.PUBLIC)) {
@@ -50,7 +50,7 @@ public class VisibilityUtilService {
         return project.get();
     }
     
-    public void checkUsernameAgainstProjectVisibility(String email, String username, String projectName) {
-        getProjectCheckUsernameAgainstProjectVisibility(email, username, projectName);
+    public void checkUsernameAgainstProjectVisibility(Long id, String username, String projectName) {
+        getProjectCheckUsernameAgainstProjectVisibility(id, username, projectName);
     }
 }

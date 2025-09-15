@@ -21,6 +21,7 @@ import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -526,7 +527,7 @@ public class ProjectTagControllerTest {
 	}
 	
 	@BeforeEach
-	public void setup() {
+	public void setup() throws FirebaseAuthException {
 		authService.register(new SignupDto(email, username, password));
 		user = userRepository.findByEmail(email).get();
 		user.setIsVerified(true);

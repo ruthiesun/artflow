@@ -4,12 +4,14 @@ import com.artflow.artflow.common.AuthConstants;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +187,8 @@ public class AuthControllerTest {
 				.content(objectMapper.writeValueAsBytes(signupDto)))
 			.andExpect(status().isOk());
 		
-		String verifyToken = jwtService.createVerifyJwtToken(new AuthUser(validEmail));
+		User user = userRepository.findByEmail(validEmail).get();
+		String verifyToken = jwtService.createVerifyJwtToken(new AuthUser(user.getId()));
 		
 		mockMvc.perform(get(UriUtil.getVerifyUri())
 				.param("token", verifyToken))

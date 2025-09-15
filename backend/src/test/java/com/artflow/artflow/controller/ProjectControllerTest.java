@@ -18,6 +18,7 @@ import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
 import com.artflow.artflow.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -148,7 +149,7 @@ public class ProjectControllerTest {
 	@Test
 	public void cannotCreateProjectsWithSameName() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
 		
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto();
 		projectCreateDto2.setProjectName(projectCreateDto1.getProjectName());
@@ -176,8 +177,8 @@ public class ProjectControllerTest {
 	public void canGetAllProjects() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri(user.getUsername()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -205,8 +206,8 @@ public class ProjectControllerTest {
 	public void canGetAllPublicProjects() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(user.getUsername(), null, Visibility.PUBLIC))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -225,8 +226,8 @@ public class ProjectControllerTest {
 		
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
-		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
-		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getId());
+		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri(anotherUser.getUsername()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -243,8 +244,8 @@ public class ProjectControllerTest {
 	public void canGetAllPublicProjectsWithoutLogin() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUri(user.getUsername())))
 			.andExpect(status().isOk())
@@ -270,13 +271,13 @@ public class ProjectControllerTest {
 		projectCreateDto2.setTagStrings(List.of(tag1, tag3));
 		ProjectCreateDto projectCreateDto3 = new ProjectCreateDto("proj 3", null, Visibility.PUBLIC);
 		projectCreateDto3.setTagStrings(List.of(tag3));
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto3, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto3, user.getId());
 		
 		ProjectCreateDto projectCreateDto4 = new ProjectCreateDto("proj 4", null, Visibility.PUBLIC);
 		projectCreateDto4.setTagStrings(List.of(tag1, tag2, tag3));
-		projectService.create(anotherUser.getUsername(), projectCreateDto4, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto4, anotherUser.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(user.getUsername(), List.of(tag1, tag2), null))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -308,13 +309,13 @@ public class ProjectControllerTest {
 		projectCreateDto2.setTagStrings(List.of(tag1, tag3));
 		ProjectCreateDto projectCreateDto3 = new ProjectCreateDto("proj 3", null, Visibility.PUBLIC);
 		projectCreateDto3.setTagStrings(List.of(tag3));
-		projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto3, user.getEmail());
+		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto3, user.getId());
 		
 		ProjectCreateDto projectCreateDto4 = new ProjectCreateDto("proj 4", null, Visibility.PUBLIC);
 		projectCreateDto4.setTagStrings(List.of(tag1, tag2, tag3));
-		projectService.create(anotherUser.getUsername(), projectCreateDto4, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto4, anotherUser.getId());
 		
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectsUriWithQueryParams(user.getUsername(), List.of(tag1, tag2), Visibility.PUBLIC))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -340,8 +341,8 @@ public class ProjectControllerTest {
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
-		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
-		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getId());
+		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getId());
 		
 		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
 			new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
@@ -368,8 +369,8 @@ public class ProjectControllerTest {
 	public void canGetProject() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", null, Visibility.PRIVATE);
-		ProjectDto projectDto1 = projectService.create(user.getUsername(), projectCreateDto1, user.getEmail());
-		projectService.create(user.getUsername(), projectCreateDto2, user.getEmail());
+		ProjectDto projectDto1 = projectService.create(user.getUsername(), projectCreateDto1, user.getId());
+		projectService.create(user.getUsername(), projectCreateDto2, user.getId());
 
 		MvcResult res = mockMvc.perform(get(UriUtil.getProjectUri(user.getUsername(), projectDto1.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -395,8 +396,8 @@ public class ProjectControllerTest {
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
-		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
-		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getId());
+		projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getId());
 		
 		Set<Set<JsonUtil.Field>> expectedProjects = new HashSet<>(List.of(
 			new HashSet<>(List.of(new JsonUtil.Field("projectName", projectCreateDto1.getProjectName())))
@@ -423,7 +424,7 @@ public class ProjectControllerTest {
 		Visibility visibility2 = Visibility.PRIVATE;
 		
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto(name1, desc1, visibility1);
-		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getEmail());
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId(), name2, desc2, visibility2);
 		
 		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
@@ -443,7 +444,7 @@ public class ProjectControllerTest {
 	@Test
 	public void cannotUpdateProjectThatDoesNotExist() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", Visibility.PRIVATE);
-		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getEmail());
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
 		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId() + 1, projectDto.getProjectName(), projectDto.getDescription(), projectDto.getVisibility());
 		
 		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
@@ -459,8 +460,8 @@ public class ProjectControllerTest {
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
-		ProjectDto projectDto1 = projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
-		ProjectDto projectDto2 = projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		ProjectDto projectDto1 = projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getId());
+		ProjectDto projectDto2 = projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getId());
 		
 		ProjectUpdateDto projectUpdateDto1 = new ProjectUpdateDto(projectDto1.getId(), projectDto1.getProjectName() + "test", projectDto1.getDescription(), projectDto1.getVisibility());
 		ProjectUpdateDto projectUpdateDto2 = new ProjectUpdateDto(projectDto1.getId(), projectDto2.getProjectName() + "test", projectDto2.getDescription(), projectDto2.getVisibility());
@@ -481,7 +482,7 @@ public class ProjectControllerTest {
 	@Test
 	public void canDeleteProject() throws Exception {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("proj", "desc", Visibility.PRIVATE);
-		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getEmail());
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
 		
 		mockMvc.perform(delete(UriUtil.getProjectUri(user.getUsername(), projectDto.getProjectName()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -504,8 +505,8 @@ public class ProjectControllerTest {
 		userRepository.save(anotherUser);
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("proj 1", "desc", Visibility.PUBLIC);
 		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto("proj 2", "desc", Visibility.PRIVATE);
-		ProjectDto projectDto1 = projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getEmail());
-		ProjectDto projectDto2 = projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getEmail());
+		ProjectDto projectDto1 = projectService.create(anotherUser.getUsername(), projectCreateDto1, anotherUser.getId());
+		ProjectDto projectDto2 = projectService.create(anotherUser.getUsername(), projectCreateDto2, anotherUser.getId());
 		
 		mockMvc.perform(delete(UriUtil.getProjectUri(anotherUser.getUsername(), projectDto1.getProjectName()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
@@ -606,7 +607,7 @@ public class ProjectControllerTest {
 	}
 	
 	@BeforeEach
-	public void setup() {
+	public void setup() throws FirebaseAuthException {
 		authService.register(new SignupDto(email, username, password));
 		user = userRepository.findByEmail(email).get();
 		user.setIsVerified(true);

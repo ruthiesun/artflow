@@ -5,6 +5,7 @@ import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
 import com.artflow.artflow.service.AuthService;
+import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class AuthController {
 	}
 	
 	@PostMapping(UriUtil.LOGIN)
-	public ResponseEntity<TokenDto> login(@RequestBody LoginDto request) {
+	public ResponseEntity<TokenDto> login(@RequestBody LoginDto request) throws FirebaseAuthException {
 		return ResponseEntity.ok(authService.login(request));
 	}
 	

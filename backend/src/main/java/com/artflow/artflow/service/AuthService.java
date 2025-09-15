@@ -1,6 +1,5 @@
 package com.artflow.artflow.service;
 
-import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
@@ -11,8 +10,10 @@ import com.artflow.artflow.security.exception.EmailInUseException;
 import com.artflow.artflow.security.exception.InvalidCredentialsException;
 import com.artflow.artflow.security.exception.UnverifiedException;
 import com.artflow.artflow.security.exception.UsernameInUseException;
+import com.artflow.artflow.security.service.FirebaseService;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
+import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +31,14 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final MailService mailService;
+	private final FirebaseService firebaseService;
 
-	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, MailService mailService) {
+	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, MailService mailService, FirebaseService firebaseService) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
 		this.mailService = mailService;
+		this.firebaseService = firebaseService;
 	}
 	
 	public void register(SignupDto signupDto) {
@@ -47,10 +50,10 @@ public class AuthService {
 		}
 		User user = new User(signupDto.getEmail(), signupDto.getUsername(), passwordEncoder.encode(signupDto.getPassword()));
 		userRepository.save(user);
-		sendVerificationEmail(user.getEmail());
+		sendVerificationEmail(user.getEmail(), user.getId());
 	}
 	
-	public TokenDto login(LoginDto request) {
+	public TokenDto login(LoginDto request) throws FirebaseAuthException {
 		User user = userRepository.findByEmail(request.getEmail()).orElseThrow(InvalidCredentialsException::new);
 		if (!user.getIsVerified()) {
 			throw new UnverifiedException();
@@ -58,18 +61,19 @@ public class AuthService {
 		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 			throw new InvalidCredentialsException();
 		}
-		String token = jwtService.createLoginJwtToken(new AuthUser(user.getEmail()));
+		String token = firebaseService.createCustomToken(user.getId());
+		
 		return new TokenDto(token, user.getUsername());
 	}
 	
 	public void verify(String token) {
 		AuthUser authUser = jwtService.resolveVerifyJwtToken(token);
-		User user = userRepository.findByEmail(authUser.email()).orElseThrow(InvalidCredentialsException::new);
+		User user = userRepository.findById(authUser.id()).orElseThrow(InvalidCredentialsException::new);
 		user.setIsVerified(true);
 	}
 	
-	private void sendVerificationEmail(String email) {
-		String token = jwtService.createVerifyJwtToken(new AuthUser(email));
+	private void sendVerificationEmail(String email, Long id) {
+		String token = jwtService.createVerifyJwtToken(new AuthUser(id));
 		String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
 		String link = "http://localhost:5173/verify" + "?token=" + encodedToken; // todo store url in the config
 		

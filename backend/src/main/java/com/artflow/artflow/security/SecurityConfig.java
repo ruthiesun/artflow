@@ -5,7 +5,12 @@
 package com.artflow.artflow.security;
 
 import com.artflow.artflow.common.UriUtil;
+import com.artflow.artflow.security.filter.FirebaseAuthenticationFilter;
 import com.artflow.artflow.security.filter.JwtAuthenticationFilter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,25 +23,48 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtFilter;
+	private final FirebaseAuthenticationFilter firebaseFilter;
 	
-	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+	public SecurityConfig(JwtAuthenticationFilter jwtFilter, FirebaseAuthenticationFilter firebaseFilter) {
 		this.jwtFilter = jwtFilter;
+		this.firebaseFilter = firebaseFilter;
+	}
+	
+	@Value("${google.app.credentials.path}")
+	private String firebaseCredentialsPath;
+	
+	@PostConstruct
+	public void init() throws IOException {
+		if (FirebaseApp.getApps().isEmpty()) {
+			FileInputStream serviceAccount = new FileInputStream(firebaseCredentialsPath);
+			
+			FirebaseOptions options = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+				.build();
+			
+			FirebaseApp.initializeApp(options);
+		}
 	}
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.addFilterBefore(jwtFilter, AuthorizationFilter.class)
+				.addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests((requests) -> requests
 						.requestMatchers(HttpMethod.POST, UriUtil.getLoginUri(), UriUtil.getSignupUri()).permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/hello", UriUtil.getVerifyUri(),
