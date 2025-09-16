@@ -1,6 +1,7 @@
 import axios from "axios";
 import { auth } from "./firebase";
-import { signInWithCustomToken } from "firebase/auth";
+import { signInWithCustomToken, signOut } from "firebase/auth";
+import api from "../axios";
 
 
 export async function login(email: string, password: string) {
@@ -19,7 +20,13 @@ export async function login(email: string, password: string) {
         }).then((idToken) => {
             return {username, idToken};
         });
+}
 
+export async function logout() {
+    const client : Promise<void> = signOut(auth);
+    const server : Promise<void> = api.post("http://localhost:8080/api/auth/logout", {});
+
+    return Promise.all([client, server]);
 }
 
 export async function register(email: string, username: string, password: string) {

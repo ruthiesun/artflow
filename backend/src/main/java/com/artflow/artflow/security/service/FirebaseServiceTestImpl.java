@@ -1,6 +1,7 @@
 package com.artflow.artflow.security.service;
 
 import com.artflow.artflow.security.user.AuthUser;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,10 @@ public class FirebaseServiceTestImpl implements FirebaseService {
     @Override
     public String resolveIdToken(String token) throws FirebaseAuthException {
         return jwtService.resolveLoginJwtToken(token).id().toString();
+    }
+    
+    @Override
+    public void logout(Long id) throws FirebaseAuthException {
+        // not implemented for tests
     }
 }

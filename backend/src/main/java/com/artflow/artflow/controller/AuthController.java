@@ -4,10 +4,12 @@ import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +35,12 @@ public class AuthController {
 	@PostMapping(UriUtil.LOGIN)
 	public ResponseEntity<TokenDto> login(@RequestBody LoginDto request) throws FirebaseAuthException {
 		return ResponseEntity.ok(authService.login(request));
+	}
+	
+	@PostMapping(UriUtil.LOGOUT)
+	public ResponseEntity<Void> logout(@AuthenticationPrincipal AuthUser user) throws FirebaseAuthException {
+		authService.logout(user.id());
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping(UriUtil.VERIFY)

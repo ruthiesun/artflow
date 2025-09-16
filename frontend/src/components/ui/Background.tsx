@@ -3,6 +3,8 @@ import {SecondaryButton} from "../ui/Button.tsx";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../.././AuthContext.tsx";
 import {H1, Text} from "./Text.tsx";
+import {logout} from "../../api/auth/auth.ts";
+import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 
 type BgProps = {
     className?: string;
@@ -18,6 +20,10 @@ export function Background({className, children}: BgProps) {
     const handleAuthButton = (() => {
         if (isAuthenticated) {
             removeAuth();
+            logout()
+                .catch((err) => {
+                    navToErrorPage(nav, err);
+                });
         }
         nav("/login");
     });

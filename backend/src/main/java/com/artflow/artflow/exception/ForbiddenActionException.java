@@ -2,6 +2,6 @@ package com.artflow.artflow.exception;
 
 public class ForbiddenActionException extends NotFoundException {
     public ForbiddenActionException() {
-        super("Cannot perform requested action on the resource");
+        super("Does this resource exist or not? Who knows, maybe log in (this was a conscious design decision).");
     }
 }

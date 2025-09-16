@@ -33,11 +33,16 @@ export function ErrorPage() {
 }
 
 export function navToErrorPage(nav, err) {
-    nav("/error", {
-        state: {
-            status: err.response?.status,
-            message: err.message,
-            details: err.response?.data
-        }
-   });
+    if (err.response && err.response.status === 403) {
+        nav("/login");
+    }
+    else {
+        nav("/error", {
+            state: {
+                status: err.response?.status,
+                message: err.message,
+                details: err.response?.data
+            }
+        });
+    }
 }

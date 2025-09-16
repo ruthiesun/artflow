@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("dev")
+@Profile("!test")
 public class FirebaseServiceImpl implements FirebaseService {
     
     @Override
@@ -18,5 +18,11 @@ public class FirebaseServiceImpl implements FirebaseService {
     public String resolveIdToken(String token) throws FirebaseAuthException {
         return FirebaseAuth.getInstance().verifyIdToken(token, true).getUid();
     }
+    
+    @Override
+    public void logout(Long id) throws FirebaseAuthException {
+        FirebaseAuth.getInstance().revokeRefreshTokens(id.toString());
+    }
+    
 }
 

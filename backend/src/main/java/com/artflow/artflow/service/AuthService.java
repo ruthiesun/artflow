@@ -66,6 +66,10 @@ public class AuthService {
 		return new TokenDto(token, user.getUsername());
 	}
 	
+	public void logout(Long userId) throws FirebaseAuthException {
+		firebaseService.logout(userId);
+	}
+	
 	public void verify(String token) {
 		AuthUser authUser = jwtService.resolveVerifyJwtToken(token);
 		User user = userRepository.findById(authUser.id()).orElseThrow(InvalidCredentialsException::new);

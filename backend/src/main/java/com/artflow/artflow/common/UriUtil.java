@@ -11,6 +11,7 @@ public class UriUtil {
 	public static final String AUTH = "/auth";
 	public static final String SIGNUP = "/register";
 	public static final String LOGIN = "/login";
+	public static final String LOGOUT = "/logout";
 	public static final String VERIFY = "/verify";
 	public static final String USERNAME = "/{username}";
 	
@@ -32,6 +33,10 @@ public class UriUtil {
 	
 	public static String getLoginUri() {
 		return BASE + AUTH + LOGIN;
+	}
+	
+	public static String getLogoutUri() {
+		return BASE + AUTH + LOGOUT;
 	}
 	
 	public static String getSignupUri() {
