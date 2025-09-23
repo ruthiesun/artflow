@@ -6,6 +6,7 @@ import com.artflow.artflow.dto.ProjectImageDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectImageService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +31,8 @@ public class ProjectImageController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ProjectImageDto> create(@PathVariable String username, @PathVariable String projectName, @RequestBody ProjectImageCreateDto projectImageCreateDto, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectImageDto> create(@PathVariable String username, @PathVariable String projectName,
+												  @Valid @RequestBody ProjectImageCreateDto projectImageCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectImageDto projectImageDto = projectImageService.create(username, projectName, projectImageCreateDto, user.id());
 		return ResponseEntity.created(URI.create(
 				UriUtil.getImageUri(
@@ -47,17 +49,20 @@ public class ProjectImageController {
 	}
 	
 	@GetMapping(UriUtil.IMAGE)
-	public ResponseEntity<ProjectImageDto> getImageForProject(@PathVariable String username, @PathVariable String projectName, @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectImageDto> getImageForProject(@PathVariable String username, @PathVariable String projectName,
+															  @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
 		Long id = user == null ? null : user.id();
 		return ResponseEntity.ok(projectImageService.getImageForProject(username, UriUtil.fromSlug(projectName), imageId, id));
 	}
 	@PutMapping
-	public ResponseEntity<ProjectImageDto> update(@PathVariable String username, @RequestBody ProjectImageUpdateDto projectImageUpdateDto, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectImageDto> update(@PathVariable String username, @Valid @RequestBody ProjectImageUpdateDto projectImageUpdateDto,
+												  @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectImageService.updateProjectImage(username, projectImageUpdateDto, user.id()));
 	}
 	
 	@DeleteMapping(UriUtil.IMAGE)
-	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName, @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName,
+									   @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
 		projectImageService.deleteProjectImage(username, imageId, user.id());
 		return ResponseEntity.noContent().build();
 	}

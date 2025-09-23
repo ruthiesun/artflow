@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProjectImageRepository extends JpaRepository<ProjectImage, Long> {
-	long countByProject_ProjectNameAndProject_Owner_Username(String projectName, String username);
-	Optional<ProjectImage> findByProject_ProjectNameAndProject_Owner_UsernameAndPosition(String projectName, String username, int position);
-	List<ProjectImage> findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(String projectName, String username);
+	long countByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(String projectName, String username);
+	Optional<ProjectImage> findByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCaseAndPosition(String projectName, String username, int position);
+	List<ProjectImage> findByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCaseOrderByPosition(String projectName, String username);
 }

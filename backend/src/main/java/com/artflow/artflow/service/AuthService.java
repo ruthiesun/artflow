@@ -42,10 +42,10 @@ public class AuthService {
 	}
 	
 	public void register(SignupDto signupDto) {
-		if (userRepository.existsByEmail(signupDto.getEmail())) {
+		if (userRepository.existsByEmailIgnoreCase(signupDto.getEmail())) {
 			throw new EmailInUseException(signupDto.getEmail());
 		}
-		if (userRepository.existsByUsername(signupDto.getUsername())) {
+		if (userRepository.existsByUsernameIgnoreCase(signupDto.getUsername())) {
 			throw new UsernameInUseException(signupDto.getUsername());
 		}
 		User user = new User(signupDto.getEmail(), signupDto.getUsername(), passwordEncoder.encode(signupDto.getPassword()));
@@ -54,7 +54,7 @@ public class AuthService {
 	}
 	
 	public TokenDto login(LoginDto request) throws FirebaseAuthException {
-		User user = userRepository.findByEmail(request.getEmail()).orElseThrow(InvalidCredentialsException::new);
+		User user = userRepository.findByEmailIgnoreCase(request.getEmail()).orElseThrow(InvalidCredentialsException::new);
 		if (!user.getIsVerified()) {
 			throw new UnverifiedException();
 		}

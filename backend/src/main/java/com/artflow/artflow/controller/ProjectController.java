@@ -6,6 +6,7 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +34,7 @@ public class ProjectController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ProjectDto> create(@PathVariable String username, @RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectDto> create(@PathVariable String username, @Valid @RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
 		ProjectDto projectDto = projectService.create(username, projectCreateDto, user.id());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectUri(
@@ -56,7 +57,7 @@ public class ProjectController {
 	}
 	
 	@PutMapping()
-	public ResponseEntity<ProjectDto> update(@PathVariable String username, @RequestBody ProjectUpdateDto projectUpdateDto, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectDto> update(@PathVariable String username, @Valid @RequestBody ProjectUpdateDto projectUpdateDto, @AuthenticationPrincipal AuthUser user) {
 		return ResponseEntity.ok(projectService.updateProject(username, projectUpdateDto, user.id()));
 	}
 	

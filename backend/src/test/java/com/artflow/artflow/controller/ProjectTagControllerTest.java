@@ -5,10 +5,8 @@ import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.controller.common.JsonUtil;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
-import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.ProjectTagId;
 import com.artflow.artflow.model.Tag;
@@ -28,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.repository.query.Param;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -106,10 +103,10 @@ public class ProjectTagControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
 				.andExpect(status().isCreated());
 		
-		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectNameAndProject_Owner_Username(
+		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameIgnoreCaseAndProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(
 				tagName, projectName, project.getOwner().getUsername());
 		assertTrue(foundProjectTag.isPresent());
-		List<String> tags = projectTagRepository.findDistinctTagNameByProject_Owner_Username(user.getUsername());
+		List<String> tags = projectTagRepository.findDistinctTagNameIgnoreCaseByProject_Owner_UsernameIgnoreCase(user.getUsername());
         assertEquals(1, tags.size());
 		assertEquals(tagName, tags.get(0));
 	}
@@ -127,9 +124,66 @@ public class ProjectTagControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
 				.andExpect(status().isCreated());
 		
-		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameAndProject_ProjectNameAndProject_Owner_Username(
+		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameIgnoreCaseAndProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(
 				tagName, projectName, project.getOwner().getUsername());
 		assertTrue(foundProjectTag.isPresent());
+	}
+	
+	@Test
+	public void canCreateProjectTagHandleUpperCase() throws Exception {
+		String projectName = project.getProjectName();
+		String tagName = "A GREAT TAG";
+		
+		ProjectTagCreateDto projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isCreated());
+		
+		Optional<ProjectTag> foundProjectTag = projectTagRepository.findByTagNameIgnoreCaseAndProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(
+			tagName, projectName, project.getOwner().getUsername());
+		assertTrue(foundProjectTag.isPresent());
+		List<String> tags = projectTagRepository.findDistinctTagNameIgnoreCaseByProject_Owner_UsernameIgnoreCase(user.getUsername());
+		assertEquals(1, tags.size());
+		assertEquals(tagName.toLowerCase(), tags.get(0));
+	}
+	
+	@Test
+	public void cannotCreateProjectTagWithInvalidTagName() throws Exception {
+		String projectName = project.getProjectName();
+		String tagName = "some tag ";
+		ProjectTagCreateDto projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		tagName = " some tag";
+		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		tagName = "some  tag";
+		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		tagName = "tag!";
+		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -164,12 +218,12 @@ public class ProjectTagControllerTest {
 		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), publicProject.getProjectName()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new ProjectTagCreateDto(publicProject.getProjectName(), "alien!"))))
+				.content(objectMapper.writeValueAsBytes(new ProjectTagCreateDto(publicProject.getProjectName(), "alien"))))
 			.andExpect(status().isNotFound());
 		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), privateProject.getProjectName()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new ProjectTagCreateDto(privateProject.getProjectName(), "alien!"))))
+				.content(objectMapper.writeValueAsBytes(new ProjectTagCreateDto(privateProject.getProjectName(), "alien"))))
 			.andExpect(status().isNotFound());
 	}
 	
@@ -529,7 +583,7 @@ public class ProjectTagControllerTest {
 	@BeforeEach
 	public void setup() throws FirebaseAuthException {
 		authService.register(new SignupDto(email, username, password));
-		user = userRepository.findByEmail(email).get();
+		user = userRepository.findByEmailIgnoreCase(email).get();
 		user.setIsVerified(true);
 		token = authService.login(new LoginDto(email, password)).getToken();
 		project = projectRepository.save(new UserProject(user, "test project"));

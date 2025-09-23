@@ -6,6 +6,7 @@ import com.artflow.artflow.dto.ProjectTagDto;
 import com.artflow.artflow.dto.TagDto;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectTagService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +30,8 @@ public class ProjectTagController {
 	}
 	
 	@PostMapping(UriUtil.PROJECTS + UriUtil.PROJECT + UriUtil.TAGS)
-	public ResponseEntity<ProjectTagDto> create(@PathVariable String username, @RequestBody ProjectTagCreateDto projectTagCreateDto, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectTagDto> create(@PathVariable String username, @Valid @RequestBody ProjectTagCreateDto projectTagCreateDto,
+												@AuthenticationPrincipal AuthUser user) {
 		ProjectTagDto tagDto = projectTagService.create(username, projectTagCreateDto, user.id());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectTagUri(
@@ -40,7 +42,8 @@ public class ProjectTagController {
 	}
 	
 	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
-	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String username, @PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<ProjectTagDto> getTagForProject(@PathVariable String username, @PathVariable String projectName,
+														  @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		Long id = user == null ? null : user.id();
 		return ResponseEntity.ok(projectTagService.getTagForProject(
 				username,
@@ -56,13 +59,15 @@ public class ProjectTagController {
 	}
 	
 	@GetMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS)
-	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<List<ProjectTagDto>> getTagsForProject(@PathVariable String username, @PathVariable String projectName,
+																 @AuthenticationPrincipal AuthUser user) {
 		Long id = user == null ? null : user.id();
 		return ResponseEntity.ok(projectTagService.getTagsForProject(username, UriUtil.fromSlug(projectName), id));
 	}
 	
 	@DeleteMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
-	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName, @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
+	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName,
+									   @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
 		projectTagService.deleteTag(
 				username,
 				UriUtil.fromSlug(projectName),

@@ -39,7 +39,7 @@ public class VisibilityUtilService {
     public UserProject getProjectCheckUsernameAgainstProjectVisibility(Long id, String username, String projectName) {
         boolean publicOnly = !doesUsernameBelongToId(id, username);
         
-        Optional<UserProject> project = projectRepo.findByOwner_UsernameAndProjectName(username, projectName);
+        Optional<UserProject> project = projectRepo.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(username, projectName);
         if (publicOnly && (!project.isPresent() || project.get().getVisibility() != Visibility.PUBLIC)) {
             throw new ForbiddenActionException();
         }

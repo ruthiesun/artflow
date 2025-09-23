@@ -33,7 +33,7 @@ public class AuthController {
 	}
 	
 	@PostMapping(UriUtil.LOGIN)
-	public ResponseEntity<TokenDto> login(@RequestBody LoginDto request) throws FirebaseAuthException {
+	public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginDto request) throws FirebaseAuthException {
 		return ResponseEntity.ok(authService.login(request));
 	}
 	

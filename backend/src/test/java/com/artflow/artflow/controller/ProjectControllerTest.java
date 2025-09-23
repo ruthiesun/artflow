@@ -8,6 +8,7 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.dto.common.ValidationConstants;
 import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
@@ -102,7 +103,7 @@ public class ProjectControllerTest {
 				.andExpect(status().isCreated())
 			.andReturn();
 		
-		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameAndProjectName(user.getUsername(), projectCreateDto.getProjectName());
+		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(user.getUsername(), projectCreateDto.getProjectName());
 		assertTrue(foundProject.isPresent());
 		assertTrue(foundProject.get().getVisibility() == Visibility.PUBLIC);
 		
@@ -123,7 +124,7 @@ public class ProjectControllerTest {
 				.andExpect(status().isCreated());
 		
 		
-		List<ProjectTag> tagsFromProjectTagRepo = projectTagRepository.findByProject_ProjectNameAndProject_Owner_Username(
+		List<ProjectTag> tagsFromProjectTagRepo = projectTagRepository.findByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(
 				projectCreateDto.getProjectName(), user.getUsername());
 		Set<String> expectedTags = new HashSet<>(projectCreateDto.getTagStrings());
 		for (ProjectTag tag : tagsFromProjectTagRepo) {
@@ -147,17 +148,87 @@ public class ProjectControllerTest {
 	}
 	
 	@Test
+	public void cannotCreateProjectWithInvalidName() throws Exception {
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(new ProjectCreateDto("a project ", "desc", Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(new ProjectCreateDto(" a project", "desc", Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(new ProjectCreateDto("a  project", "desc", Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(new ProjectCreateDto("a project?", "desc", Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotCreateProjectWithInvalidDescription() throws Exception {
+        String longDesc = "a".repeat(ValidationConstants.PROJECT_DESC_LENGTH_MAX + 1);
+		
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(new ProjectCreateDto("a project", longDesc, Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotCreateProjectWithInvalidTags() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		
+		projectCreateDto.setTagStrings(List.of("tag a ", "tag b"));
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		projectCreateDto.setTagStrings(List.of(" tag a", "tag b"));
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		projectCreateDto.setTagStrings(List.of("tag  a", "tag b"));
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDto)))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void cannotCreateProjectsWithSameName() throws Exception {
 		ProjectCreateDto projectCreateDto1 = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		projectService.create(user.getUsername(), projectCreateDto1, user.getId());
 		
-		ProjectCreateDto projectCreateDto2 = new ProjectCreateDto();
-		projectCreateDto2.setProjectName(projectCreateDto1.getProjectName());
+		ProjectCreateDto projectCreateDtoConflict = new ProjectCreateDto(projectCreateDto1.getProjectName(), "", Visibility.PUBLIC);
 		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsBytes(projectCreateDto2)))
+						.content(objectMapper.writeValueAsBytes(projectCreateDtoConflict)))
 				.andExpect(status().isConflict());
+		
+		projectCreateDtoConflict = new ProjectCreateDto(projectCreateDto1.getProjectName().toUpperCase(), "", Visibility.PUBLIC);
+		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectCreateDtoConflict)))
+			.andExpect(status().isConflict());
 	}
 	
 	@Test
@@ -433,12 +504,96 @@ public class ProjectControllerTest {
 						.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
 				.andExpect(status().isOk());
 		
-		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameAndProjectName(user.getUsername(), projectUpdateDto.getProjectName());
+		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(user.getUsername(), projectUpdateDto.getProjectName());
 		assertTrue(foundProject.isPresent());
 		assertSame(visibility2, foundProject.get().getVisibility());
 		assertEquals(name2, foundProject.get().getProjectName());
 		assertEquals(desc2, foundProject.get().getDescription());
 		assertTrue(foundProject.get().getUpdatedDateTime().isAfter(projectDto.getUpdatedDateTime()));
+	}
+	
+	@Test
+	public void cannotUpdateProjectWithInvalidName() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
+		
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(), "a project ", projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId()," a project", projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(),"a  project", projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(),"a project?", projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotUpdateProjectWithInvalidDescription() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
+		
+		String longDesc = "a".repeat(ValidationConstants.PROJECT_DESC_LENGTH_MAX + 1);
+		
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(),"a project", longDesc, Visibility.PUBLIC))))
+			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void cannotUpdateProjectWithInvalidTags() throws Exception {
+		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
+		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
+		
+		ProjectUpdateDto projectUpdateDto = new ProjectUpdateDto(projectDto.getId(), projectDto.getProjectName(), projectDto.getDescription(), projectDto.getVisibility());
+		projectUpdateDto.setTagStrings(List.of("tag a ", "tag b"));
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
+			.andExpect(status().isBadRequest());
+		
+		projectCreateDto.setTagStrings(List.of(" tag a", "tag b"));
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
+			.andExpect(status().isBadRequest());
+		
+		projectCreateDto.setTagStrings(List.of("tag  a", "tag b"));
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
+			.andExpect(status().isBadRequest());
+		
+		projectCreateDto.setTagStrings(List.of("Tag a", "tag b"));
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectUpdateDto)))
+			.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -488,7 +643,7 @@ public class ProjectControllerTest {
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token))
 				.andExpect(status().isNoContent());
 		
-		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameAndProjectName(user.getUsername(), projectCreateDto.getProjectName());
+		Optional<UserProject> foundProject = projectRepository.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(user.getUsername(), projectCreateDto.getProjectName());
 		assertTrue(foundProject.isEmpty());
 	}
 	
@@ -531,7 +686,7 @@ public class ProjectControllerTest {
 		
 		// create a project with some tags
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
-		projectCreateDto.setTagStrings(List.of("a tag!", "another tag"));
+		projectCreateDto.setTagStrings(List.of("a tag", "another tag"));
 		MvcResult createResult = mockMvc.perform(post(UriUtil.getProjectsUri(username))
 						.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 						.contentType(APPLICATION_JSON)
@@ -609,7 +764,7 @@ public class ProjectControllerTest {
 	@BeforeEach
 	public void setup() throws FirebaseAuthException {
 		authService.register(new SignupDto(email, username, password));
-		user = userRepository.findByEmail(email).get();
+		user = userRepository.findByEmailIgnoreCase(email).get();
 		user.setIsVerified(true);
 		token = authService.login(new LoginDto(email, password)).getToken();
 	}

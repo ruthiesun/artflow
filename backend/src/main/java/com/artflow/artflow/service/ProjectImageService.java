@@ -36,9 +36,9 @@ public class ProjectImageService {
 	public ProjectImageDto create(String username, String projectName, ProjectImageCreateDto projectImageCreateDto, Long userId) {
 		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
-		UserProject project = projectRepo.findByOwner_UsernameAndProjectName(username, projectName)
+		UserProject project = projectRepo.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(username, projectName)
 				.orElseThrow(() -> new ProjectNotFoundException(projectName, username));
-		long currentNumImages = projectImageRepo.countByProject_ProjectNameAndProject_Owner_Username(
+		long currentNumImages = projectImageRepo.countByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(
 				projectName,
 				username
 		);
@@ -59,7 +59,7 @@ public class ProjectImageService {
 	public List<ProjectImageDto> getImagesForProject(String username, String projectName, Long userId) {
 		visibilityUtilService.checkUsernameAgainstProjectVisibility(userId, username, projectName);
 		
-		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameAndProject_Owner_UsernameOrderByPosition(projectName, username);
+		List<ProjectImage> images = projectImageRepo.findByProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCaseOrderByPosition(projectName, username);
 		return toDto(images);
 	}
 	

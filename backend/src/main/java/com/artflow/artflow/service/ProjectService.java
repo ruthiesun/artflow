@@ -54,7 +54,7 @@ public class ProjectService {
 		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		User user = userRepo.findByIdWithProjects(userId).get();
 		
-		if (projectRepo.findByOwner_UsernameAndProjectName(username, projectInitDto.getProjectName()).isPresent()) {
+		if (projectRepo.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(username, projectInitDto.getProjectName()).isPresent()) {
 			throw new ProjectNameInUseException(projectInitDto.getProjectName());
 		}
 		UserProject project = new UserProject(user, projectInitDto.getProjectName());
@@ -90,16 +90,16 @@ public class ProjectService {
 		}
 		
 		if (tags == null && visibility == null) {
-			return toDto(projectRepo.findByOwner_UsernameOrderByCreatedDateTimeDesc(username));
+			return toDto(projectRepo.findByOwner_UsernameIgnoreCaseOrderByCreatedDateTimeDesc(username));
 		}
 		if (tags == null) {
-			return toDto(projectRepo.findByOwner_UsernameAndVisibilityOrderByCreatedDateTimeDesc(username, visibility));
+			return toDto(projectRepo.findByOwner_UsernameIgnoreCaseAndVisibilityOrderByCreatedDateTimeDesc(username, visibility));
 		}
 		if (visibility == null) {
-			return toDto(projectRepo.findByUsernameAndTagsOrderByCreatedDateTime(username, tags));
+			return toDto(projectRepo.findByUsernameIgnoreCaseAndTagsIgnoreCaseOrderByCreatedDateTime(username, tags));
 		}
 		else {
-			return toDto(projectRepo.findByUsernameAndVisibilityAndTagsOrderByCreatedDateTime(username, visibility, tags));
+			return toDto(projectRepo.findByUsernameIgnoreCaseAndVisibilityAndTagsIgnoreCaseOrderByCreatedDateTime(username, visibility, tags));
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class ProjectService {
 		
 		UserProject project = projectRepo.findByIdWithTags(projectUpdateDto.getId())
 				.orElseThrow(() -> new ProjectNotFoundException(projectUpdateDto.getProjectName(), username));
-		Optional<UserProject> projectWithRequestedName = projectRepo.findByOwner_UsernameAndProjectName(username, projectUpdateDto.getProjectName());
+		Optional<UserProject> projectWithRequestedName = projectRepo.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCase(username, projectUpdateDto.getProjectName());
 		if (projectWithRequestedName.isPresent() && !Objects.equals(projectWithRequestedName.get().getId(), project.getId())) {
 			throw new ProjectNameInUseException(projectUpdateDto.getProjectName());
 		}
@@ -128,7 +128,7 @@ public class ProjectService {
 	public void deleteProject(String username, String projectName, Long userId) {
 		visibilityUtilService.checkUsernameAgainstId(userId, username);
 		
-		Optional<UserProject> foundProject = projectRepo.findByOwner_UsernameAndProjectNameWithTags(username, projectName);
+		Optional<UserProject> foundProject = projectRepo.findByOwner_UsernameIgnoreCaseAndProjectNameIgnoreCaseWithTags(username, projectName);
 		if (foundProject.isEmpty()) {
 			return;
 		}
@@ -166,7 +166,7 @@ public class ProjectService {
 		
 		for (String tagString : tagStrings) {
 			log.info("checking if project \"" + project.getProjectName() + "\" under user with username \"" + project.getOwner().getUsername() + "\" is already tagged with \"" + tagString + "\"");
-			if (projectTagRepo.existsByTagNameAndProject_ProjectNameAndProject_Owner_Username(tagString, project.getProjectName(), project.getOwner().getUsername())) {
+			if (projectTagRepo.existsByTagNameIgnoreCaseAndProject_ProjectNameIgnoreCaseAndProject_Owner_UsernameIgnoreCase(tagString, project.getProjectName(), project.getOwner().getUsername())) {
 				log.info("project " + project.getProjectName() + " already contains tag " + tagString);
 				continue; // project already contains tag
 			}

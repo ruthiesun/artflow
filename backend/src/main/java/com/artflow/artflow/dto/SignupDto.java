@@ -1,5 +1,6 @@
 package com.artflow.artflow.dto;
 
+import com.artflow.artflow.dto.common.ValidationConstants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -9,15 +10,14 @@ public class SignupDto {
 	private String email;
 	
 	@Pattern(
-		regexp = "^(?=.*[a-z])[a-z0-9_-]+$",
-		message = "Username must contain at least one letter and can only include lowercase letters, numbers, hyphens, and underscores"
+		regexp = ValidationConstants.USERNAME_REGEX,
+		message = ValidationConstants.USERNAME_MESSAGE
 	)
-	@Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
 	private String username;
 	
 	@Pattern(
-		regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-		message = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+		regexp = ValidationConstants.PASSWORD_REGEX,
+		message = ValidationConstants.PASSWORD_MESSAGE
 	)
 	private String password;
 	

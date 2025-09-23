@@ -1,15 +1,29 @@
 package com.artflow.artflow.dto;
 
+import com.artflow.artflow.dto.common.ValidationConstants;
 import com.artflow.artflow.model.Visibility;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public class ProjectUpdateDto {
 	private Long id;
+	@Pattern(
+		regexp = ValidationConstants.PROJECT_NAME_REGEX,
+		message = ValidationConstants.PROJECT_NAME_MESSAGE
+	)
 	private String projectName;
+	@Size(max = ValidationConstants.PROJECT_DESC_LENGTH_MAX)
 	private String description;
 	private Visibility visibility;
-	private List<String> tagStrings;
+	private List<
+		@Pattern(
+			regexp = ValidationConstants.TAG_REGEX,
+			message = ValidationConstants.TAG_MESSAGE
+		)
+		@Size(max = ValidationConstants.TAG_LENGTH_MAX)
+			String> tagStrings;
 	
 	public ProjectUpdateDto() {
 	
