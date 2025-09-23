@@ -18,6 +18,7 @@ import com.artflow.artflow.repository.TagRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
+import com.artflow.artflow.validation.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.transaction.Transactional;
@@ -75,6 +76,9 @@ public class ProjectTagControllerTest {
 	
 	@Autowired
 	private AuthService authService;
+	
+	@Autowired
+	private ValidationService validationService;
 	
 	private User user;
 	private UserProject project;
@@ -178,6 +182,22 @@ public class ProjectTagControllerTest {
 			.andExpect(status().isBadRequest());
 		
 		tagName = "tag!";
+		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		tagName = "a".repeat(validationService.getRule("tag").getMinLength() - 1);
+		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
+		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectTagCreateDto)))
+			.andExpect(status().isBadRequest());
+		
+		tagName = "a".repeat(validationService.getRule("tag").getMaxLength() + 1);
 		projectTagCreateDto = new ProjectTagCreateDto(projectName, tagName);
 		mockMvc.perform(post(UriUtil.getProjectTagsUri(user.getUsername(), projectName))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)

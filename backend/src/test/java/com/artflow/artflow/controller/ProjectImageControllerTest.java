@@ -8,7 +8,7 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.dto.common.ValidationConstants;
+import com.artflow.artflow.validation.ValidationConfig;
 import com.artflow.artflow.model.ProjectImage;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
@@ -17,6 +17,7 @@ import com.artflow.artflow.repository.ProjectImageRepository;
 import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
+import com.artflow.artflow.validation.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.persistence.EntityManager;
@@ -75,6 +76,9 @@ public class ProjectImageControllerTest {
 	
 	@Autowired
 	private AuthService authService;
+	
+	@Autowired
+	private ValidationService validationService;
 	
 	private User user;
 	private UserProject project;
@@ -148,7 +152,7 @@ public class ProjectImageControllerTest {
 	
 	@Test
 	public void cannotCreateProjectImageWithInvalidDescription() throws Exception {
-		String longCaption = "a".repeat(ValidationConstants.PROJECT_IMAGE_CAPTION_LENGTH_MAX + 1);
+		String longCaption = "a".repeat(validationService.getRule("projectImageCaption").getMaxLength() + 1);
 		ProjectImageCreateDto projectImageCreateDto = new ProjectImageCreateDto(longCaption, LocalDateTime.now(), validUrl1);
 		mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
@@ -449,7 +453,7 @@ public class ProjectImageControllerTest {
 		project.getImages().add(image);
 		image = projectImageRepository.save(image);
 		
-		String longCaption = "a".repeat(ValidationConstants.PROJECT_IMAGE_CAPTION_LENGTH_MAX + 1);
+		String longCaption = "a".repeat(validationService.getRule("projectImageCaption").getMaxLength() + 1);
 		ProjectImageUpdateDto projectImageUpdateDto =
 			new ProjectImageUpdateDto(image.getId(), image.getPosition(), longCaption, image.getDateTime(), image.getUrl());
 		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))

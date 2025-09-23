@@ -8,7 +8,7 @@ import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.dto.common.ValidationConstants;
+import com.artflow.artflow.validation.ValidationConfig;
 import com.artflow.artflow.model.ProjectTag;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.model.UserProject;
@@ -18,6 +18,7 @@ import com.artflow.artflow.repository.UserProjectRepository;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.service.AuthService;
 import com.artflow.artflow.service.ProjectService;
+import com.artflow.artflow.validation.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.persistence.EntityManager;
@@ -78,6 +79,9 @@ public class ProjectControllerTest {
 	
 	@Autowired
 	private AuthService authService;
+	
+	@Autowired
+	private ValidationService validationService;
 	
 	@Autowired
 	private ProjectService projectService;
@@ -176,7 +180,7 @@ public class ProjectControllerTest {
 	
 	@Test
 	public void cannotCreateProjectWithInvalidDescription() throws Exception {
-        String longDesc = "a".repeat(ValidationConstants.PROJECT_DESC_LENGTH_MAX + 1);
+        String longDesc = "a".repeat(validationService.getRule("projectDescription").getMaxLength() + 1);
 		
 		mockMvc.perform(post(UriUtil.getProjectsUri(user.getUsername()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
@@ -544,6 +548,22 @@ public class ProjectControllerTest {
 				.content(objectMapper.writeValueAsBytes(
 					new ProjectUpdateDto(projectDto.getId(),"a project?", projectDto.getDescription(), projectDto.getVisibility()))))
 			.andExpect(status().isBadRequest());
+		
+		String invalidName = "a".repeat(validationService.getRule("projectName").getMinLength() - 1);
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(),invalidName, projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
+		
+		invalidName = "a".repeat(validationService.getRule("projectName").getMaxLength() + 1);
+		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(
+					new ProjectUpdateDto(projectDto.getId(),invalidName, projectDto.getDescription(), projectDto.getVisibility()))))
+			.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -551,8 +571,7 @@ public class ProjectControllerTest {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto("a project", "desc", Visibility.PUBLIC);
 		ProjectDto projectDto = projectService.create(user.getUsername(), projectCreateDto, user.getId());
 		
-		String longDesc = "a".repeat(ValidationConstants.PROJECT_DESC_LENGTH_MAX + 1);
-		
+		String longDesc = "a".repeat(validationService.getRule("projectDescription").getMaxLength() + 1);
 		mockMvc.perform(put(UriUtil.getProjectsUri(user.getUsername()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)

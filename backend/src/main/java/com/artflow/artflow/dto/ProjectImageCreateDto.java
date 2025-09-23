@@ -1,13 +1,14 @@
 package com.artflow.artflow.dto;
 
-import com.artflow.artflow.dto.common.ValidationConstants;
+import com.artflow.artflow.validation.ValidByRule;
+import com.artflow.artflow.validation.ValidationConfig;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
 
 public class ProjectImageCreateDto {
-	@Size(max = ValidationConstants.PROJECT_IMAGE_CAPTION_LENGTH_MAX)
+	@ValidByRule("projectImageCaption")
 	private String caption;
 	private LocalDateTime dateTime;
 	@URL

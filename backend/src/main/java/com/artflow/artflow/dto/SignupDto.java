@@ -1,24 +1,16 @@
 package com.artflow.artflow.dto;
 
-import com.artflow.artflow.dto.common.ValidationConstants;
+import com.artflow.artflow.validation.ValidByRule;
+import com.artflow.artflow.validation.ValidationConfig;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 public class SignupDto {
 	@Email
 	private String email;
-	
-	@Pattern(
-		regexp = ValidationConstants.USERNAME_REGEX,
-		message = ValidationConstants.USERNAME_MESSAGE
-	)
+	@ValidByRule("username")
 	private String username;
-	
-	@Pattern(
-		regexp = ValidationConstants.PASSWORD_REGEX,
-		message = ValidationConstants.PASSWORD_MESSAGE
-	)
+	@ValidByRule("password")
 	private String password;
 	
 	public SignupDto(String email, String username, String password) {

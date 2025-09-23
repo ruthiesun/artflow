@@ -3,12 +3,13 @@ package com.artflow.artflow.controller;
 import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.dto.common.ValidationConstants;
+import com.artflow.artflow.validation.ValidationConfig;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.security.service.JwtService;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
+import com.artflow.artflow.validation.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,9 @@ public class AuthControllerTest {
 	
 	@Autowired
 	private JwtService jwtService;
+	
+	@Autowired
+	private ValidationService validationService;
 	
 	String validEmail = "ruthieismakinganapp@gmail.com";
 	String validUsername = "test-username_";
@@ -131,14 +135,14 @@ public class AuthControllerTest {
 				.content(objectMapper.writeValueAsBytes(signupDto)))
 			.andExpect(status().isBadRequest());
 		
-		invalidUsername = "a".repeat(ValidationConstants.USERNAME_LENGTH_MAX + 1);
+		invalidUsername = "a".repeat(validationService.getRule("username").getMaxLength() + 1);
 		signupDto = new SignupDto(validEmail, invalidUsername, validPassword);
 		mockMvc.perform(post(UriUtil.getSignupUri())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(signupDto)))
 			.andExpect(status().isBadRequest());
 		
-		invalidUsername = "a".repeat(ValidationConstants.USERNAME_LENGTH_MIN - 1);
+		invalidUsername = "a".repeat(validationService.getRule("username").getMinLength() - 1);
 		signupDto = new SignupDto(validEmail, invalidUsername, validPassword);
 		mockMvc.perform(post(UriUtil.getSignupUri())
 				.contentType(APPLICATION_JSON)
@@ -150,6 +154,14 @@ public class AuthControllerTest {
 	public void cannotSignUpWithInvalidPassword() throws Exception {
 		String invalidPassword = "P@word1";
 		SignupDto signupDto = new SignupDto(validEmail, validUsername, invalidPassword);
+		mockMvc.perform(post(UriUtil.getSignupUri())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(signupDto)))
+			.andExpect(status().isBadRequest());
+		
+		invalidPassword = "P@word1";
+		invalidPassword = invalidPassword + "a".repeat(validationService.getRule("password").getMaxLength() + 1 - invalidPassword.length());
+		signupDto = new SignupDto(validEmail, validUsername, invalidPassword);
 		mockMvc.perform(post(UriUtil.getSignupUri())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(signupDto)))
