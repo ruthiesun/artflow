@@ -8,12 +8,8 @@ import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui
 import {ErrorText, H1} from "../components/ui/Text.tsx";
 import {PrimaryButton} from "../components/ui/Button.tsx";
 import { Input } from "../components/ui/Input.tsx";
-
-// Username regex
-const usernameRegex = /^(?=.*[a-z])[a-z0-9_-]+$/;
-
-// Password regex
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+import { Validator } from "../Validator.ts";
+import { navToErrorPage } from "./ErrorPage.tsx";
 
 export function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -21,8 +17,19 @@ export function RegisterPage() {
     const [password, setPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [validator, setValidator] = useState<Validator>();
     const nav = useNavigate();
     const {setAuth} = useAuth();
+
+    useEffect(() => {
+        Validator.getInstance()
+        .then((res) => {
+            setValidator(res);
+        })
+        .catch((err) => {
+            navToErrorPage(nav, err);
+        });
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -38,18 +45,17 @@ export function RegisterPage() {
             return;
         }
 
-        if (!usernameRegex.test(username)) {
-            setError("Username must be URL-friendly (lowercase letters, numbers, - and _ allowed)");
+        if (validator === undefined) {
             return;
         }
 
-        if (!(username.length >= 3) || !(username.length <= 20)) {
-            setError("Username must be between 3 and 20 characters (inclusive)");
+        if (!(new RegExp(validator.getUsernameRegex()).test(username))) {
+            setError(validator.getUsernameMessage());
             return;
         }
 
-        if (!passwordRegex.test(password)) {
-            setError("Password must be 8+ chars and include uppercase, lowercase, number, special char");
+        if (!(new RegExp(validator.getPasswordRegex()).test(password))) {
+            setError(validator.getPasswordMessage());
             return;
         }
             
@@ -81,7 +87,7 @@ export function RegisterPage() {
                         {error && <ErrorText className="mb-4" content={error} />}
 
                         <div className="mb-2">
-                            <PrimaryButton disabled={email.trim() === "" || password.trim() === ""} type="submit" text="Register" />
+                            <PrimaryButton disabled={(email.trim() === "" || password.trim() === "") && validator !== undefined} type="submit" text="Register" />
                         </div>
                     </form>
                 </EdgePadding>

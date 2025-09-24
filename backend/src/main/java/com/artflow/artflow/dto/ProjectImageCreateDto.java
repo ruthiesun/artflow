@@ -12,6 +12,7 @@ public class ProjectImageCreateDto {
 	private String caption;
 	private LocalDateTime dateTime;
 	@URL
+	@ValidByRule("projectImageUrl")
 	private String url;
 	
 	public ProjectImageCreateDto(String caption, LocalDateTime dateTime, String url) {

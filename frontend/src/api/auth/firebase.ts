@@ -1,6 +1,6 @@
 
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD1EZ_I48qbm30XqR2bYBCAlXgvScIZyAM",
@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only once
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app : FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Export the initialized auth instance
-export const auth = getAuth(app);
+export const auth : Auth = getAuth(app);

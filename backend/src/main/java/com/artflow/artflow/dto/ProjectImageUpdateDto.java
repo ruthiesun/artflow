@@ -14,6 +14,7 @@ public class ProjectImageUpdateDto {
 	private String caption;
 	private LocalDateTime dateTime;
 	@URL
+	@ValidByRule("projectImageUrl")
 	private String url;
 	
 	public ProjectImageUpdateDto(Long id, Integer position, String caption, LocalDateTime dateTime, String url) {

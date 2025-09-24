@@ -21,7 +21,7 @@ export function H3({className, content}: Props) {
 
 export function Text({className, content}: Props) {
     return (
-        <p className={`${className} text-text-font text-foreground break-normal wrap-anywhere`}>
+        <p className={`${className} text-text-font text-foreground break-normal wrap-anywhere whitespace-pre-wrap`}>
             {content}
         </p>
     )

@@ -3,6 +3,6 @@ export type Project = {
     projectName: string;
     description: string;
     visibility: string;
-    createdDateTime: Date;
-    updatedDateTime: Date;
+    createdDateTime: string;
+    updatedDateTime: string;
 }

@@ -47,7 +47,7 @@ export function DeleteButton({type, text, onClick}: ButtonProps) {
 export function DisplayOnlyTagButton({type, text}: ButtonProps) {
     return (
         <button type={type}
-                className={`${buttonClass} bg-secondary-400`}
+                className={`${buttonClass} bg-secondary-400 whitespace-pre-wrap`}
                 disabled={true}
         >
             {text}

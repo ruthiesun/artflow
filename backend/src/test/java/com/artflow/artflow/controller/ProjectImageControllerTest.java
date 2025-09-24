@@ -169,6 +169,14 @@ public class ProjectImageControllerTest {
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
 			.andExpect(status().isBadRequest());
+		
+		String longString = "a".repeat(validationService.getRule("projectImageUrl").getMaxLength() + 1);
+		projectImageCreateDto = new ProjectImageCreateDto("", LocalDateTime.now(), "https://" + longString + ".com/");
+		mockMvc.perform(post(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageCreateDto)))
+			.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -471,6 +479,15 @@ public class ProjectImageControllerTest {
 		
 		ProjectImageUpdateDto projectImageUpdateDto =
 			new ProjectImageUpdateDto(image.getId(), image.getPosition(), image.getCaption(), image.getDateTime(), "badurl");
+		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
+				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsBytes(projectImageUpdateDto)))
+			.andExpect(status().isBadRequest());
+		
+		String longString = "a".repeat(validationService.getRule("projectImageUrl").getMaxLength() + 1);
+		projectImageUpdateDto =
+			new ProjectImageUpdateDto(image.getId(), image.getPosition(), image.getCaption(), image.getDateTime(), "https://" + longString + ".com/");
 		mockMvc.perform(put(UriUtil.getImagesUri(user.getUsername(), project.getProjectName()))
 				.header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_TOKEN_PREAMBLE + token)
 				.contentType(APPLICATION_JSON)

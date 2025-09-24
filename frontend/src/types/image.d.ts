@@ -1,7 +1,7 @@
 export type ProjectImagePrePersist = {
     position: number
     caption: string
-    dateTime: Date | null
+    dateTime: string
     url: string
     projectName: string
 }

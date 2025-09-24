@@ -18,10 +18,20 @@
         "maxLength": 100
     },
     "projectDescription": {
+        "regex": "^.{0,250}$",
+        "message": "Project description must be at most 250 characters",
+        "minLength": 0,
+        "maxLength": 250
+    },
+    "projectImageUrl": {
+        "regex": "^.{0,250}$",
+        "message": "URL must be at most 250 characters",
         "minLength": 0,
         "maxLength": 250
     },
     "projectImageCaption": {
+        "regex": "^.{0,250}$",
+        "message": "Caption must be at most 250 characters",
         "minLength": 0,
         "maxLength": 250
     },

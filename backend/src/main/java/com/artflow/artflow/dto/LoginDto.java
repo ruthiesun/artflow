@@ -10,7 +10,6 @@ public class LoginDto {
 	@Email
 	private String email;
 	
-	@ValidByRule("password")
 	private String password;
 	
 	public LoginDto(String email, String password) {

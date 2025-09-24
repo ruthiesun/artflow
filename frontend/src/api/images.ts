@@ -18,7 +18,7 @@ export async function createImageForProject(username: string, projectName: strin
         .then(res => res.data as ProjectImage);
 }
 
-export async function updateImageForProject(username: string, projectName: string, id: number, position: number, url: string, caption: string, dateTime: Date | null) {
+export async function updateImageForProject(username: string, projectName: string, id: number, position: number, url: string, caption: string, dateTime: string) {
     const body = {
         id: id,
         position: position,
