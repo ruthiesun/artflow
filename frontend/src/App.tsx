@@ -12,6 +12,8 @@ import {Root} from "./pages/Root.tsx";
 import {PublicRoute} from "./PublicRoute.tsx"
 import {ProtectedRoute} from "./ProtectedRoute.tsx"
 import {PrivateRoute} from "./PrivateRoute.tsx"
+import { ResetPasswordRequestPage } from "./pages/ResetPasswordRequestPage.tsx";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage.tsx";
 
 const App = () => {
     return (
@@ -19,7 +21,9 @@ const App = () => {
             <Routes>
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+                <Route path="/reset" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
                 <Route path="/register-success" element={<PublicRoute><RegisterSuccessPage /></PublicRoute>} />
+                <Route path="/reset-request" element={<PublicRoute><ResetPasswordRequestPage /></PublicRoute>} />
                 <Route path="/verify" element={<PublicRoute><VerifySuccessPage /></PublicRoute>} />
                 <Route path="/:username/projects" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
                 <Route path="/:username/projects/new" element={<PrivateRoute><NewProjectPage /></PrivateRoute>} />

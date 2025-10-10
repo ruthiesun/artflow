@@ -5,13 +5,15 @@ import {navToErrorPage} from "./ErrorPage.tsx";
 import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {PasswordInput} from "../components/business/PasswordInput.tsx";
-import {PrimaryButton} from "../components/ui/Button.tsx";
+import {PrimaryButton, SecondaryButton} from "../components/ui/Button.tsx";
 import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
+import { ConfirmPasswordResetModal } from "../components/business/ConfirmPasswordResetModal.tsx";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
     const {setAuth} = useAuth();
@@ -55,11 +57,17 @@ export function LoginPage() {
                         </div>
                     </form>
                     <div>
+                        <div className="mb-2">
+                            <SecondaryButton type="button" text="Forgot your password?" onClick={() => setShowModal(true)}/>
+                        </div>
                         <Link to="/register" className="text-primary">
                             Create an account
                         </Link>
                     </div>
                 </EdgePadding>
+                {showModal && (
+                    <ConfirmPasswordResetModal onClose={() => setShowModal(false)}/>
+                )}
             </BackgroundBorderSm>
         </BackgroundNoNav>
     );

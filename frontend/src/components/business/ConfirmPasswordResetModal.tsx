@@ -1,20 +1,19 @@
 import {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {deleteProject} from "../../api/projects.ts";
 import {SmallModal} from "../ui/Modal.tsx";
 import {Input} from "../ui/Input.tsx";
 import {PrimaryButton} from "../ui/Button.tsx";
 import {ErrorText, Text} from "../ui/Text.tsx";
+import { requestReset } from "../../api/auth/auth.ts";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
+import { EmailInput } from "./EmailInput.tsx";
 
-type ConfirmDeleteProjectProps = {
-    projectName: string;
-    username: string;
+type ConfirmPasswordResetProps = {
     onClose: () => void;
 };
 
-export function ConfirmDeleteProjectModal({ projectName, username, onClose }: ConfirmDeleteProjectProps) {
-    const [typedName, setTypedName] = useState<string>("");
+export function ConfirmPasswordResetModal({ onClose }: ConfirmPasswordResetProps) {
+    const [email, setEmail] = useState<string>("")
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
 
@@ -22,9 +21,9 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
         e.preventDefault();
         setError(null);
 
-        deleteProject(username, projectName)
+        requestReset(email)
             .then(() => {
-                nav("/projects")
+                nav("/reset-request");
             })
             .catch(err => setError(err.message));
     };
@@ -33,13 +32,13 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
         <SmallModal content={
             (
                 <div>
-                <Text content="Confirm the name of the project to delete." />
+                <Text content="Type the email associated with your account. A link will be sent to the email, if the account exists." />
                 <form onSubmit={handleSubmit}>
                     <div className="mb-2">
-                        <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
+                        <EmailInput email={email} setEmail={setEmail} />
                     </div>
                     {error && <ErrorText className="mb-4" content={error} />}
-                    <PrimaryButton disabled={typedName !== projectName} type="submit" text="Delete" />
+                    <PrimaryButton type="submit" text="Confirm" />
                 </form>
                 </div>
             )

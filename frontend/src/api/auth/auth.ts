@@ -36,3 +36,11 @@ export async function register(email: string, username: string, password: string
 export async function verify(token: string) {
     return axios.get(`http://localhost:8080/api/auth/verify?token=${token}`);
 }
+
+export async function requestReset(email: string) {
+    return axios.post("http://localhost:8080/api/auth/resetRequest", {email: email});
+}
+
+export async function reset(password: string, token: string) {
+    return axios.post(`http://localhost:8080/api/auth/reset?token=${token}`, {password: password});
+}
