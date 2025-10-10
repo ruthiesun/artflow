@@ -1,6 +1,8 @@
 package com.artflow.artflow.controller;
 
 import com.artflow.artflow.common.UriUtil;
+import com.artflow.artflow.dto.ResetDto;
+import com.artflow.artflow.dto.ResetRequestDto;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
@@ -8,6 +10,7 @@ import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,5 +51,18 @@ public class AuthController {
 		authService.verify(token);
 		return ResponseEntity.ok("Account has been verified.");
 	}
+	
+	@PostMapping(UriUtil.PASSWORD_RESET_REQUEST)
+	public ResponseEntity<String> resetPasswordRequest(@Valid @RequestBody ResetRequestDto resetRequestDto) {
+		authService.sendResetEmail(resetRequestDto);
+		return ResponseEntity.ok("A reset link will be sent to the provided email, if an account exists.");
+	}
+	
+	@PostMapping(UriUtil.PASSWORD_RESET)
+	public ResponseEntity<Void> resetPassword(@RequestParam("token") String token, @Valid @RequestBody ResetDto resetDto) {
+		authService.reset(resetDto, token);
+		return ResponseEntity.ok().build();
+	}
+	
 }
 

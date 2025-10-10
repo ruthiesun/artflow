@@ -61,7 +61,11 @@ public class SecurityConfig {
 		return http
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers(HttpMethod.POST, UriUtil.getLoginUri(), UriUtil.getSignupUri()).permitAll()
+						.requestMatchers(HttpMethod.POST,
+							UriUtil.getLoginUri(),
+							UriUtil.getSignupUri(),
+							UriUtil.getResetRequestUri(),
+							UriUtil.getResetUri()).permitAll()
 						.requestMatchers(HttpMethod.GET,
 							UriUtil.getVerifyUri(),
 							UriUtil.getProjectWildcardUri(),

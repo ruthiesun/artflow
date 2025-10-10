@@ -1,5 +1,7 @@
 package com.artflow.artflow.service;
 
+import com.artflow.artflow.dto.ResetDto;
+import com.artflow.artflow.dto.ResetRequestDto;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
@@ -76,12 +78,36 @@ public class AuthService {
 		user.setIsVerified(true);
 	}
 	
+	public void sendResetEmail(ResetRequestDto resetRequestDto) {
+		String email = resetRequestDto.getEmail();
+		if (userRepository.existsByEmailIgnoreCase(email)) {
+			sendPasswordResetEmail(email);
+		}
+	}
+	
+	public void reset(ResetDto resetDto, String token) {
+		String email = jwtService.resolvePasswordResetJwtToken(token);
+		User user = userRepository.findByEmailIgnoreCase(email).orElseThrow(InvalidCredentialsException::new);
+		if (!user.getIsVerified()) {
+			throw new UnverifiedException();
+		}
+		user.setPassword(passwordEncoder.encode(resetDto.getPassword()));
+	}
+	
 	private void sendVerificationEmail(String email, Long id) {
 		String token = jwtService.createVerifyJwtToken(new AuthUser(id));
 		String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
 		String link = "http://localhost:5173/verify" + "?token=" + encodedToken; // todo store url in the config
 		
 		mailService.sendSimpleMessage(email, "Verify your Artflow account", "Click the link to verify your account: " + link);
+	}
+	
+	private void sendPasswordResetEmail(String email) {
+		String token = jwtService.createPasswordResetJwtToken(email);
+		String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
+		String link = "http://localhost:5173/reset" + "?token=" + encodedToken; // todo store url in the config
+		
+		mailService.sendSimpleMessage(email, "Reset password", "Click the link to reset your password: " + link);
 	}
 }
 

@@ -13,6 +13,8 @@ public class UriUtil {
 	public static final String LOGIN = "/login";
 	public static final String LOGOUT = "/logout";
 	public static final String VERIFY = "/verify";
+	public static final String PASSWORD_RESET_REQUEST = "/resetRequest";
+	public static final String PASSWORD_RESET = "/reset";
 	public static final String USERNAME = "/{username}";
 	
 	public static final String PROJECTS = "/projects";
@@ -45,6 +47,14 @@ public class UriUtil {
 	
 	public static String getVerifyUri() {
 		return BASE + AUTH + VERIFY;
+	}
+	
+	public static String getResetRequestUri() {
+		return BASE + AUTH + PASSWORD_RESET_REQUEST;
+	}
+	
+	public static String getResetUri() {
+		return BASE + AUTH + PASSWORD_RESET;
 	}
 	
 	public static String getProjectsUriWithQueryParams(String username, List<String> tags, Visibility visibility) {
