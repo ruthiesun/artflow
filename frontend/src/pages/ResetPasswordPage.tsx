@@ -1,7 +1,5 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {useAuth} from "../AuthContext.tsx"
-import {EmailInput} from "../components/business/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
 import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
 import {ErrorText, H1} from "../components/ui/Text.tsx";
@@ -18,7 +16,6 @@ export function ResetPasswordPage() {
     const [error, setError] = useState<string | null>(null);
     const [validator, setValidator] = useState<Validator>();
     const nav = useNavigate();
-    const {setAuth} = useAuth();
 
     useEffect(() => {
         Validator.getInstance()

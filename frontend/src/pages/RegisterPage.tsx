@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {register} from "../api/auth/auth.ts";
-import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
 import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
@@ -19,7 +18,6 @@ export function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
     const [validator, setValidator] = useState<Validator>();
     const nav = useNavigate();
-    const {setAuth} = useAuth();
 
     useEffect(() => {
         Validator.getInstance()

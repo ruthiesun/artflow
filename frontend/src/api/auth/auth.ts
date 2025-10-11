@@ -1,24 +1,22 @@
 import axios from "axios";
 import { auth } from "./firebase";
-import { signInWithCustomToken, signOut } from "firebase/auth";
+import { signInWithCustomToken, signOut, updateProfile, type User } from "firebase/auth";
 import api from "../axios";
 
 
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string) : Promise<string> {
     let username : string;
+    let user : User;
 
     return axios.post("http://localhost:8080/api/auth/login", {email: email, password: password})
         .then((firebaseTokenAndUsername) => {
             username = firebaseTokenAndUsername.data.username;
             return signInWithCustomToken(auth, firebaseTokenAndUsername.data.token);
         }).then((userCredential) => {
-            // Signed in successfully.
-            const user = userCredential.user;
-
-            // Now, from this 'user' object, you can get the ID token
-            return user.getIdToken(/* forceRefresh */ true);
-        }).then((idToken) => {
-            return {username, idToken};
+            user = userCredential.user;
+            return updateProfile(user, { displayName: username });
+        }).then (() => {
+            return username;
         });
 }
 

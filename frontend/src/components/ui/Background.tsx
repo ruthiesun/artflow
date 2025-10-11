@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {SecondaryButton} from "../ui/Button.tsx";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../.././AuthContext.tsx";
@@ -13,21 +13,23 @@ type BgProps = {
 
 export function Background({className, children}: BgProps) {
     const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-    const {isAuthenticated, removeAuth} = useAuth();
+    const {isAuthenticated, setIsLoading} = useAuth();
     const nav = useNavigate();
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     const handleAuthButton = (() => {
         if (isAuthenticated) {
-            removeAuth();
+            setIsLoading(true);
             logout()
+                .then(() => {
+                    nav("/login");
+                })
                 .catch((err) => {
                     navToErrorPage(nav, err);
                 });
         }
         nav("/login");
     });
-
 
     const authButtonText = isAuthenticated ? "Logout" : "Login";
 

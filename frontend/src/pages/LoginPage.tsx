@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {login} from "../api/auth/auth.ts";
 import {navToErrorPage} from "./ErrorPage.tsx";
-import {useAuth} from "../AuthContext.tsx"
 import {EmailInput} from "../components/business/EmailInput.tsx";
 import {PasswordInput} from "../components/business/PasswordInput.tsx";
 import {PrimaryButton, SecondaryButton} from "../components/ui/Button.tsx";
@@ -16,15 +15,13 @@ export function LoginPage() {
     const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
-    const {setAuth} = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
 
         login(email, password)
-            .then(({username, idToken}) => {
-                setAuth(idToken, username);
+            .then((username: string) => {
                 nav("/" + username + "/projects");
             })
             .catch(err => {
