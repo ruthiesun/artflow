@@ -47,34 +47,11 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> handleInvalidArg(MethodArgumentNotValidException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(Map.of("error", ex.getMessage()));
+			.body(Map.of("error", "Invalid inputs"));
 	}
 	
-	@ExceptionHandler(FirebaseAuthException.class)
-	public ResponseEntity<?> handleFirebase(FirebaseAuthException ex) {
-		HttpStatus status = HttpStatus.I_AM_A_TEAPOT; //todo
-//		switch (ex.getAuthErrorCode()) {
-//			case CERTIFICATE_FETCH_FAILED:
-//			case CONFIGURATION_NOT_FOUND:
-//			case EMAIL_ALREADY_EXISTS:
-//			case EMAIL_NOT_FOUND:
-//			case EXPIRED_ID_TOKEN:
-//			case EXPIRED_SESSION_COOKIE:
-//			case INVALID_DYNAMIC_LINK_DOMAIN:
-//			case INVALID_HOSTING_LINK_DOMAIN:
-//			case INVALID_ID_TOKEN:
-//			case INVALID_SESSION_COOKIE:
-//			case PHONE_NUMBER_ALREADY_EXISTS:
-//			case REVOKED_ID_TOKEN:
-//			case REVOKED_SESSION_COOKIE:
-//			case TENANT_ID_MISMATCH:
-//			case TENANT_NOT_FOUND:
-//			case UID_ALREADY_EXISTS:
-//			case UNAUTHORIZED_CONTINUE_URL:
-//			case USER_NOT_FOUND:
-//			default:// USER_DISABLED
-//		}
-		return ResponseEntity.status(status)
-			.body(Map.of("error", ex.getMessage()));
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handleGeneral(Exception ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
 	}
 }
