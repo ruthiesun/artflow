@@ -25,12 +25,8 @@ export function LoginPage() {
                 nav("/" + username + "/projects");
             })
             .catch(err => {
-                if (err.response?.status === 401) {
-                    setError("Invalid login credentials");
-                }
-                else {
-                    navToErrorPage(nav, err);
-                }
+                console.log(err);
+                setError(err.response.data.error);
             });
     };
 

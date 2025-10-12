@@ -50,8 +50,15 @@ public class ApiExceptionHandler {
 			.body(Map.of("error", "Invalid inputs"));
 	}
 	
+	@ExceptionHandler(RateLimitException.class)
+	public ResponseEntity<?> handleRateLimit(RateLimitException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(Map.of("error", ex.getMessage()));
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handleGeneral(Exception ex) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred");
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.body(Map.of("error","An internal error occurred"));
 	}
 }
