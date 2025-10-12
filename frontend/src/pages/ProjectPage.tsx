@@ -74,8 +74,8 @@ export function ProjectPage() {
                     </div>
                     <div className="flex flex-row">
                         {tags.map((tag: ProjectTag) => (
-                            <div className="mr-2">
-                                <DisplayOnlyTagButton key={tag.tagName} type="button" text={tag.tagName} />
+                            <div key={tag.tagName} className="mr-2">
+                                <DisplayOnlyTagButton type="button" text={tag.tagName} />
                             </div>
                         ))}
                     </div>

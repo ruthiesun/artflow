@@ -72,20 +72,19 @@ export function HomePage() {
                     <div>
                         <div className="flex flex-wrap">
                             {selectedTags.map((tag: Tag) => (
-                                <div className="mr-2">
-                                    <SelectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
+                                <div key={tag.tagName} className="mr-2">
+                                    <SelectedTagButton type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
                                 </div>
                             ))}
                             {deselectedTags.map((tag: Tag) => (
-                                <div className="mr-2">
-                                    <DeselectedTagButton key={tag.tagName} type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
+                                <div key={tag.tagName} className="mr-2">
+                                    <DeselectedTagButton type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
                                 </div>
                             ))}
                         </div>
                     </div>
                     <div className="mt-4">
                         {projects.map((project: Project) => (
-//                             <LazyComponent key={project.projectName}>
                                 <div key={project.projectName} className="rounded-xl p-2 bg-white mb-4 group cursor-pointer" onClick={() => nav(project.projectName)}>
                                     <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
                                     <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
@@ -93,7 +92,6 @@ export function HomePage() {
                                         <ImageCarouselPreview projectName={project.projectName} username={username}/>
                                     </div>
                                 </div>
-//                             </LazyComponent>
                         ))}
                     </div>
                 </EdgePadding>

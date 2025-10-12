@@ -25,7 +25,6 @@ export function LoginPage() {
                 nav("/" + username + "/projects");
             })
             .catch(err => {
-                console.log(err);
                 setError(err.response.data.error);
             });
     };
