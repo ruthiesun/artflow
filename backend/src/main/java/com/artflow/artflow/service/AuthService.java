@@ -5,7 +5,7 @@ import com.artflow.artflow.dto.ResetRequestDto;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
-import com.artflow.artflow.email.MailService;
+//import com.artflow.artflow.email.MailService;
 import com.artflow.artflow.model.User;
 import com.artflow.artflow.repository.UserRepository;
 import com.artflow.artflow.security.exception.EmailInUseException;
@@ -32,14 +32,14 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
-	private final MailService mailService;
+//	private final MailService mailService;
 	private final FirebaseService firebaseService;
 
-	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, MailService mailService, FirebaseService firebaseService) {
+	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, FirebaseService firebaseService) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
-		this.mailService = mailService;
+//		this.mailService = mailService;
 		this.firebaseService = firebaseService;
 	}
 	
@@ -99,7 +99,7 @@ public class AuthService {
 		String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
 		String link = "http://localhost:5173/verify" + "?token=" + encodedToken; // todo store url in the config
 		
-		mailService.sendSimpleMessage(email, "Verify your Artflow account", "Click the link to verify your account: " + link);
+//		mailService.sendSimpleMessage(email, "Verify your Artflow account", "Click the link to verify your account: " + link);
 	}
 	
 	private void sendPasswordResetEmail(String email) {
@@ -107,7 +107,7 @@ public class AuthService {
 		String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
 		String link = "http://localhost:5173/reset" + "?token=" + encodedToken; // todo store url in the config
 		
-		mailService.sendSimpleMessage(email, "Reset password", "Click the link to reset your password: " + link);
+//		mailService.sendSimpleMessage(email, "Reset password", "Click the link to reset your password: " + link);
 	}
 }
 
