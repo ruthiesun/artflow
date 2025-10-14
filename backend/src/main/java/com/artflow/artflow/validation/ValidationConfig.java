@@ -7,18 +7,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 
 @Configuration
 public class ValidationConfig {
-    @Value("file:../shared/validation.json") // relative path
-    private Resource validationResource;
+    @Value("${validators.path}")
+    private String validatorsPath;
     
     @Bean
     public Map<String, ValidationRule> validationRules() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<Map<String, ValidationRule>> typeRef = new TypeReference<>() {};
-        return mapper.readValue(validationResource.getInputStream(), typeRef);
+        FileInputStream validators = new FileInputStream(validatorsPath);
+        return mapper.readValue(validators, typeRef);
     }
 }
