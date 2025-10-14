@@ -1,4 +1,4 @@
-import validatorJson from "../../shared/validation.json";
+import validatorJson from "../validation.json";
 
 const usernameField: string = "username";
 const passwordField: string = "password";

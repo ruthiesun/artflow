@@ -1,0 +1,44 @@
+{
+    "username": {
+        "regex": "^(?=.*[a-zA-Z])[a-zA-Z0-9_-]{3,20}$",
+        "message": "Username must be between 3 and 20 characters, contain at least one letter, and can only contain alphanumeric characters, hyphens, and underscores.",
+        "minLength": 3,
+        "maxLength": 20
+    },
+    "password": {
+        "regex": "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,100}$",
+        "message": "Password must be between 8 and 100 characters and contain an uppercase letter, lowercase letter, number, and a special character (@$!%*?&).",
+        "minLength": 8,
+        "maxLength": 100
+    },
+    "projectName": {
+        "regex": "^(?=.{1,100}$)[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$",
+        "message": "Project name must be between 1 and 100 characters and can only contain alphanumeric characters and single spaces.",
+        "minLength": 1,
+        "maxLength": 100
+    },
+    "projectDescription": {
+        "regex": "^.{0,250}$",
+        "message": "Project description must be at most 250 characters",
+        "minLength": 0,
+        "maxLength": 250
+    },
+    "projectImageUrl": {
+        "regex": "^.{0,250}$",
+        "message": "URL must be at most 250 characters",
+        "minLength": 0,
+        "maxLength": 250
+    },
+    "projectImageCaption": {
+        "regex": "^.{0,250}$",
+        "message": "Caption must be at most 250 characters",
+        "minLength": 0,
+        "maxLength": 250
+    },
+    "tag": {
+        "regex": "^(?=.{1,20}$)[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$",
+        "message": "Tags must be between 1 and 20 characters and can only contain alphanumeric characters and single spaces.",
+        "minLength": 1,
+        "maxLength": 20
+    }
+}
