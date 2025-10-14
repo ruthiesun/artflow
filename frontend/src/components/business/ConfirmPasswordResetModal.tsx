@@ -1,11 +1,9 @@
-import {useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {SmallModal} from "../ui/Modal.tsx";
-import {Input} from "../ui/Input.tsx";
-import {PrimaryButton} from "../ui/Button.tsx";
-import {ErrorText, Text} from "../ui/Text.tsx";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { SmallModal } from "../ui/Modal.tsx";
+import { PrimaryButton } from "../ui/Button.tsx";
+import { ErrorText, Text } from "../ui/Text.tsx";
 import { requestReset } from "../../api/auth/auth.ts";
-import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 import { EmailInput } from "./EmailInput.tsx";
 
 type ConfirmPasswordResetProps = {
@@ -17,7 +15,7 @@ export function ConfirmPasswordResetModal({ onClose }: ConfirmPasswordResetProps
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         setError(null);
 
@@ -32,16 +30,16 @@ export function ConfirmPasswordResetModal({ onClose }: ConfirmPasswordResetProps
         <SmallModal content={
             (
                 <div>
-                <Text content="Type the email associated with your account. A link will be sent to the email, if the account exists." />
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-2">
-                        <EmailInput email={email} setEmail={setEmail} />
-                    </div>
-                    {error && <ErrorText className="mb-4" content={error} />}
-                    <PrimaryButton type="submit" text="Confirm" />
-                </form>
+                    <Text content="Type the email associated with your account. A link will be sent to the email, if the account exists." />
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-2">
+                            <EmailInput email={email} setEmail={setEmail} />
+                        </div>
+                        {error && <ErrorText className="mb-4" content={error} />}
+                        <PrimaryButton type="submit" text="Confirm" />
+                    </form>
                 </div>
             )
-        } onClose={onClose}/>
+        } onClose={onClose} />
     )
 }

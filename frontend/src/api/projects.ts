@@ -1,6 +1,6 @@
 import api from "./axios"
-import type {Project} from "../types/project"
-import type {Tag} from "../types/tag";
+import type { Project } from "../types/project"
+import type { Tag } from "../types/tag";
 
 export async function getAllProjects(username: string): Promise<Project[]> {
     return api.get<Project[]>("/" + username + "/projects")
@@ -32,7 +32,7 @@ export async function getProject(username: string, projectName: string): Promise
         .then(res => res.data as Project);
 }
 
-export async function createProject(username: string, name: string, description: string, visibility: string, tags: string[] ) : Promise<Project> {
+export async function createProject(username: string, name: string, description: string, visibility: string, tags: string[]): Promise<Project> {
     const body = {
         projectName: name,
         description: description,
@@ -43,7 +43,7 @@ export async function createProject(username: string, name: string, description:
         .then(res => res.data as Project)
 }
 
-export async function updateProject(username: string, id: number, name: string, description: string, visibility: string, tags: string[] ) : Promise<Project> {
+export async function updateProject(username: string, id: number, name: string, description: string, visibility: string, tags: string[]): Promise<Project> {
     const body = {
         id: id,
         projectName: name,

@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import {useAuth} from "./AuthContext.tsx"
+import { useAuth } from "./AuthContext.tsx"
 
 // can only access when logged out
 export const PublicRoute = ({ children }: { children: JSX.Element }) => {

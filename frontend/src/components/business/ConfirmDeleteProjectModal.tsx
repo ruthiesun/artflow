@@ -1,11 +1,10 @@
-import {useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {deleteProject} from "../../api/projects.ts";
-import {SmallModal} from "../ui/Modal.tsx";
-import {Input} from "../ui/Input.tsx";
-import {PrimaryButton} from "../ui/Button.tsx";
-import {ErrorText, Text} from "../ui/Text.tsx";
-import { navToErrorPage } from "../../pages/ErrorPage.tsx";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { deleteProject } from "../../api/projects.ts";
+import { SmallModal } from "../ui/Modal.tsx";
+import { Input } from "../ui/Input.tsx";
+import { PrimaryButton } from "../ui/Button.tsx";
+import { ErrorText, Text } from "../ui/Text.tsx";
 
 type ConfirmDeleteProjectProps = {
     projectName: string;
@@ -18,7 +17,7 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
     const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         setError(null);
 
@@ -33,16 +32,16 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
         <SmallModal content={
             (
                 <div>
-                <Text content="Confirm the name of the project to delete." />
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-2">
-                        <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
-                    </div>
-                    {error && <ErrorText className="mb-4" content={error} />}
-                    <PrimaryButton disabled={typedName !== projectName} type="submit" text="Delete" />
-                </form>
+                    <Text content="Confirm the name of the project to delete." />
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-2">
+                            <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
+                        </div>
+                        {error && <ErrorText className="mb-4" content={error} />}
+                        <PrimaryButton disabled={typedName !== projectName} type="submit" text="Delete" />
+                    </form>
                 </div>
             )
-        } onClose={onClose}/>
+        } onClose={onClose} />
     )
 }

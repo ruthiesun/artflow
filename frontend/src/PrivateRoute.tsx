@@ -1,12 +1,12 @@
-import {useEffect, useState} from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {useAuth} from "./AuthContext.tsx"
+import { useAuth } from "./AuthContext.tsx"
 
 // can only access when logged in to the corresponding user
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
     const { isAuthenticated, isLoading, getUsername } = useAuth();
-    const {username} = useParams<{ username: string }>();
-    const [error, setError] = useState<string | null>(null);
+    const { username } = useParams<{ username: string }>();
+    // const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
 
     useEffect(() => {
@@ -17,13 +17,13 @@ export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 
     useEffect(() => {
         if (!isLoading && username && username !== getUsername()) {
-            setError("Other users' projects are view-only.");
+            // setError("Other users' projects are view-only.");
             nav("/error");
         }
     }, [isLoading, username]);
 
     if (isLoading) return null;
-    
+
     return children;
 }
 

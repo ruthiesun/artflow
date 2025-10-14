@@ -1,17 +1,17 @@
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import {LoginPage} from "./pages/LoginPage.tsx";
-import {HomePage} from "./pages/HomePage.tsx";
-import {RegisterPage} from "./pages/RegisterPage.tsx";
-import {RegisterSuccessPage} from "./pages/RegisterSuccessPage.tsx";
-import {VerifySuccessPage} from "./pages/VerifySuccessPage.tsx";
-import {ProjectPage} from "./pages/ProjectPage.tsx";
-import {NewProjectPage} from "./pages/NewProjectPage.tsx";
-import {EditProjectPage} from "./pages/EditProjectPage.tsx";
-import {ErrorPage} from "./pages/ErrorPage.tsx";
-import {Root} from "./pages/Root.tsx";
-import {PublicRoute} from "./PublicRoute.tsx"
-import {ProtectedRoute} from "./ProtectedRoute.tsx"
-import {PrivateRoute} from "./PrivateRoute.tsx"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LoginPage } from "./pages/LoginPage.tsx";
+import { HomePage } from "./pages/HomePage.tsx";
+import { RegisterPage } from "./pages/RegisterPage.tsx";
+import { RegisterSuccessPage } from "./pages/RegisterSuccessPage.tsx";
+import { VerifySuccessPage } from "./pages/VerifySuccessPage.tsx";
+import { ProjectPage } from "./pages/ProjectPage.tsx";
+import { NewProjectPage } from "./pages/NewProjectPage.tsx";
+import { EditProjectPage } from "./pages/EditProjectPage.tsx";
+import { ErrorPage } from "./pages/ErrorPage.tsx";
+import { Root } from "./pages/Root.tsx";
+import { PublicRoute } from "./PublicRoute.tsx"
+import { ProtectedRoute } from "./ProtectedRoute.tsx"
+import { PrivateRoute } from "./PrivateRoute.tsx"
 import { ResetPasswordRequestPage } from "./pages/ResetPasswordRequestPage.tsx";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage.tsx";
 

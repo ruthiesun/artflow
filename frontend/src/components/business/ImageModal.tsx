@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
-import type {ProjectImageElem, ProjectImagePrePersist} from "../../types/image";
-import {SmallModal} from "../ui/Modal.tsx"
-import {PrimaryButton} from "../ui/Button.tsx"
-import {Input, TextAreaInput, DateInput} from "../ui/Input.tsx"
+import { useEffect, useState } from "react";
+import type { ProjectImageElem, ProjectImagePrePersist } from "../../types/image";
+import { SmallModal } from "../ui/Modal.tsx"
+import { PrimaryButton } from "../ui/Button.tsx"
+import { Input, TextAreaInput, DateInput } from "../ui/Input.tsx"
 import { ErrorText } from "../ui/Text.tsx";
 import { Validator } from "../../Validator.ts";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
@@ -25,12 +25,12 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
 
     useEffect(() => {
         Validator.getInstance()
-        .then((res) => {
-            setValidator(res);
-        })
-        .catch((err) => {
-            navToErrorPage(nav, err);
-        });
+            .then((res) => {
+                setValidator(res);
+            })
+            .catch((err) => {
+                navToErrorPage({ nav, err });
+            });
     }, []);
 
     const updateImage = (() => {
@@ -52,10 +52,10 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
             setError(validator.getProjectImageCaptionMessage());
             return;
         }
-        
+
         const newDateTime: string = date === "" ? "" : date + "T00:00:00";
 
-        const updatedImages : ProjectImageElem[] = images.map((img : ProjectImageElem) =>
+        const updatedImages: ProjectImageElem[] = images.map((img: ProjectImageElem) =>
             img.position === editingImage.position
                 ? { ...img, url: url, dateTime: newDateTime, caption: caption }
                 : img
@@ -70,13 +70,13 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
                 <div>
                     {error && <p>{error}</p>}
                     <Input label="Url" type="text" value={url} setValue={setUrl} />
-                    <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
+                    <TextAreaInput label="Caption" value={caption} setValue={setCaption} />
                     <DateInput label="Date" value={date} setValue={setDate} />
                     {error && <ErrorText className="mb-4" content={error} />}
                     <PrimaryButton type='button' text="Update" disabled={url.trim() === ""} onClick={updateImage} />
                 </div>
             )
-        } onClose={onClose}/>
+        } onClose={onClose} />
     )
 }
 
@@ -87,7 +87,7 @@ type AddImageModalProps = {
     onClose: (() => void)
 }
 
-export function AddImageModal({projectName, setImages, images, onClose}: AddImageModalProps) {
+export function AddImageModal({ projectName, setImages, images, onClose }: AddImageModalProps) {
     const [url, setUrl] = useState<string>("");
     const [date, setDate] = useState<string>("");
     const [caption, setCaption] = useState<string>("");
@@ -99,9 +99,9 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
             return
         }
 
-        const dateTime = date === "" ? null : new Date(date + "T00:00:00");
+        const dateTime: string | null = date === "" ? null : (new Date(date + "T00:00:00")).toDateString();
 
-        const newImage: ProjectImagePrePersist = {position: images.length, caption: caption, dateTime: dateTime, url: url, projectName: projectName}
+        const newImage: ProjectImagePrePersist = { position: images.length, caption: caption, dateTime: dateTime, url: url, projectName: projectName }
         setImages([...images, newImage]);
         onClose()
     })
@@ -111,11 +111,11 @@ export function AddImageModal({projectName, setImages, images, onClose}: AddImag
             <div>
                 {error && <p>{error}</p>}
                 <Input label="Url" type="text" value={url} setValue={setUrl} />
-                <TextAreaInput label="Caption" type="text" value={caption} setValue={setCaption} />
+                <TextAreaInput label="Caption" value={caption} setValue={setCaption} />
                 <DateInput label="Date" value={date} setValue={setDate} />
                 <PrimaryButton type='button' text="Create" disabled={url.trim() === ""} onClick={updateImages} />
             </div>
-        )} onClose={onClose}/>
+        )} onClose={onClose} />
     )
 }
 

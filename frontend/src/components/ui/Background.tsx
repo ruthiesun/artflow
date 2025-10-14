@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {SecondaryButton} from "../ui/Button.tsx";
-import {useNavigate} from "react-router-dom";
-import {useAuth} from "../.././AuthContext.tsx";
-import {H1, Text} from "./Text.tsx";
-import {logout} from "../../api/auth/auth.ts";
+import { useState } from "react";
+import { SecondaryButton } from "../ui/Button.tsx";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../.././AuthContext.tsx";
+import { H1, Text } from "./Text.tsx";
+import { logout } from "../../api/auth/auth.ts";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 
 type BgProps = {
@@ -11,9 +11,9 @@ type BgProps = {
     children: React.ReactNode;
 };
 
-export function Background({className, children}: BgProps) {
+export function Background({ children }: BgProps) {
     const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-    const {isAuthenticated, setIsLoading} = useAuth();
+    const { isAuthenticated, setIsLoading } = useAuth();
     const nav = useNavigate();
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
@@ -25,7 +25,7 @@ export function Background({className, children}: BgProps) {
                     nav("/login");
                 })
                 .catch((err) => {
-                    navToErrorPage(nav, err);
+                    navToErrorPage({nav, err});
                 });
         }
         nav("/login");
@@ -55,7 +55,7 @@ export function Background({className, children}: BgProps) {
                         <NavDropDownRow children={<Text content="Home" />} onClick={() => {
                             setIsDropDownOpen(!isDropDownOpen);
                             nav("/projects");
-                        }}/>
+                        }} />
                         <NavDropDownRow children={<Text content={`${authButtonText}`} />} onClick={handleAuthButton} />
                     </div>
                 )}
@@ -72,15 +72,15 @@ type NavDropDownRowProps = {
 };
 
 
-    function NavDropDownRow({children, onClick}: NavDropDownRowProps)  {
-        return (
-            <div className="hover:opacity-50 cursor-pointer p-2" onClick={onClick}>
-                {children}
-            </div>
-        );
-    }
+function NavDropDownRow({ children, onClick }: NavDropDownRowProps) {
+    return (
+        <div className="hover:opacity-50 cursor-pointer p-2" onClick={onClick}>
+            {children}
+        </div>
+    );
+}
 
-export function BackgroundNoNav({className, children}: BgProps) {
+export function BackgroundNoNav({ className, children }: BgProps) {
     return (
         <div className={`min-h-screen bg-background flex items-center justify-center px-4 ${className}`}>
             {children}
@@ -88,7 +88,7 @@ export function BackgroundNoNav({className, children}: BgProps) {
     )
 }
 
-export function BackgroundBorder({className, children}: BgProps) {
+export function BackgroundBorder({ className, children }: BgProps) {
     return (
         <div className={`${className} w-full shadow-lg bg-background-50`}>
             {children}
@@ -96,7 +96,7 @@ export function BackgroundBorder({className, children}: BgProps) {
     )
 }
 
-export function BackgroundBorderSm({className, children}: BgProps) {
+export function BackgroundBorderSm({ className, children }: BgProps) {
     return (
         <div className={`${className} w-full rounded-xl shadow-lg bg-background-50 max-w-md`}>
             {children}
@@ -104,7 +104,7 @@ export function BackgroundBorderSm({className, children}: BgProps) {
     )
 }
 
-export function EdgePadding({className, children}: BgProps) {
+export function EdgePadding({ className, children }: BgProps) {
     return (
         <div className={`${className} p-2 md:p-4 lg:p-8`}>
             {children}

@@ -3,14 +3,14 @@ const textInputClass = "font-input text-foreground w-full px-4 py-2 border borde
 
 type InputProps = {
     label: string;
-    type: string;
+    type?: string;
     value: string;
-    setValue: ((newValue) => void)
+    setValue: ((newValue: any) => void)
     placeholder?: string;
-    onKeyDown?: () => void;
+    onKeyDown?: (e? : any) => void;
 };
 
-export function Input({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
+export function Input({ label, type, value, setValue, placeholder, onKeyDown }: InputProps) {
     return (
         <div>
             <label className={labelClass}>{label}</label>
@@ -26,17 +26,16 @@ export function Input({label, type, value, setValue, placeholder, onKeyDown}: In
     )
 }
 
-export function TextAreaInput({label, type, value, setValue, placeholder, onKeyDown}: InputProps) {
+export function TextAreaInput({ label, value, setValue, placeholder, onKeyDown }: InputProps) {
     return (
         <div>
             <label className={labelClass}>{label}</label>
             <textarea
-                type={type}
                 value={value}
                 onChange={e => setValue(e.target.value)}
                 placeholder={placeholder}
                 onKeyDown={onKeyDown}
-                rows="5"
+                rows={5}
                 className={textInputClass}
             />
         </div>
@@ -50,23 +49,23 @@ type RadioInputProps = {
     onChange: (() => void);
     checked: boolean;
 };
-export function RadioInput({label, name, value, onChange, checked}: RadioInputProps) {
+export function RadioInput({ label, name, value, onChange, checked }: RadioInputProps) {
     return (
-            <label className={labelClass}>
-                <input type="radio" name={name} value={value} checked={checked} onChange={onChange}
+        <label className={labelClass}>
+            <input type="radio" name={name} value={value} checked={checked} onChange={onChange}
                 className="text-foreground mr-1" />
-                {label}
-            </label>
+            {label}
+        </label>
     )
 }
 
 type DateInputProps = {
     label: string;
     value: string;
-    setValue: ((newValue) => void)
+    setValue: ((newValue: any) => void)
 }
 
-export function DateInput({label, value, setValue}: DateInputProps) {
+export function DateInput({ label, value, setValue }: DateInputProps) {
     return (
         <div>
             <label className={labelClass}>{label}</label>

@@ -1,4 +1,4 @@
-import type {ProjectImage} from "../types/image.d.ts";
+import type { ProjectImage } from "../types/image.d.ts";
 import api from "./axios.ts";
 
 export async function getImagesForProject(username: string, projectName: string): Promise<ProjectImage[]> {
@@ -6,7 +6,7 @@ export async function getImagesForProject(username: string, projectName: string)
         .then(res => res.data as ProjectImage[]);
 }
 
-export async function createImageForProject(username: string, projectName: string, url: string, caption: string, dateTime: Date | null) {
+export async function createImageForProject(username: string, projectName: string, url: string, caption: string, dateTime: string | null) {
     const body = {
         projectName: projectName,
         url: url,
@@ -18,7 +18,7 @@ export async function createImageForProject(username: string, projectName: strin
         .then(res => res.data as ProjectImage);
 }
 
-export async function updateImageForProject(username: string, projectName: string, id: number, position: number, url: string, caption: string, dateTime: string) {
+export async function updateImageForProject(username: string, projectName: string, id: number, position: number, url: string, caption: string, dateTime: string | null) {
     const body = {
         id: id,
         position: position,

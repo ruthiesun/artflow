@@ -1,4 +1,4 @@
-import {Input} from "../ui/Input.tsx";
+import { Input } from "../ui/Input.tsx";
 
 type ProjectNameInputProps = {
     name: string;

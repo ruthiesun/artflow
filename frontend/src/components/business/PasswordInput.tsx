@@ -1,18 +1,20 @@
-import {Input} from "../ui/Input.tsx";
+import { Input } from "../ui/Input.tsx";
 
 type PasswordInputProps = {
     password: string;
     setPassword: ((newValue: string) => void)
 };
 
+type GenericPasswordInputProps = PasswordInputProps & { label: string };
+
 export function PasswordInput({ password, setPassword }: PasswordInputProps) {
-    return GenericPasswordInput({password: password, setPassword: setPassword, label: "Password"});
+    return GenericPasswordInput({ password: password, setPassword: setPassword, label: "Password" });
 }
 
 export function ConfirmPasswordInput({ password, setPassword }: PasswordInputProps) {
-    return GenericPasswordInput({password: password, setPassword: setPassword, label: "Confirm Password"});
+    return GenericPasswordInput({ password: password, setPassword: setPassword, label: "Confirm Password" });
 }
 
-function GenericPasswordInput({ password, setPassword, label}) {
+function GenericPasswordInput({ password, setPassword, label }: GenericPasswordInputProps) {
     return (<Input label={label} type="password" value={password} setValue={setPassword} />)
 }

@@ -1,32 +1,30 @@
-import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {useAuth} from "../AuthContext.tsx"
-import type {Project} from "../types/project";
-import type {ProjectTag} from "../types/tag";
-import {getProject} from "../api/projects.ts";
-import {getTagsForProject} from "../api/tags.ts";
-import {navToErrorPage} from "./ErrorPage.tsx";
-import {LoadingOverlay} from "../components/business/LoadingOverlay.tsx";
-import {ConfirmDeleteProjectModal} from "../components/business/ConfirmDeleteProjectModal.tsx";
-import {ImageCarousel} from "../components/business/ImageCarousel.tsx";
-import {DisplayOnlyTagButton, DeleteButton, SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
-import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
-import {H1, H3, Text, TimestampText} from "../components/ui/Text.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../AuthContext.tsx"
+import type { Project } from "../types/project";
+import type { ProjectTag } from "../types/tag";
+import { getProject } from "../api/projects.ts";
+import { getTagsForProject } from "../api/tags.ts";
+import { navToErrorPage } from "./ErrorPage.tsx";
+import { LoadingOverlay } from "../components/business/LoadingOverlay.tsx";
+import { ConfirmDeleteProjectModal } from "../components/business/ConfirmDeleteProjectModal.tsx";
+import { ImageCarousel } from "../components/business/ImageCarousel.tsx";
+import { DisplayOnlyTagButton, DeleteButton, SecondaryButton } from "../components/ui/Button.tsx";
+import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
+import { H1, Text, TimestampText } from "../components/ui/Text.tsx";
 
 export function ProjectPage() {
-    const {username} = useParams<{ username: string }>();
-    const {projectName} = useParams<{ projectName: string }>();
-    const {getUsername} = useAuth();
-    const [project, setProject] = useState<Project>(null);
+    const { username } = useParams<{ username: string }>();
+    const { projectName } = useParams<{ projectName: string }>();
+    const { getUsername } = useAuth();
+    const [project, setProject] = useState<Project | null>(null);
     const [tags, setTags] = useState<ProjectTag[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
 
     useEffect(() => {
         if (!projectName || !username) {
-            setError("Null param");
             return;
         }
 
@@ -36,7 +34,7 @@ export function ProjectPage() {
                 setIsLoading(false);
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             });
 
         getTagsForProject(username, projectName)
@@ -44,7 +42,7 @@ export function ProjectPage() {
                 setTags(projectTags);
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             });
 
     }, [username, projectName]);
@@ -54,10 +52,13 @@ export function ProjectPage() {
             hour: '2-digit',
             minute: '2-digit',
             hour12: true,   // enables AM/PM
-            });
+        });
     }
 
     const modButtonClassName = username === getUsername() ? "" : "hidden";
+    if (!project || !username) {
+        return;
+    }
 
     return (
         <Background>
@@ -85,16 +86,16 @@ export function ProjectPage() {
                         <Text content={project.description} />
                     </div>}
                 </EdgePadding>
-                    {!isLoading && <div className="flex justify-center items-center">
-                        <div className="w-full">
-                            <ImageCarousel projectName={project.projectName} username={username}/>
-                        </div>
-                    </div>}
-                    {showModal && (
-                        <ConfirmDeleteProjectModal projectName={project.projectName} username={username} onClose={() => setShowModal(false)}/>
-                    )}
-                    {isLoading && <LoadingOverlay/>}
-                
+                {!isLoading && <div className="flex justify-center items-center">
+                    <div className="w-full">
+                        <ImageCarousel projectName={project.projectName} username={username} />
+                    </div>
+                </div>}
+                {showModal && (
+                    <ConfirmDeleteProjectModal projectName={project.projectName} username={username} onClose={() => setShowModal(false)} />
+                )}
+                {isLoading && <LoadingOverlay />}
+
             </BackgroundBorder>
         </Background>
     );

@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only once
-const app : FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Export the initialized auth instance
-export const auth : Auth = getAuth(app);
+export const auth: Auth = getAuth(app);

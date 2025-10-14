@@ -1,28 +1,27 @@
-import {useEffect, useState} from "react"
-import {useNavigate, useParams} from "react-router-dom";
-import {useAuth} from "../AuthContext.tsx"
-import type {Project} from "../types/project"
-import type {Tag} from "../types/tag";
-import {getAllProjectsWithTags} from "../api/projects.ts";
-import {getTagsForUser} from "../api/tags.ts";
-import {navToErrorPage} from "./ErrorPage.tsx";
-import {ImageCarouselPreview} from "../components/business/ImageCarousel.tsx";
-import {SecondaryButton, DeselectedTagButton, SelectedTagButton} from "../components/ui/Button.tsx";
-import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
-import {H1, H3, Text} from "../components/ui/Text.tsx";
+import { useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../AuthContext.tsx"
+import type { Project } from "../types/project"
+import type { Tag } from "../types/tag";
+import { getAllProjectsWithTags } from "../api/projects.ts";
+import { getTagsForUser } from "../api/tags.ts";
+import { navToErrorPage } from "./ErrorPage.tsx";
+import { ImageCarouselPreview } from "../components/business/ImageCarousel.tsx";
+import { SecondaryButton, DeselectedTagButton, SelectedTagButton } from "../components/ui/Button.tsx";
+import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
+import { H3, Text } from "../components/ui/Text.tsx";
 
 export function HomePage() {
-    const {username} = useParams<{ username: string }>()
-    const {getUsername} = useAuth();
+    const { username } = useParams<{ username: string }>()
+    const { getUsername } = useAuth();
     const [projects, setProjects] = useState<Project[]>([])
     const [deselectedTags, setDeselectedTags] = useState<Tag[]>([])
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-    const [error, setError] = useState<string | null>(null);
+    // const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
         if (!username) {
-            setError("Null username");
             return;
         }
 
@@ -31,13 +30,12 @@ export function HomePage() {
                 setDeselectedTags(allTags)
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             })
     }, [username]);
 
     useEffect(() => {
         if (!username) {
-            setError("Null username");
             return;
         }
 
@@ -46,9 +44,9 @@ export function HomePage() {
                 setProjects(allProjects)
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             })
-        }, [selectedTags, deselectedTags]);
+    }, [selectedTags, deselectedTags]);
 
     const selectTag = (selectedTag: Tag) => {
         setSelectedTags(prev => [...prev, selectedTag]);
@@ -61,6 +59,9 @@ export function HomePage() {
     };
 
     const modButtonClassName = username === getUsername() ? "" : "hidden";
+    if (!username) {
+        return;
+    }
 
     return (
         <Background>
@@ -85,13 +86,13 @@ export function HomePage() {
                     </div>
                     <div className="mt-4">
                         {projects.map((project: Project) => (
-                                <div key={project.projectName} className="rounded-xl p-2 bg-white mb-4 group cursor-pointer" onClick={() => nav(project.projectName)}>
-                                    <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
-                                    <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
-                                    <div className="rounded-lg bg-surface group-hover:opacity-50 transition-opacity">
-                                        <ImageCarouselPreview projectName={project.projectName} username={username}/>
-                                    </div>
+                            <div key={project.projectName} className="rounded-xl p-2 bg-white mb-4 group cursor-pointer" onClick={() => nav(project.projectName)}>
+                                <H3 className="group-hover:opacity-50 transition-opacity" content={project.projectName} />
+                                <Text className="mb-2 group-hover:opacity-50 transition-opacity" content={project.description} />
+                                <div className="rounded-lg bg-surface group-hover:opacity-50 transition-opacity">
+                                    <ImageCarouselPreview projectName={project.projectName} username={username} />
                                 </div>
+                            </div>
                         ))}
                     </div>
                 </EdgePadding>

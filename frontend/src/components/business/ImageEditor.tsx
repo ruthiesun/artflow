@@ -1,25 +1,25 @@
-import {useState, useEffect} from "react";
-import {CSS} from '@dnd-kit/utilities';
+import { useState } from "react";
+import { CSS } from '@dnd-kit/utilities';
 import {
     arrayMove,
     SortableContext,
     useSortable,
     rectSortingStrategy
 } from "@dnd-kit/sortable";
-import {closestCenter, DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
-import type {ProjectImage, ProjectImageElem} from "../../types/image";
-import {AddImageModal, EditImageModal} from "./ImageModal.tsx";
-import {SecondaryButton} from "../ui/Button.tsx";
-import {labelClass} from "../ui/Input.tsx";
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { ProjectImage, ProjectImageElem } from "../../types/image";
+import { AddImageModal, EditImageModal } from "./ImageModal.tsx";
+import { SecondaryButton } from "../ui/Button.tsx";
+import { labelClass } from "../ui/Input.tsx";
 
 type ImageEditorProps = {
     projectName: string
     images: ProjectImageElem[];
-    setImages: ((newImages: ProjectImageElem[]) => void)
+    setImages: (value: ProjectImageElem[] | ((prev: ProjectImageElem[]) => ProjectImageElem[])) => void;
     addDeletedImage: ((imageToDelete: ProjectImage) => void)
 };
 
-export function ImageEditor({projectName, images, setImages, addDeletedImage}: ImageEditorProps) {
+export function ImageEditor({ projectName, images, setImages, addDeletedImage }: ImageEditorProps) {
     const sensors = useSensors(useSensor(PointerSensor));
     const [showAddImageModal, setShowAddImageModal] = useState(false);
     const [showEditImageModal, setShowEditImageModal] = useState(false);
@@ -55,7 +55,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
                         if (over && active.id !== over.id) {
                             const oldIndex = images.findIndex((img) => img.position === active.id);
                             const newIndex = images.findIndex((img) => img.position === over.id);
-                            setImages(((prev) => arrayMove(prev, oldIndex, newIndex)) as ProjectImageElem[]);
+                            setImages(prev => arrayMove(prev, oldIndex, newIndex));
                         }
                     }}
                 >
@@ -71,7 +71,7 @@ export function ImageEditor({projectName, images, setImages, addDeletedImage}: I
             <div className="mt-2">
                 <SecondaryButton type="button" text="Add new image" onClick={() => setShowAddImageModal(true)} />
             </div>
-            
+
             {showAddImageModal &&
                 <AddImageModal projectName={projectName} setImages={setImages} images={images} onClose={(() => setShowAddImageModal(false))} />
             }
@@ -118,15 +118,15 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
 
             <div className="absolute top-1 left-1 z-1 flex flex-row">
                 <ImageButton iconSrc="/src/assets/icons/edit.svg" alt="Edit" className="cursor-pointer"
-                onClick={(e) => {
-                    e.stopPropagation(); // prevent drag handle click from triggering modal
-                    onEdit(image);
-                }} />
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent drag handle click from triggering modal
+                        onEdit(image);
+                    }} />
                 <ImageButton iconSrc="/src/assets/icons/delete.svg" alt="Delete" className="cursor-pointer"
-                onClick={(e) => {
-                    e.stopPropagation(); // prevent drag handle click from triggering modal
-                    onDelete(image);
-                }} />
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent drag handle click from triggering modal
+                        onDelete(image);
+                    }} />
                 <div
                     {...listeners}
                     onMouseDown={() => setIsBeingMoved(true)}
@@ -142,16 +142,16 @@ type ImageButtonProps = {
     iconSrc: string;
     alt: string;
     className?: string;
-    onClick?: (e) => void;
-    }
+    onClick?: (e: any) => void;
+}
 
-function ImageButton({iconSrc, alt, className, onClick}: ImageButtonProps) {
+function ImageButton({ iconSrc, alt, className, onClick }: ImageButtonProps) {
     return (
-            <div
-                className={`${className} p-1 mr-1 w-max h-max bg-white rounded`}
-                onClick={onClick}
-            >
-                <img src={iconSrc} alt={alt} className="w-4 h-4" />
-            </div>
-        )
-    }
+        <div
+            className={`${className} p-1 mr-1 w-max h-max bg-white rounded`}
+            onClick={onClick}
+        >
+            <img src={iconSrc} alt={alt} className="w-4 h-4" />
+        </div>
+    )
+}

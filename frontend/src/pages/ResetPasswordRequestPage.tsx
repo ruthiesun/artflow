@@ -1,5 +1,5 @@
-import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
-import {Text} from "../components/ui/Text.tsx";
+import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
+import { Text } from "../components/ui/Text.tsx";
 
 export function ResetPasswordRequestPage() {
     return (

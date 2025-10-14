@@ -1,12 +1,12 @@
 import validatorJson from "../../shared/validation.json";
 
-const usernameField : string = "username";
-const passwordField : string = "password";
-const projectNameField : string = "projectName";
-const projectDescriptionField : string = "projectDescription";
-const projectImageUrlField : string = "projectImageUrl";
-const projectImageCaptionField : string = "projectImageCaption";
-const tagField : string = "tag";
+const usernameField: string = "username";
+const passwordField: string = "password";
+const projectNameField: string = "projectName";
+const projectDescriptionField: string = "projectDescription";
+const projectImageUrlField: string = "projectImageUrl";
+const projectImageCaptionField: string = "projectImageCaption";
+const tagField: string = "tag";
 
 interface ValidationRule {
     regex: string;
@@ -54,7 +54,7 @@ export class Validator {
     public getProjectNameMessage(): string {
         return this.settings[projectNameField].message;
     }
-    
+
     public getProjectDescriptionRegex(): string {
         return this.settings[projectDescriptionField].regex;
     }

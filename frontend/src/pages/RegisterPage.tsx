@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {register} from "../api/auth/auth.ts";
-import {EmailInput} from "../components/business/EmailInput.tsx";
-import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
-import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
-import {ErrorText, H1} from "../components/ui/Text.tsx";
-import {PrimaryButton} from "../components/ui/Button.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { register } from "../api/auth/auth.ts";
+import { EmailInput } from "../components/business/EmailInput.tsx";
+import { ConfirmPasswordInput, PasswordInput } from "../components/business/PasswordInput.tsx";
+import { BackgroundNoNav, BackgroundBorderSm, EdgePadding } from "../components/ui/Background.tsx";
+import { ErrorText, H1 } from "../components/ui/Text.tsx";
+import { PrimaryButton } from "../components/ui/Button.tsx";
 import { Input } from "../components/ui/Input.tsx";
 import { Validator } from "../Validator.ts";
 import { navToErrorPage } from "./ErrorPage.tsx";
@@ -21,15 +21,15 @@ export function RegisterPage() {
 
     useEffect(() => {
         Validator.getInstance()
-        .then((res) => {
-            setValidator(res);
-        })
-        .catch((err) => {
-            navToErrorPage(nav, err);
-        });
+            .then((res) => {
+                setValidator(res);
+            })
+            .catch((err) => {
+                navToErrorPage({ nav, err });
+            });
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         setError(null);
 
@@ -56,7 +56,7 @@ export function RegisterPage() {
             setError(validator.getPasswordMessage());
             return;
         }
-            
+
         register(email, username, password)
             .then(() => {
                 nav("/register-success");
@@ -81,7 +81,7 @@ export function RegisterPage() {
                         <div className="mb-2">
                             <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
                         </div>
-                        
+
                         {error && <ErrorText className="mb-4" content={error} />}
 
                         <div className="mb-2">

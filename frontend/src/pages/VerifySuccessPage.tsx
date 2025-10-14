@@ -1,9 +1,9 @@
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { verify } from "../api/auth/auth.ts";
-import {navToErrorPage} from "./ErrorPage.tsx";
-import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
-import {Text} from "../components/ui/Text.tsx";
+import { navToErrorPage } from "./ErrorPage.tsx";
+import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
+import { Text } from "../components/ui/Text.tsx";
 
 
 export function VerifySuccessPage() {
@@ -20,10 +20,10 @@ export function VerifySuccessPage() {
                 })
                 .catch(err => {
                     console.log("error")
-                    navToErrorPage(nav, err);
+                    navToErrorPage({ nav, err });
                 })
         }
-  }, [token]);
+    }, [token]);
 
     return (
         <Background>

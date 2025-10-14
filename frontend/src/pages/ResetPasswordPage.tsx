@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {ConfirmPasswordInput, PasswordInput} from "../components/business/PasswordInput.tsx";
-import {BackgroundNoNav, BackgroundBorderSm, EdgePadding} from "../components/ui/Background.tsx";
-import {ErrorText, H1} from "../components/ui/Text.tsx";
-import {PrimaryButton} from "../components/ui/Button.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ConfirmPasswordInput, PasswordInput } from "../components/business/PasswordInput.tsx";
+import { BackgroundNoNav, BackgroundBorderSm, EdgePadding } from "../components/ui/Background.tsx";
+import { ErrorText, H1 } from "../components/ui/Text.tsx";
+import { PrimaryButton } from "../components/ui/Button.tsx";
 import { Validator } from "../Validator.ts";
 import { navToErrorPage } from "./ErrorPage.tsx";
 import { reset } from "../api/auth/auth.ts";
@@ -19,15 +19,15 @@ export function ResetPasswordPage() {
 
     useEffect(() => {
         Validator.getInstance()
-        .then((res) => {
-            setValidator(res);
-        })
-        .catch((err) => {
-            navToErrorPage(nav, err);
-        });
+            .then((res) => {
+                setValidator(res);
+            })
+            .catch((err) => {
+                navToErrorPage({ nav, err });
+            });
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         setError(null);
 
@@ -53,7 +53,7 @@ export function ResetPasswordPage() {
         if (!token) {
             return;
         }
-            
+
         reset(password, token)
             .then(() => {
                 nav("/login");
@@ -72,7 +72,7 @@ export function ResetPasswordPage() {
                         <div className="mb-2">
                             <ConfirmPasswordInput password={confirmedPassword} setPassword={setConfirmedPassword} />
                         </div>
-                        
+
                         {error && <ErrorText className="mb-4" content={error} />}
 
                         <div className="mb-2">

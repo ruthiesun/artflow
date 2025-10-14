@@ -1,6 +1,6 @@
-import {useState} from "react";
-import {Input, labelClass} from "../ui/Input.tsx";
-import {DisplayOnlyTagButton} from "../ui/Button.tsx";
+import { useState } from "react";
+import { Input } from "../ui/Input.tsx";
+import { DisplayOnlyTagButton } from "../ui/Button.tsx";
 
 
 type ProjectTagInputProps = {
@@ -11,7 +11,7 @@ type ProjectTagInputProps = {
 export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
     const [currTag, setCurrTag] = useState<string>("");
 
-    const addTag = (e) => {
+    const addTag = (e: any) => {
         if ((e.key === "Enter" || e.key === ",") && currTag.trim() !== "") {
             e.preventDefault();
             const newTag = currTag.trim();
@@ -28,12 +28,12 @@ export function ProjectTagInput({ tags, setTags }: ProjectTagInputProps) {
 
     return (
         <div>
-            <Input label="Tags" type="text" value={currTag} setValue={setCurrTag} placeholder="Type a tag and press Enter" onKeyDown={addTag}/>
+            <Input label="Tags" type="text" value={currTag} setValue={setCurrTag} placeholder="Type a tag and press Enter" onKeyDown={addTag} />
 
             <div className="mt-2">
                 {tags.map(tag => (
                     <div key={tag} className="mb-1">
-                        <DisplayOnlyTagButton type="text" text={tag} />
+                        <DisplayOnlyTagButton type="button" text={tag} />
                         <button
                             onClick={() => removeTag(tag)}
                             className="text-warning cursor-pointer"

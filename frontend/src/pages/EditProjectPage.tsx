@@ -1,30 +1,30 @@
-import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import type {Project} from "../types/project";
-import type {ProjectImage, ProjectImageElem} from "../types/image";
-import {getProject, updateProject} from "../api/projects.ts";
-import {getTagsForProject} from "../api/tags.ts";
-import {createImageForProject, deleteImageForProject, getImagesForProject, updateImageForProject} from "../api/images.ts";
-import {HttpStatusCode} from "axios";
-import {navToErrorPage} from "./ErrorPage.tsx";
-import {LoadingOverlay} from "../components/business/LoadingOverlay.tsx";
-import {ProjectNameInput} from "../components/business/ProjectNameInput.tsx";
-import {ProjectDescriptionInput} from "../components/business/ProjectDescriptionInput.tsx";
-import {ProjectVisibilityRadio} from "../components/business/ProjectVisibilityRadio.tsx";
-import {ProjectTagInput} from "../components/business/ProjectTagInput.tsx";
-import {ImageEditor} from "../components/business/ImageEditor.tsx";
-import {Background, BackgroundBorder, EdgePadding} from "../components/ui/Background.tsx";
-import {ErrorText, H1} from "../components/ui/Text.tsx";
-import {PrimaryButton} from "../components/ui/Button.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import type { Project } from "../types/project";
+import type { ProjectImage, ProjectImageElem } from "../types/image";
+import { getProject, updateProject } from "../api/projects.ts";
+import { getTagsForProject } from "../api/tags.ts";
+import { createImageForProject, deleteImageForProject, getImagesForProject, updateImageForProject } from "../api/images.ts";
+import { HttpStatusCode } from "axios";
+import { navToErrorPage } from "./ErrorPage.tsx";
+import { LoadingOverlay } from "../components/business/LoadingOverlay.tsx";
+import { ProjectNameInput } from "../components/business/ProjectNameInput.tsx";
+import { ProjectDescriptionInput } from "../components/business/ProjectDescriptionInput.tsx";
+import { ProjectVisibilityRadio } from "../components/business/ProjectVisibilityRadio.tsx";
+import { ProjectTagInput } from "../components/business/ProjectTagInput.tsx";
+import { ImageEditor } from "../components/business/ImageEditor.tsx";
+import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
+import { ErrorText, H1 } from "../components/ui/Text.tsx";
+import { PrimaryButton } from "../components/ui/Button.tsx";
 import { Validator } from "../Validator.ts";
 
 export function EditProjectPage() {
-    const {username} = useParams<{ username: string }>()
-    const {projectName} = useParams<{ projectName: string }>()
-    const [project, setProject] = useState<Project>(null)
+    const { username } = useParams<{ username: string }>()
+    const { projectName } = useParams<{ projectName: string }>()
+    const [project, setProject] = useState<Project|null>(null)
     const [name, setName] = useState<string>("")
     const [description, setDescription] = useState<string>("")
-    const [visibility, setVisibility] =  useState<'public' | 'private'>('private')
+    const [visibility, setVisibility] = useState<'public' | 'private'>('private')
     const [tags, setTags] = useState<string[]>([])
     const [images, setImages] = useState<ProjectImageElem[]>([])
     const [deletedImages, setDeletedImages] = useState<ProjectImage[]>([])
@@ -37,13 +37,9 @@ export function EditProjectPage() {
 
     useEffect(() => {
         if (!projectName) {
-            setError("Null project name");
-            navToErrorPage(nav, error);
             return;
         }
         if (!username) {
-            setError("Null username");
-            navToErrorPage(nav, error);
             return;
         }
 
@@ -56,7 +52,7 @@ export function EditProjectPage() {
                 setIsLoadingProject(false);
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             })
 
         getTagsForProject(username, projectName)
@@ -69,7 +65,7 @@ export function EditProjectPage() {
                 setIsLoadingTags(false);
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             })
 
         getImagesForProject(username, projectName)
@@ -78,26 +74,26 @@ export function EditProjectPage() {
                 setIsLoadingImages(false);
             })
             .catch(err => {
-                navToErrorPage(nav, err);
+                navToErrorPage({ nav, err });
             })
 
     }, [username, projectName]);
 
     useEffect(() => {
         Validator.getInstance()
-        .then((res) => {
-            setValidator(res);
-        })
-        .catch((err) => {
-            navToErrorPage(nav, err);
-        });
+            .then((res) => {
+                setValidator(res);
+            })
+            .catch((err) => {
+                navToErrorPage({ nav, err });
+            });
     }, []);
 
     const addDeletedImage = ((image: ProjectImage) => {
         setDeletedImages([...deletedImages, image])
     })
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault()
         setError(null)
 
@@ -105,9 +101,7 @@ export function EditProjectPage() {
             setError("Please fill in all fields.")
             return;
         }
-        if (!username) {
-            setError("Null username");
-            navToErrorPage(nav, error);
+        if (!username || !project) {
             return;
         }
 
@@ -128,8 +122,8 @@ export function EditProjectPage() {
             return;
         }
 
-        for (let i : number = 0; i < tags.length; i++) {
-            const tag : string = tags[i];
+        for (let i: number = 0; i < tags.length; i++) {
+            const tag: string = tags[i];
             if (!(new RegExp(validator.getTagRegex()).test(tag))) {
                 setError(validator.getTagMessage());
                 return;
@@ -144,7 +138,8 @@ export function EditProjectPage() {
                 const res = await deleteImageForProject(username, trimmedName, img.id)
                 if (res.status !== HttpStatusCode.NoContent) {
                     setError(`${res.statusText}: Failed to delete image with id=${img.id}`)
-                    navToErrorPage(nav, error);
+                    console.log(error);
+                    return;
                 }
             }
 
@@ -152,7 +147,7 @@ export function EditProjectPage() {
             const positionToImageMap = new Map<number, ProjectImage>();
 
             for (let i = 0; i < images.length; i++) {
-                const image : ProjectImageElem = images[i];
+                const image: ProjectImageElem = images[i];
                 // If the image already exists, just map it to its new position
                 if ("id" in image) {
                     positionToImageMap.set(i, image);
@@ -164,7 +159,11 @@ export function EditProjectPage() {
 
             // update all images using the map
             for (let i = 0; i < images.length; i++) {
-                const image: ProjectImage = positionToImageMap.get(i);
+                const image: ProjectImage | undefined = positionToImageMap.get(i);
+                if (!image) {
+                    console.log(`image ${i} is null`);
+                    return;
+                }
                 await updateImageForProject(username, trimmedName, image.id, i, image.url, image.caption, image.dateTime);
             }
 
@@ -172,11 +171,14 @@ export function EditProjectPage() {
         }
         catch (err) {
             // todo handle unavailable names without nav
-            navToErrorPage(nav, err);
+            navToErrorPage({ nav, err });
         }
     };
 
     const isLoading = isLoadingProject || isLoadingTags || isLoadingImages;
+    if (!projectName) {
+        return;
+    }
 
     return (
         <Background>
@@ -197,12 +199,12 @@ export function EditProjectPage() {
                             <ProjectTagInput tags={tags} setTags={setTags} />
                         </div>}
                         {!isLoadingImages && <div className="mb-2">
-                            <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage}/>
+                            <ImageEditor projectName={projectName} images={images} setImages={setImages} addDeletedImage={addDeletedImage} />
                         </div>}
                         {error && <ErrorText className="mb-4" content={error} />}
                         <PrimaryButton type="submit" text="Save changes" disabled={validator !== undefined && isLoading && (name.trim() === "" || visibility.trim() === "")} />
                     </form>
-                    {isLoading && <LoadingOverlay/>}
+                    {isLoading && <LoadingOverlay />}
                 </EdgePadding>
             </BackgroundBorder>
         </Background>

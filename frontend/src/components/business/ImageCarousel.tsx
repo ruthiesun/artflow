@@ -1,10 +1,10 @@
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import type {ProjectImage} from "../../types/image";
-import {getImagesForProject} from "../../api/images.ts";
-import {LargeModal} from "../ui/Modal.tsx";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { ProjectImage } from "../../types/image";
+import { getImagesForProject } from "../../api/images.ts";
+import { LargeModal } from "../ui/Modal.tsx";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
-import {H1, H3, Text, TimestampText} from "../ui/Text.tsx";
+import { Text, TimestampText } from "../ui/Text.tsx";
 import { EdgePadding } from "../ui/Background.tsx";
 
 type ImageDisplayProps = {
@@ -13,13 +13,13 @@ type ImageDisplayProps = {
     onClick?: () => void;
 }
 
-function ImageDisplaySmall({image, className}: ImageDisplayProps) {
+function ImageDisplaySmall({ image, className }: ImageDisplayProps) {
     return (
         <img
-        src={image.url}
-        alt={`image in position: ${image.position}`}
-        className={`${className} h-full rounded-sm inline-block object-contain shadow-sm`}
-    />)
+            src={image.url}
+            alt={`image in position: ${image.position}`}
+            className={`${className} h-full rounded-sm inline-block object-contain shadow-sm`}
+        />)
 }
 
 type ImageDetailsProps = {
@@ -27,7 +27,7 @@ type ImageDetailsProps = {
     onClose: () => void
 }
 
-function ImageDetails({image, onClose}: ImageDetailsProps) {
+function ImageDetails({ image, onClose }: ImageDetailsProps) {
     return (
         <LargeModal content={
             <img src={image.url} alt="large image" className="object-contain w-full h-full" />
@@ -40,22 +40,21 @@ type ImageCarouselProps = {
     projectName: string;
 };
 
-export function ImageCarousel({ projectName, username}: ImageCarouselProps) {
+export function ImageCarousel({ projectName, username }: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
-    const [selectedImage, setSelectedImage] = useState<ProjectImage>(null)
+    const [selectedImage, setSelectedImage] = useState<ProjectImage | null>(null)
     const [showImageDetailsModal, setShowImageDetailsModal] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
         getImagesForProject(username, projectName)
-            .then((projectImages) =>
+            .then((projectImages: ProjectImage[]) =>
                 setImages(projectImages)
             )
-            .catch((err) => {
-                navToErrorPage(nav, err);
+            .catch((err: any) => {
+                navToErrorPage({ nav, err });
             })
-        }, []);
+    }, []);
 
     const prepareToShowImageDetails = (img: ProjectImage) => {
         setSelectedImage(img);
@@ -65,7 +64,7 @@ export function ImageCarousel({ projectName, username}: ImageCarouselProps) {
     return (
         <div className="flex-col flex justify-center items-center lg:items-start">
             {images.map((image, index) => (
-                <div key={image.position} className="w-full pb-1 md:pb-2">
+                <div key={index} className="w-full pb-1 md:pb-2">
                     <EdgePadding className="py-1 bg-surface">
                         <div className="flex flex-col items-center lg:flex-row lg:items-start max-w-full">
                             <img
@@ -91,18 +90,17 @@ export function ImageCarousel({ projectName, username}: ImageCarouselProps) {
     )
 }
 
-export function ImageCarouselPreview({ projectName, username}: ImageCarouselProps) {
+export function ImageCarouselPreview({ projectName, username }: ImageCarouselProps) {
     const [images, setImages] = useState<ProjectImage[]>([])
-    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate()
 
     useEffect(() => {
         getImagesForProject(username, projectName)
-            .then((projectImages) =>
+            .then((projectImages: ProjectImage[]) =>
                 setImages(projectImages)
             )
-            .catch((err) => {
-                navToErrorPage(nav, err);
+            .catch((err: any) => {
+                navToErrorPage({ nav, err });
             })
     }, []);
 
