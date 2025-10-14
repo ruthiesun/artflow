@@ -25,7 +25,7 @@ export function Background({ children }: BgProps) {
                     nav("/login");
                 })
                 .catch((err) => {
-                    navToErrorPage({nav, err});
+                    navToErrorPage({ nav, err });
                 });
         }
         nav("/login");

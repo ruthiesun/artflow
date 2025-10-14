@@ -1,8 +1,10 @@
 import axios from "axios";
 import { auth } from "./auth/firebase";
 
+export const base: string = "https://artflow-761n.onrender.com/api";
+
 const api = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: `${base}`,
     headers: {
         "Content-Type": "application/json"
     },
