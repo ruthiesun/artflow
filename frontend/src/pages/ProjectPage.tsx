@@ -73,9 +73,9 @@ export function ProjectPage() {
                             <DeleteButton type="button" text="Delete project" disabled={isLoading} onClick={() => setShowModal(true)} />
                         </div>
                     </div>
-                    <div className="flex flex-row">
+                    <div className="flex flex-wrap">
                         {tags.map((tag: ProjectTag) => (
-                            <div key={tag.tagName} className="mr-2">
+                            <div key={tag.tagName} className="mr-2 mb-2">
                                 <DisplayOnlyTagButton type="button" text={tag.tagName} />
                             </div>
                         ))}

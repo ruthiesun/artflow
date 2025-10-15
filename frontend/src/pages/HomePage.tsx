@@ -73,12 +73,12 @@ export function HomePage() {
                     <div>
                         <div className="flex flex-wrap">
                             {selectedTags.map((tag: Tag) => (
-                                <div key={tag.tagName} className="mr-2">
+                                <div key={tag.tagName} className="mr-2 mb-2">
                                     <SelectedTagButton type="button" text={tag.tagName} onClick={() => deselectTag(tag)} />
                                 </div>
                             ))}
                             {deselectedTags.map((tag: Tag) => (
-                                <div key={tag.tagName} className="mr-2">
+                                <div key={tag.tagName} className="mr-2 mb-2">
                                     <DeselectedTagButton type="button" text={tag.tagName} onClick={() => selectTag(tag)} />
                                 </div>
                             ))}
