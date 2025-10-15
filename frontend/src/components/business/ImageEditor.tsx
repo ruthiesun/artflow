@@ -117,12 +117,12 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
             <img src={image.url} alt="A project image" className={`object-cover w-full h-full z-0 ${imgOpacity} transition`} />
 
             <div className="absolute top-1 left-1 z-1 flex flex-row">
-                <ImageButton iconSrc="/src/assets/icons/edit.svg" alt="Edit" className="cursor-pointer"
+                <ImageButton iconSrc="/icons/edit.svg" alt="Edit" className="cursor-pointer"
                     onClick={(e) => {
                         e.stopPropagation(); // prevent drag handle click from triggering modal
                         onEdit(image);
                     }} />
-                <ImageButton iconSrc="/src/assets/icons/delete.svg" alt="Delete" className="cursor-pointer"
+                <ImageButton iconSrc="/icons/delete.svg" alt="Delete" className="cursor-pointer"
                     onClick={(e) => {
                         e.stopPropagation(); // prevent drag handle click from triggering modal
                         onDelete(image);
@@ -131,7 +131,7 @@ function SortableImage({ image, onEdit, onDelete }: SortableImageProps) {
                     {...listeners}
                     onMouseDown={() => setIsBeingMoved(true)}
                     onMouseUp={() => setIsBeingMoved(false)}>
-                    <ImageButton iconSrc="/src/assets/icons/drag.svg" alt="Move" className="cursor-grab" />
+                    <ImageButton iconSrc="/icons/drag.svg" alt="Move" className="cursor-grab" />
                 </div>
             </div>
         </div>
