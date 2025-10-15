@@ -8,7 +8,7 @@ import { ProjectPage } from "./pages/ProjectPage.tsx";
 import { NewProjectPage } from "./pages/NewProjectPage.tsx";
 import { EditProjectPage } from "./pages/EditProjectPage.tsx";
 import { ErrorPage } from "./pages/ErrorPage.tsx";
-// import { Root } from "./pages/Root.tsx";
+import { Root } from "./pages/Root.tsx";
 import { PublicRoute } from "./PublicRoute.tsx"
 import { ProtectedRoute } from "./ProtectedRoute.tsx"
 import { PrivateRoute } from "./PrivateRoute.tsx"
@@ -30,7 +30,7 @@ const App = () => {
                 <Route path="/:username/projects/:projectName" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} />
                 <Route path="/:username/projects/:projectName/edit" element={<PrivateRoute><EditProjectPage /></PrivateRoute>} />
                 <Route path="/error" element={<ErrorPage />} />
-                {/* <Route path="/*" element={<Root />} /> */}
+                <Route path="/*" element={<Root />} />
             </Routes>
         </Router>
     );
