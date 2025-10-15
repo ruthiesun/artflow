@@ -99,7 +99,7 @@ export function AddImageModal({ projectName, setImages, images, onClose }: AddIm
             return
         }
 
-        const dateTime: string | null = date === "" ? null : (new Date(date + "T00:00:00")).toDateString();
+        const dateTime: string | null = date === "" ? null : (new Date(date + "T00:00:00")).toString();
 
         const newImage: ProjectImagePrePersist = { position: images.length, caption: caption, dateTime: dateTime, url: url, projectName: projectName }
         setImages([...images, newImage]);
