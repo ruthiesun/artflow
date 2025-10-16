@@ -2,7 +2,11 @@
 
 A full-stack web application for documenting art projects.
 
-See a demo here.
+See a demo [here](https://artflow-demo.onrender.com/ruthie/projects/). Login credentials for demo account are the following:
+
+Email: ruthieismakinganapp@gmail.com
+
+Password: N6MUh56qwUNmFjR?
 
 View my personal page [here](https://artflow-demo.onrender.com/ruthie/projects/).
 
@@ -91,6 +95,7 @@ Note that the backend will likely take a minute or two to spin up (the page will
 /api/<username>/projects/<project_name>/tags/<tag_name> (GET)
 
 /api/<username>/projects/<project_name>/tags/<tag_name> (DELETE)
+
 
 
 
