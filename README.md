@@ -1,120 +1,96 @@
-# Artflow (README is out-of-date/WIP) 🎨
+# Artflow
 
-Artflow is a full-stack web application for uploading and organizing works-in-progress, final art pieces, and project timelines. It allows artists to keep their work organized, private or public, and optionally tagged by medium, style, or other categories.
+A full-stack web application for documenting art projects.
 
----
+See a demo here.
 
-## ✨ Features
+View my personal page [here](https://artflow-demo.onrender.com/ruthie/projects/).
 
-- ✅ User authentication with Spring Security
-- ✅ Image uploads (WIP, final product, sketches)
-- ✅ Tagging system for projects
-- ✅ Public/private visibility options
-- ✅ Projects grouped by creation date and art type
-- ✅ Clean, responsive UI (to be designed)
-- ✅ TDD (Test-Driven Development) for backend services
+Note that the backend will likely take a minute or two to spin up (the page will look pretty empty until then).
 
 ---
 
-## 📁 Project Structure
+## Features
 
-    artflow/
-    ├── src/
-    │ ├── main/
-    │ │ ├── java/com/artflow/artflow/
-    │ │ │ ├── controller/
-    │ │ │ ├── model/
-    │ │ │ ├── repository/
-    │ │ │ ├── service/
-    │ │ │ └── ArtflowApplication.java
-    │ │ └── resources/
-    │ │ ├── application.properties
-    │ │ └── static/ # For static frontend files (if applicable)
-    │ └── test/java/com/artflow/artflow/
-    │ ├── controller/
-    │ ├── service/
-    │ └── ArtflowApplicationTests.java
-    ├── .env # Local dev secrets (ignored by Git)
-    ├── .gitignore
-    ├── README.md
-    ├── pom.xml
-    └── seed/ # DB seed and test data
-    ├── test_data.sql
-    └── schema.sql
+- User authentication with Firebase
+- Account verification and password reset with JWTs and Spring Security
+- Tagging system for projects
+- Public/private visibility options
+- Responsive UI
 
+## Project Structure
+
+### Backend
+
+- Spring Boot, Hibernate
+- MVC architecture
+- Developed with a TDD approach, with JUnit tests for the model and controller layers
+- Controller: Input validation with DTO objects and invokes the service layer
+- Service: Business logic involving the model layer POJOs
+- Repository: Queries the database, returning model layer POJOs
+- Model: POJOs used by Hibernate to map to the database
+- Implements a REST API
+
+### Frontend
+
+- React, TypeScript, Tailwind CSS, Axios, Vite
+- Routing with React Router
+- Authentication with the Firebase SDK and a React context
+- Styling delegated to Tailwind theme configurations and base React components (e.g. styled buttons, plain text, headers...)
 
 ---
 
-## 🚀 Getting Started
+## REST API endpoints
 
-### ✅ Prerequisites
+### Authentication
 
-- Java 20+
-- Maven
-- Git
-- [Neon](https://neon.tech) for PostgreSQL
+/api/auth/register (POST)
 
-### 🛠️ Setup
+/api/auth/login (POST)
 
-1. **Clone the repo:**
+/api/auth/logout (POST)
 
-   ```bash
-   git clone https://github.com/your-username/artflow.git
-   cd artflow
+/api/auth/verify (GET)
 
-2. Create .env in the root of the project:
+/api/auth/resetRequest (POST)
 
-    ```text
-    DB_URL=jdbc:postgresql://your-neon-db-url
-    DB_USERNAME=your_db_user
-    DB_PASSWORD=your_db_password
+/api/auth/reset (POST)
 
-3. Run the app:
+### PROJECTS
 
-    ```bash
-    ./mvnw spring-boot:run
+/api/<username>/projects (POST)
 
-Or from IntelliJ: run ArtflowApplication.java
+/api/<username>/projects (GET)
 
-4. Access it at:
+/api/<username>/projects (PUT)
 
-http://localhost:8080
+/api/<username>/projects/<project_name> (GET)
 
-### 🛠️ Testing
-Run all tests:
+/api/<username>/projects/<project_name> (DELETE)
 
-    ./mvnw test
+### IMAGES
 
-Tests live under src/test/java.
+/api/<username>/projects/<project_name>/images (POST)
 
-## 🛣️ Roadmap
-### ✅ v1.0 MVP
--[ ] Spring Boot backend
--[ ] Security (basic auth)
--[ ] Neon integration
--[ ] Image upload support (via external service or database)
--[ ] Project model: multiple images, tags, visibility
--[ ] Public/private viewing permissions
--[ ] Responsive-friendly backend endpoints
+/api/<username>/projects/<project_name>/images (GET)
 
-### ⏳ v1.1 (Next)
--[ ] Implement UI with modern frontend (React, Next.js, etc.)
--[ ] OAuth 2.0 login (Google, GitHub)
--[ ] Frontend testing (Jest, Cypress)
--[ ] Form validation and error handling
+/api/<username>/projects/<project_name>/images (PUT)
 
-### 🛡️ Environment and Security
-- .env is excluded from Git to protect secrets
-- Use dotenv-java to load environment variables
+/api/<username>/projects/<project_name>/images/<image_id> (GET)
 
-### 🧰 Tech Stack
-- Backend: Java, Spring Boot, Spring Security, JPA
-- Database: PostgreSQL (hosted via Neon)
-- Frontend (planned): React (or similar)
-- Testing: JUnit, Mockito
-- Deployment: TBD (Netlify, Vercel, Render, or Railway)
+/api/<username>/projects/<project_name>/images/<image_id> (DELETE)
 
-🖼️ Image Hosting
-- Images may be stored in:
-- A cloud file service (Cloudinary, Firebase Storage, S3-compatible API)
-- Or in PostgreSQL as base64 blobs (not preferred for large files)
+### TAGS
+
+/api/<username>/tags (GET)
+
+/api/<username>/projects/<project_name>/tags (POST)
+
+/api/<username>/projects/<project_name>/tags (GET)
+
+/api/<username>/projects/<project_name>/tags/<tag_name> (GET)
+
+/api/<username>/projects/<project_name>/tags/<tag_name> (DELETE)
+
+
+
