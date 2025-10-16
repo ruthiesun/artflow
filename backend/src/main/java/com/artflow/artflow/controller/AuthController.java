@@ -6,6 +6,7 @@ import com.artflow.artflow.dto.ResetRequestDto;
 import com.artflow.artflow.dto.TokenDto;
 import com.artflow.artflow.dto.LoginDto;
 import com.artflow.artflow.dto.SignupDto;
+import com.artflow.artflow.exception.DemoException;
 import com.artflow.artflow.exception.LoginAttemptException;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.AuthService;
@@ -40,8 +41,9 @@ public class AuthController {
 
 	@PostMapping(UriUtil.SIGNUP)
 	public ResponseEntity<String> register(@Valid @RequestBody SignupDto request) {
-		authService.register(request);
-		return ResponseEntity.ok("An email with a verification link has been sent to " + request.getEmail() + ".");
+        throw new DemoException();
+//		authService.register(request);
+//		return ResponseEntity.ok("An email with a verification link has been sent to " + request.getEmail() + ".");
 	}
 	
 	@PostMapping(UriUtil.LOGIN)
@@ -61,20 +63,23 @@ public class AuthController {
 	
 	@GetMapping(UriUtil.VERIFY)
 	public ResponseEntity<String> verifyUser(@RequestParam("token") String token) {
-		authService.verify(token);
-		return ResponseEntity.ok("Account has been verified.");
+        throw new DemoException();
+//		authService.verify(token);
+//		return ResponseEntity.ok("Account has been verified.");
 	}
 	
 	@PostMapping(UriUtil.PASSWORD_RESET_REQUEST)
 	public ResponseEntity<String> resetPasswordRequest(@Valid @RequestBody ResetRequestDto resetRequestDto) {
-		authService.sendResetEmail(resetRequestDto);
-		return ResponseEntity.ok("A reset link will be sent to the provided email, if an account exists.");
+        throw new DemoException();
+//		authService.sendResetEmail(resetRequestDto);
+//		return ResponseEntity.ok("A reset link will be sent to the provided email, if an account exists.");
 	}
 	
 	@PostMapping(UriUtil.PASSWORD_RESET)
 	public ResponseEntity<Void> resetPassword(@RequestParam("token") String token, @Valid @RequestBody ResetDto resetDto) {
-		authService.reset(resetDto, token);
-		return ResponseEntity.ok().build();
+        throw new DemoException();
+//		authService.reset(resetDto, token);
+//		return ResponseEntity.ok().build();
 	}
 	
 }

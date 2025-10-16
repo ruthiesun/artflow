@@ -4,6 +4,7 @@ import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.ProjectImageCreateDto;
 import com.artflow.artflow.dto.ProjectImageDto;
 import com.artflow.artflow.dto.ProjectImageUpdateDto;
+import com.artflow.artflow.exception.DemoException;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectImageService;
 import jakarta.validation.Valid;
@@ -33,6 +34,9 @@ public class ProjectImageController {
 	@PostMapping
 	public ResponseEntity<ProjectImageDto> create(@PathVariable String username, @PathVariable String projectName,
 												  @Valid @RequestBody ProjectImageCreateDto projectImageCreateDto, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		ProjectImageDto projectImageDto = projectImageService.create(username, projectName, projectImageCreateDto, user.id());
 		return ResponseEntity.created(URI.create(
 				UriUtil.getImageUri(
@@ -57,12 +61,18 @@ public class ProjectImageController {
 	@PutMapping
 	public ResponseEntity<ProjectImageDto> update(@PathVariable String username, @Valid @RequestBody ProjectImageUpdateDto projectImageUpdateDto,
 												  @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		return ResponseEntity.ok(projectImageService.updateProjectImage(username, projectImageUpdateDto, user.id()));
 	}
 	
 	@DeleteMapping(UriUtil.IMAGE)
 	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName,
 									   @PathVariable Long imageId, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		projectImageService.deleteProjectImage(username, imageId, user.id());
 		return ResponseEntity.noContent().build();
 	}

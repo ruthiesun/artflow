@@ -4,6 +4,7 @@ import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.ProjectTagCreateDto;
 import com.artflow.artflow.dto.ProjectTagDto;
 import com.artflow.artflow.dto.TagDto;
+import com.artflow.artflow.exception.DemoException;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectTagService;
 import jakarta.validation.Valid;
@@ -32,6 +33,9 @@ public class ProjectTagController {
 	@PostMapping(UriUtil.PROJECTS + UriUtil.PROJECT + UriUtil.TAGS)
 	public ResponseEntity<ProjectTagDto> create(@PathVariable String username, @Valid @RequestBody ProjectTagCreateDto projectTagCreateDto,
 												@AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		ProjectTagDto tagDto = projectTagService.create(username, projectTagCreateDto, user.id());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectTagUri(
@@ -68,6 +72,9 @@ public class ProjectTagController {
 	@DeleteMapping(UriUtil.PROJECTS + UriUtil.PROJECT +  UriUtil.TAGS + UriUtil.TAG)
 	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName,
 									   @PathVariable String tagName, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		projectTagService.deleteTag(
 				username,
 				UriUtil.fromSlug(projectName),

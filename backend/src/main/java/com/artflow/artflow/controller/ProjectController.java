@@ -4,6 +4,7 @@ import com.artflow.artflow.common.UriUtil;
 import com.artflow.artflow.dto.ProjectDto;
 import com.artflow.artflow.dto.ProjectCreateDto;
 import com.artflow.artflow.dto.ProjectUpdateDto;
+import com.artflow.artflow.exception.DemoException;
 import com.artflow.artflow.security.user.AuthUser;
 import com.artflow.artflow.service.ProjectService;
 import jakarta.validation.Valid;
@@ -35,6 +36,11 @@ public class ProjectController {
 	
 	@PostMapping
 	public ResponseEntity<ProjectDto> create(@PathVariable String username, @Valid @RequestBody ProjectCreateDto projectCreateDto, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			System.out.println("should print");
+			throw new DemoException();
+		}
+		System.out.println("should not print");
 		ProjectDto projectDto = projectService.create(username, projectCreateDto, user.id());
 		return ResponseEntity
 				.created(URI.create(UriUtil.getProjectUri(
@@ -58,11 +64,17 @@ public class ProjectController {
 	
 	@PutMapping()
 	public ResponseEntity<ProjectDto> update(@PathVariable String username, @Valid @RequestBody ProjectUpdateDto projectUpdateDto, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		return ResponseEntity.ok(projectService.updateProject(username, projectUpdateDto, user.id()));
 	}
 	
 	@DeleteMapping(UriUtil.PROJECT)
 	public ResponseEntity<Void> delete(@PathVariable String username, @PathVariable String projectName, @AuthenticationPrincipal AuthUser user) {
+		if (username.equals("demo")) {
+			throw new DemoException();
+		}
 		projectService.deleteProject(username, UriUtil.fromSlug(projectName), user.id());
 		return ResponseEntity.noContent().build();
 	}

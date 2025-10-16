@@ -56,6 +56,12 @@ public class ApiExceptionHandler {
 			.body(Map.of("error", ex.getMessage()));
 	}
 	
+	@ExceptionHandler(DemoException.class)
+	public ResponseEntity<?> handleDemo(DemoException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(Map.of("error", ex.getMessage()));
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handleGeneral(Exception ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
