@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage.tsx";
 import { HomePage } from "./pages/HomePage.tsx";
 import { RegisterPage } from "./pages/RegisterPage.tsx";
@@ -25,6 +25,7 @@ const App = () => {
                 <Route path="/register-success" element={<PublicRoute><RegisterSuccessPage /></PublicRoute>} />
                 <Route path="/reset-request" element={<PublicRoute><ResetPasswordRequestPage /></PublicRoute>} />
                 <Route path="/verify" element={<PublicRoute><VerifySuccessPage /></PublicRoute>} />
+                <Route path="/:username" element={<ProtectedRoute><RedirectToHome /></ProtectedRoute>} />
                 <Route path="/:username/projects" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
                 <Route path="/:username/projects/new" element={<PrivateRoute><NewProjectPage /></PrivateRoute>} />
                 <Route path="/:username/projects/:projectName" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} />
@@ -34,6 +35,16 @@ const App = () => {
             </Routes>
         </Router>
     );
+}
+
+function RedirectToHome() {
+    const { username } = useParams<{ username: string }>();
+
+    if (!username) {
+        return;
+    }
+
+    return <Navigate to={`/${username}/projects`} replace />;
 }
 
 export default App;
