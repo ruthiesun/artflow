@@ -12,6 +12,7 @@ import { ImageCarousel } from "../components/business/ImageCarousel.tsx";
 import { DisplayOnlyTagButton, DeleteButton, SecondaryButton } from "../components/ui/Button.tsx";
 import { Background, BackgroundBorder, EdgePadding } from "../components/ui/Background.tsx";
 import { H1, Text, TimestampText } from "../components/ui/Text.tsx";
+import { getDateTimeStringLocal, toISO } from "../util/date.ts";
 
 export function ProjectPage() {
     const { username } = useParams<{ username: string }>();
@@ -47,14 +48,6 @@ export function ProjectPage() {
 
     }, [username, projectName]);
 
-    function getPrettyTime(timeString: string): string {
-        return (new Date(timeString)).toLocaleTimeString(undefined, {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,   // enables AM/PM
-        });
-    }
-
     const modButtonClassName = username === getUsername() ? "" : "hidden";
     if (!project || !username) {
         return;
@@ -81,8 +74,8 @@ export function ProjectPage() {
                         ))}
                     </div>
                     {!isLoading && <div className="mt-4 mb-4">
-                        <TimestampText content={`Created: ${project.createdDateTime.split("T")[0]} ${getPrettyTime(project.createdDateTime)}`} />
-                        <TimestampText content={`Last updated: ${project.updatedDateTime.split("T")[0]} ${getPrettyTime(project.updatedDateTime)}`} />
+                        <TimestampText content={`Created: ${getDateTimeStringLocal(toISO(project.createdDateTime))}`} />
+                        <TimestampText content={`Last updated: ${getDateTimeStringLocal(toISO(project.updatedDateTime))}`} />
                         <Text content={project.description} />
                     </div>}
                 </EdgePadding>

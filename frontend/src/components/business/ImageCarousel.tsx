@@ -6,6 +6,7 @@ import { LargeModal } from "../ui/Modal.tsx";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 import { Text, TimestampText } from "../ui/Text.tsx";
 import { EdgePadding } from "../ui/Background.tsx";
+import { getDateStringLocal, toISO } from "../../util/date.ts";
 
 type ImageDisplayProps = {
     image: ProjectImage;
@@ -77,7 +78,7 @@ export function ImageCarousel({ projectName, username }: ImageCarouselProps) {
                                 {image.dateTime == null ? (
                                     <TimestampText content="Date unknown" />
                                 ) : (
-                                    <TimestampText content={`${image.dateTime.split("T")[0]}`} />
+                                    <TimestampText content={`${getDateStringLocal(toISO(image.dateTime))}`} />
                                 )}
                                 <Text content={image.caption} />
                             </div>

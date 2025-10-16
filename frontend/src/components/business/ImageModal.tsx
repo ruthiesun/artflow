@@ -7,6 +7,7 @@ import { ErrorText } from "../ui/Text.tsx";
 import { Validator } from "../../Validator.ts";
 import { navToErrorPage } from "../../pages/ErrorPage.tsx";
 import { useNavigate } from "react-router-dom";
+import { getDateTimeStringUTC } from "../../util/date.ts";
 
 type EditImageModalProps = {
     editingImage: ProjectImageElem,
@@ -53,7 +54,7 @@ export function EditImageModal({ editingImage, setImages, images, onClose }: Edi
             return;
         }
 
-        const newDateTime: string = date === "" ? "" : date + "T00:00:00";
+        const newDateTime: string | null = getDateTimeStringUTC(date);
 
         const updatedImages: ProjectImageElem[] = images.map((img: ProjectImageElem) =>
             img.position === editingImage.position
@@ -125,7 +126,7 @@ export function AddImageModal({ projectName, setImages, images, onClose }: AddIm
             return;
         }
 
-        const dateTime: string | null = date === "" ? null : date + "T00:00:00";
+        const dateTime: string | null = getDateTimeStringUTC(date);
 
         const newImage: ProjectImagePrePersist = { position: images.length, caption: caption, dateTime: dateTime, url: url, projectName: projectName }
         setImages([...images, newImage]);
