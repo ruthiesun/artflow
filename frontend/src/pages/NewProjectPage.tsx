@@ -74,7 +74,7 @@ export function NewProjectPage() {
                 nav("/" + username + "/projects/" + createdProject.projectName, { replace: true })
             })
             .catch(err => {
-                navToErrorPage({ nav, err });
+                setError(err.response.data.error);
             });
     }
 

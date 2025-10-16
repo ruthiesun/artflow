@@ -169,9 +169,8 @@ export function EditProjectPage() {
 
             nav("/" + username + "/projects/" + trimmedName, { replace: true })
         }
-        catch (err) {
-            // todo handle unavailable names without nav
-            navToErrorPage({ nav, err });
+        catch (err: any) {
+            setError(err.response.data.error);
         }
     };
 

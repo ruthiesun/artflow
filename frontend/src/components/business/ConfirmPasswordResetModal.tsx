@@ -23,7 +23,7 @@ export function ConfirmPasswordResetModal({ onClose }: ConfirmPasswordResetProps
             .then(() => {
                 nav("/reset-request");
             })
-            .catch(err => setError(err.message));
+            .catch(err => setError(err.response.data.error));
     };
 
     return (

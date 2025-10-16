@@ -60,7 +60,7 @@ export function RegisterPage() {
         register(email, username, password)
             .then(() => {
                 nav("/register-success");
-            }).catch(err => setError(err.message))
+            }).catch(err => setError(err.response.data.error));
     };
 
     return (

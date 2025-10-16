@@ -57,7 +57,7 @@ export function ResetPasswordPage() {
         reset(password, token)
             .then(() => {
                 nav("/login");
-            }).catch(err => setError(err.message))
+            }).catch(err => setError(err.response.data.error));
     };
 
     return (

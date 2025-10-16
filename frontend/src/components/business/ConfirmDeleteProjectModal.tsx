@@ -25,14 +25,16 @@ export function ConfirmDeleteProjectModal({ projectName, username, onClose }: Co
             .then(() => {
                 nav("/projects")
             })
-            .catch(err => setError(err.message));
+            .catch(err => setError(err.response.data.error));
     };
 
     return (
         <SmallModal content={
             (
                 <div>
-                    <Text content="Confirm the name of the project to delete." />
+                    <div className="mb-2">
+                        <Text content="Confirm the name of the project to delete." />
+                    </div>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-2">
                             <Input label="Project name" type="text" value={typedName} setValue={setTypedName} />
