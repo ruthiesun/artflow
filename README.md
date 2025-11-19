@@ -48,53 +48,54 @@ Note that the backend will likely take a minute or two to spin up (the page will
 
 ### Authentication
 
-/api/auth/register (POST)
+`/api/auth/register (POST)`
 
-/api/auth/login (POST)
+`/api/auth/login (POST)`
 
-/api/auth/logout (POST)
+`/api/auth/logout (POST)`
 
-/api/auth/verify (GET)
+`/api/auth/verify (GET)`
 
-/api/auth/resetRequest (POST)
+`/api/auth/resetRequest (POST)`
 
-/api/auth/reset (POST)
+`/api/auth/reset (POST)`
 
 ### PROJECTS
 
-/api/<username>/projects (POST)
+`/api/<username>/projects/?tags=<tag_name>&visibility=<public_or_private>`
 
-/api/<username>/projects (GET)
+`/api/<username>/projects (GET)`
 
-/api/<username>/projects (PUT)
+`/api/<username>/projects (PUT)`
 
-/api/<username>/projects/<project_name> (GET)
+`/api/<username>/projects/<project_name> (GET)`
 
-/api/<username>/projects/<project_name> (DELETE)
+`/api/<username>/projects/<project_name> (DELETE)`
 
 ### IMAGES
 
-/api/<username>/projects/<project_name>/images (POST)
+`/api/<username>/projects/<project_name>/images (POST)`
 
-/api/<username>/projects/<project_name>/images (GET)
+`/api/<username>/projects/<project_name>/images (GET)`
 
-/api/<username>/projects/<project_name>/images (PUT)
+`/api/<username>/projects/<project_name>/images (PUT)`
 
-/api/<username>/projects/<project_name>/images/<image_id> (GET)
+`/api/<username>/projects/<project_name>/images/<image_id> (GET)`
 
-/api/<username>/projects/<project_name>/images/<image_id> (DELETE)
+`/api/<username>/projects/<project_name>/images/<image_id> (DELETE)`
 
 ### TAGS
 
-/api/<username>/tags (GET)
+`/api/<username>/tags (GET)`
 
-/api/<username>/projects/<project_name>/tags (POST)
+`/api/<username>/projects/<project_name>/tags (POST)`
 
-/api/<username>/projects/<project_name>/tags (GET)
+`/api/<username>/projects/<project_name>/tags (GET)`
 
-/api/<username>/projects/<project_name>/tags/<tag_name> (GET)
+`/api/<username>/projects/<project_name>/tags/<tag_name> (GET)`
 
-/api/<username>/projects/<project_name>/tags/<tag_name> (DELETE)
+`/api/<username>/projects/<project_name>/tags/<tag_name> (DELETE)`
+
 
 
 
