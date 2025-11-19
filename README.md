@@ -62,9 +62,9 @@ Note that the backend will likely take a minute or two to spin up (the page will
 
 ### PROJECTS
 
-`/api/<username>/projects/?tags=<tag_name>&visibility=<public_or_private>`
+`/api/<username>/projects (POST)`
 
-`/api/<username>/projects (GET)`
+`/api/<username>/projects/?tags=<tag_name>&visibility=<public_or_private> (GET)`
 
 `/api/<username>/projects (PUT)`
 
@@ -95,6 +95,7 @@ Note that the backend will likely take a minute or two to spin up (the page will
 `/api/<username>/projects/<project_name>/tags/<tag_name> (GET)`
 
 `/api/<username>/projects/<project_name>/tags/<tag_name> (DELETE)`
+
 
 
 
